@@ -74,3 +74,4 @@ target_link_libraries(lm_alpha
 # Install targets
 install(TARGETS lm_core DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
+
