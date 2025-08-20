@@ -14,8 +14,7 @@ class ShutdownHandler {
 public:
     // Serialize state to JSON
     static void save_state(
-        const std::filesystem::path& output_path,
-        bool include_model_weights = false
+        const std::filesystem::path& output_path
     );
     
     // Cleanup hooks

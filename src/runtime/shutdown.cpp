@@ -1,5 +1,6 @@
 #include "lm/runtime/init.hpp"
 #include "lm/runtime/shutdown.hpp"
+#include <sstream>
 #include <fstream>
 #include <vector>
 #include <mutex>
@@ -12,8 +13,7 @@ namespace {
 }
 
 void ShutdownHandler::save_state(
-    const std::filesystem::path& output_path,
-    bool include_model_weights) 
+    const std::filesystem::path& output_path) 
 {
     try {
         nlohmann::json state;

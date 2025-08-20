@@ -7,6 +7,8 @@
 #include <memory>
 #include <utility>
 #include <cstdint>  // For uint16_t
+#include <queue>
+#include <functional>
 
 namespace lm {
     
