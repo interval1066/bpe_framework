@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.6)
+project(lm_framework)
+
 add_library(lm_tokenizer
     bpe_tokenizer.cpp
     unicode_utils.cpp
