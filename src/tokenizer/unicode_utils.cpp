@@ -22,7 +22,7 @@ bool is_punctuation(uint32_t codepoint) {
 }
 
 bool is_control(uint32_t codepoint) {
-    return u_isCntrl(codepoint);
+    return u_iscntrl(codepoint);
 }
 
 std::string normalize(const std::string& text) {

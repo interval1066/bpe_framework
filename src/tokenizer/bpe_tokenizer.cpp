@@ -42,6 +42,7 @@ BPETokenizer::BPETokenizer() : pimpl_(new Impl) {
 
 BPETokenizer::~BPETokenizer() = default;
 
+/*==========================
 void BPETokenizer::Impl::initialize_vocab() {
     // Add basic bytes to vocabulary
     for (int i = 0; i < 256; i++) {
@@ -56,6 +57,27 @@ void BPETokenizer::Impl::initialize_vocab() {
     unknown_token_id = vocab[unknown_token];  // This line should set unknown_token_id
 }
 
+=========================*/
+void BPETokenizer::Impl::initialize_vocab() {
+    // Add basic bytes to vocabulary
+    for (int i = 0; i < 256; i++) {
+        std::string token(1, static_cast<char>(i));
+        vocab[token] = next_token_id;
+        inv_vocab[next_token_id] = token;
+        next_token_id++;
+    }
+    
+    // Add special tokens directly instead of calling add_special_token
+    if (vocab.find(unknown_token) == vocab.end()) {
+        vocab[unknown_token] = next_token_id;
+        inv_vocab[next_token_id] = unknown_token;
+        special_tokens[unknown_token] = next_token_id;
+        unknown_token_id = next_token_id;
+        next_token_id++;
+    }
+}
+
+//=======================
 std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text) const {
     if (normalization_enabled) {
         std::string normalized = unicode::normalize(text);

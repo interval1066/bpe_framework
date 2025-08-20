@@ -1,3 +1,4 @@
+#include "lm/runtime/init.hpp"
 #include "lm/runtime/shutdown.hpp"
 #include <fstream>
 #include <vector>
