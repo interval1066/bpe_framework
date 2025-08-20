@@ -1,7 +1,7 @@
 # bpe_framework
 Large Language Model for Agentic AI
 
-Biuld: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 
 #### The test_bpe application does the following:
  1. Includes necessary headers and defines the main function.
