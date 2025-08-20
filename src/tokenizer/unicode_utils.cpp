@@ -57,7 +57,15 @@ std::vector<CodePoint> to_code_points(const std::string& text) {
         U8_NEXT(text.c_str(), i, text.size(), codepoint);
         
         if (codepoint == U_SENTINEL) {
-            throw std::runtime_error("Invalid UTF-8 sequence");
+            // Handle invalid UTF-8 gracefully instead of throwing
+            // Use replacement character (U+FFFD) for invalid sequences
+            cp.value = 0xFFFD;
+            cp.utf8 = "�";  // Replacement character
+            code_points.push_back(cp);
+            
+            // Skip this byte and continue
+            i++;
+            continue;
         }
         
         // Get the UTF-8 bytes for this code point
