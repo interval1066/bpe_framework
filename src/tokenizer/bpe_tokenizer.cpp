@@ -5,6 +5,7 @@ Here's the complete `src/tokenizer/bpe_tokenizer.cpp` file:
 ```cpp*/
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include "lm/tokenizer/unicode_utils.hpp"
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <queue>
@@ -42,22 +43,6 @@ BPETokenizer::BPETokenizer() : pimpl_(new Impl) {
 
 BPETokenizer::~BPETokenizer() = default;
 
-/*==========================
-void BPETokenizer::Impl::initialize_vocab() {
-    // Add basic bytes to vocabulary
-    for (int i = 0; i < 256; i++) {
-        std::string token(1, static_cast<char>(i));
-        vocab[token] = next_token_id;
-        inv_vocab[next_token_id] = token;
-        next_token_id++;
-    }
-    
-    // Add special tokens
-    add_special_token(unknown_token);
-    unknown_token_id = vocab[unknown_token];  // This line should set unknown_token_id
-}
-
-=========================*/
 void BPETokenizer::Impl::initialize_vocab() {
     // Add basic bytes to vocabulary
     for (int i = 0; i < 256; i++) {
@@ -77,7 +62,6 @@ void BPETokenizer::Impl::initialize_vocab() {
     }
 }
 
-//=======================
 std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text) const {
     if (normalization_enabled) {
         std::string normalized = unicode::normalize(text);
@@ -193,26 +177,43 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     // Count word frequencies
     std::unordered_map<std::string, int> word_counts;
     pimpl_->count_word_frequencies(words, word_counts);
-    
-    // BPE training algorithm
-    while (pimpl_->vocab.size() < vocab_size) {
+
+    int iteration = 0;
+    int max_iterations = 10000; // Safety limit
+
+    while (pimpl_->vocab.size() < vocab_size && iteration < max_iterations) {
         // Count pairs
         std::map<std::pair<int, int>, int> pair_counts;
         pimpl_->get_pair_counts(word_counts, pair_counts);
-        
+    
         if (pair_counts.empty()) {
-            break; // No more pairs to merge
+            std::cout << "No more pairs to merge. Stopping early." << std::endl;
+            break;
         }
-        
+    
         // Find most frequent pair
         auto max_pair = std::max_element(
             pair_counts.begin(), pair_counts.end(),
             [](const auto& a, const auto& b) { return a.second < b.second; }
         );
-        
+    
+        // Debug output
+        if (iteration % 100 == 0) {
+           std::cout << "Iteration " << iteration 
+                  << ", Vocab size: " << pimpl_->vocab.size()
+                  << ", Most frequent pair: (" << max_pair->first.first 
+                  << "," << max_pair->first.second << ") count: " 
+                  << max_pair->second << std::endl;
+        }
+    
         // Perform merge
         pimpl_->perform_merge(max_pair->first, pimpl_->next_token_id, word_counts);
         pimpl_->next_token_id++;
+        iteration++;
+    }
+
+    if (iteration >= max_iterations) {
+        std::cout << "Reached maximum iterations. Stopping training." << std::endl;
     }
 }
 
