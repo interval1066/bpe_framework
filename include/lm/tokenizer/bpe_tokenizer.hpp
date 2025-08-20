@@ -1,8 +1,8 @@
-# BPE Tokenizer Header File
+/*# BPE Tokenizer Header File
 
 Here's the complete `include/lm/tokenizer/bpe_tokenizer.hpp` file:
 
-```cpp
+```cpp*/
 #pragma once
 
 #include <string>
@@ -26,7 +26,7 @@ public:
     // Tokenization methods
     std::vector<int> encode(const std::string& text) const;
     std::string decode(const std::vector<int>& tokens) const;
-    
+
     // Serialization
     bool save(const std::string& filename) const;
     bool load(const std::string& filename);

@@ -53,7 +53,7 @@ void BPETokenizer::Impl::initialize_vocab() {
     
     // Add special tokens
     add_special_token(unknown_token);
-    unknown_token_id = vocab[unknown_token];
+    unknown_token_id = vocab[unknown_token];  // This line should set unknown_token_id
 }
 
 std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text) const {
@@ -82,19 +82,19 @@ std::vector<int> BPETokenizer::Impl::word_to_token_ids(const std::string& word) 
         
         for (const auto& character : characters) {
             if (vocab.find(character) != vocab.end()) {
-                tokens.push_back(vocab.at(character));
+                tokens.push_back(vocab.at(character));  // This pushes an int (token ID)
             } else if (byte_fallback_enabled) {
                 // If character not found, try to split into bytes
                 for (unsigned char c : character) {
                     std::string byte_str(1, static_cast<char>(c));
                     if (vocab.find(byte_str) != vocab.end()) {
-                        tokens.push_back(vocab.at(byte_str));
+                        tokens.push_back(vocab.at(byte_str));  // This pushes an int
                     } else {
-                        tokens.push_back(unknown_token_id);
+                        tokens.push_back(unknown_token_id);  // This should push an int
                     }
                 }
             } else {
-                tokens.push_back(unknown_token_id);
+                tokens.push_back(unknown_token_id);  // This should push an int
             }
         }
     } else {
@@ -102,9 +102,9 @@ std::vector<int> BPETokenizer::Impl::word_to_token_ids(const std::string& word) 
         for (char c : word) {
             std::string token(1, c);
             if (vocab.find(token) != vocab.end()) {
-                tokens.push_back(vocab.at(token));
+                tokens.push_back(vocab.at(token));  // This pushes an int
             } else {
-                tokens.push_back(unknown_token_id);
+                tokens.push_back(unknown_token_id);  // This should push an int
             }
         }
     }
@@ -349,14 +349,14 @@ void BPETokenizer::set_unknown_token(const std::string& token) {
     }
 }
 
-void BPETokenizer::add_special_token(const std::string& token) {
+/*void BPETokenizer::add_special_token(const std::string& token) {
     if (pimpl_->vocab.find(token) == pimpl_->vocab.end()) {
         pimpl_->vocab[token] = pimpl_->next_token_id;
         pimpl_->inv_vocab[pimpl_->next_token_id] = token;
         pimpl_->special_tokens[token] = pimpl_->next_token_id;
         pimpl_->next_token_id++;
     }
-}
+}*/
 
 void BPETokenizer::set_normalization(bool enabled) {
     pimpl_->normalization_enabled = enabled;
@@ -364,6 +364,15 @@ void BPETokenizer::set_normalization(bool enabled) {
 
 void BPETokenizer::set_byte_fallback(bool enabled) {
     pimpl_->byte_fallback_enabled = enabled;
+}
+
+void BPETokenizer::add_special_token(const std::string& token) {
+    if (pimpl_->vocab.find(token) == pimpl_->vocab.end()) {
+        pimpl_->vocab[token] = pimpl_->next_token_id;
+        pimpl_->inv_vocab[pimpl_->next_token_id] = token;
+        pimpl_->special_tokens[token] = pimpl_->next_token_id;
+        pimpl_->next_token_id++;
+    }
 }
 
 } // namespace lm
