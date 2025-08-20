@@ -1,9 +1,14 @@
-cmake_minimum_required(VERSION 3.5)
-project(lm_framework)
+cmake_minimum_required(VERSION 3.14)
+project(lm_framework LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Enable cross-directory linking
+if(POLICY CMP0079)
+    cmake_policy(SET CMP0079 NEW)
+endif()
 
 # Include directories
 include_directories(
@@ -12,8 +17,6 @@ include_directories(
 
 # Find dependencies
 find_package(nlohmann_json 3.9 REQUIRED)
-
-# Find ICU library
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 
 # GoogleTest
@@ -31,17 +34,14 @@ add_subdirectory(src/runtime)
 
 # Main library
 add_library(lm_core
-    src/tokenizer/bpe_tokenizer.cpp
-    src/tokenizer/unicode_utils.cpp
     src/runtime/init.cpp
     src/runtime/shutdown.cpp
 )
 
 target_link_libraries(lm_core
     PRIVATE
+        lm_tokenizer
         nlohmann_json::nlohmann_json
-        ICU::uc
-        ICU::i18n
 )
 
 # Test executables
@@ -74,4 +74,3 @@ target_link_libraries(lm_alpha
 # Install targets
 install(TARGETS lm_core DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
-

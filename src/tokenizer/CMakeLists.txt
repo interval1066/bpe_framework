@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
-project(lm_framework)
-
+# Tokenizer library
 add_library(lm_tokenizer
     bpe_tokenizer.cpp
     unicode_utils.cpp
@@ -10,9 +8,9 @@ target_include_directories(lm_tokenizer
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
 )
 
-# Find and link ICU library
-find_package(ICU REQUIRED COMPONENTS uc i18n)
-
 target_link_libraries(lm_tokenizer
-    PRIVATE ICU::uc ICU::i18n
+    PRIVATE 
+        ICU::uc 
+        ICU::i18n
 )
+
