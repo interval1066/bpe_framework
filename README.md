@@ -102,7 +102,64 @@ Key Validations
 
     Token IDs are consistent between sessions
 
-This test application provides a comprehensive validation of the BPE tokenizer's core functionality, ensuring it works correctly for text processing tasks in the LM Framework.
+# BPE Tokenizer Performance Test Suite
 
+## Overview
+
+This performance test application is a comprehensive benchmarking tool designed to evaluate the efficiency and scalability of the Byte Pair Encoding (BPE) tokenizer implementation. The test suite measures critical performance metrics including training time, memory usage, encoding/decoding speed, and serialization performance across various configurations.
+
+## Key Features
+
+### 1. Corpus Generation
+- Automatically generates realistic test corpora using common AI/ML terminology
+- Configurable sentence count and word range parameters
+- Creates diverse text samples that mimic real-world language patterns
+
+### 2. Multi-Dimensional Testing
+- Tests multiple corpus sizes (100, 1000, 5000 sentences)
+- Evaluates different vocabulary sizes (500, 1000, 2000 tokens)
+- Measures performance across various workload scenarios
+
+### 3. Comprehensive Performance Metrics
+- **Training Time**: Measures how long it takes to build the BPE vocabulary from a corpus
+- **Memory Usage**: Tracks peak memory consumption during training (Linux-specific)
+- **Encoding Speed**: Calculates processing time per token during text encoding
+- **Round-Trip Verification**: Ensures encoding/decoding preserves original content
+- **Serialization Performance**: Measures model save/load operations
+
+### 4. Validation Checks
+- Verifies encoding/decoding consistency
+- Detects potential data corruption issues
+- Validates vocabulary construction
+
+## Usage Scenarios
+
+This performance test is ideal for:
+- Benchmarking different BPE implementations
+- Evaluating hardware suitability for language processing tasks
+- Identifying performance bottlenecks in tokenization pipelines
+- Testing scalability of tokenizer implementations
+- Comparing optimization techniques
+
+## Technical Implementation
+
+The test suite utilizes:
+- High-resolution timing with `<chrono>` for precise measurements
+- Linux-specific memory tracking via `/proc/self/status`
+- Randomized corpus generation with configurable parameters
+- Exception handling for robust testing
+- Automatic cleanup of temporary files
+
+## Output Metrics
+
+The application provides detailed performance reports including:
+- Training duration in milliseconds
+- Peak memory usage in megabytes
+- Encoding speed in microseconds per token
+- Serialization/deserialization times
+- Vocabulary size validation
+- Round-trip integrity verification
+
+This test framework serves as an essential tool for developers and researchers working with BPE tokenizers, providing quantitative data to guide optimization efforts and implementation choices.
 
 
