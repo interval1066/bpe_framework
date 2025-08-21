@@ -1,7 +1,7 @@
 # bpe_framework
 Large Language Model for Agentic AI
 
-Requires: nlohman/json (https://github.com/nlohmann/json & Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu), OpenMNT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize).
+Requires: nlohman/json (https://github.com/nlohmann/json & Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu), OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize).
 
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 
