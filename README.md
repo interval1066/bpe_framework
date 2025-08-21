@@ -13,9 +13,7 @@ Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
  7. Saves the tokenizer to a file ("bpe_model.txt").
  8. Loads the tokenizer from the file and verifies the loaded tokenizer's vocabulary size.
  The purpose of this test is to verify that the BPE tokenizer can be trained, encode, decode, and serialize/deserialize correctly.
- Let's break down the code step by step.
-test_bpe Application Overview
-
+ 
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization
 
