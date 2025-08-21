@@ -162,4 +162,4 @@ The application provides detailed performance reports including:
 
 This test framework serves as an essential tool for developers and researchers working with BPE tokenizers, providing quantitative data to guide optimization efforts and implementation choices.
 
-
+Based on the research of Timothy O'Neil, Frederick Warren, et. al.
