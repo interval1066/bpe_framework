@@ -1,6 +1,8 @@
 # bpe_framework
 Large Language Model for Agentic AI
 
+Requires: nlohman/json (https://github.com/nlohmann/json & Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu).
+
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 
 #### The test_bpe application does the following:
