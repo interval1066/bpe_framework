@@ -1,6 +1,22 @@
 cmake_minimum_required(VERSION 3.14)
 project(lm_framework LANGUAGES CXX)
 
+# Check for Intel x86-64 hardware
+if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" AND 
+   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "amd64" AND
+   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" AND
+   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "i686" AND
+   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+    message(FATAL_ERROR "This framework requires Intel x86-64 hardware. "
+                        "Current processor architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+# Check for EIGEN_LOC variable
+if(NOT DEFINED EIGEN_LOC OR EIGEN_LOC STREQUAL "")
+    message(FATAL_ERROR "This framework requires the location of the Eigen header files. "
+                        "Please set EIGEN_LOC to the path of your Eigen installation.")
+endif()
+
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -19,6 +35,7 @@ endif()
 # Include directories
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${EIGEN_LOC} # Local Eigen installation
 )
 
 # Find dependencies
@@ -38,6 +55,21 @@ FetchContent_MakeAvailable(googletest)
 add_subdirectory(src/tokenizer)
 add_subdirectory(src/runtime)
 
+# Header-only core components (Tensor implementation)
+add_library(lm_core_components INTERFACE)
+target_include_directories(lm_core_components INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${EIGEN_LOC}  # Local Eigen installation
+)
+
+# Header-only model components
+add_library(lm_model INTERFACE)
+target_include_directories(lm_model INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${EIGEN_LOC}  # Local Eigen installation
+)
+target_link_libraries(lm_model INTERFACE lm_core_components)
+
 # Main library
 add_library(lm_core
     src/runtime/init.cpp
@@ -47,6 +79,7 @@ add_library(lm_core
 target_link_libraries(lm_core
     PRIVATE
         lm_tokenizer
+        lm_model
         nlohmann_json::nlohmann_json
 )
 
@@ -60,6 +93,7 @@ endif()
 
 # Test executables
 add_executable(test_bpe src/test_bpe.cpp)
+
 target_link_libraries(test_bpe
     PRIVATE
         lm_core
@@ -97,6 +131,13 @@ target_link_libraries(performance_test
         GTest::gtest_main
 )
 
+# Integration example
+add_executable(integration_example src/integration_example.cpp)
+target_link_libraries(integration_example
+    PRIVATE
+        lm_core
+)
+
 # Add compiler warning flags
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
@@ -110,3 +151,18 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
     endif()
 endif()
+
+# Verify Eigen installation
+add_custom_target(check_eigen
+    COMMAND ${CMAKE_COMMAND} -E echo "Checking Eigen installation at ${EIGEN_LOC}"
+    COMMAND test -f ${EIGEN_LOC}/Eigen/Core || (echo "Eigen not found at specified path: ${EIGEN_LOC}" && exit 1)
+    COMMENT "Verifying Eigen installation"
+)
+
+# Make main targets depend on Eigen check
+add_dependencies(lm_core check_eigen)
+add_dependencies(test_bpe check_eigen)
+add_dependencies(test_unicode_bpe check_eigen)
+add_dependencies(lm_alpha check_eigen)
+add_dependencies(performance_test check_eigen)
+add_dependencies(integration_example check_eigen)
