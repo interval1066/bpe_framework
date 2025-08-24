@@ -71,7 +71,9 @@ int main() {
         // Prepare input for transformer (convert token IDs to tensor)
         if (!token_ids.empty()) {
             // Create a batch of size 1 with our token IDs
-            lm::Tensor input_tensor({1, static_cast<size_t>(token_ids.size())});
+            std::vector<size_t> shape = {1, static_cast<size_t>(token_ids.size())};
+				lm::Tensor input_tensor(shape);
+
             for (size_t i = 0; i < token_ids.size(); ++i) {
                 input_tensor.data()(0, i) = static_cast<float>(token_ids[i]);
             }
@@ -84,7 +86,7 @@ int main() {
             
             // Forward pass (this would normally produce logits)
             try {
-                lm::Tensor output = transformer(input_tensor);
+                lm::Tensor output = transformer.forward(input_tensor);
                 std::cout << "Transformer forward pass completed successfully\n";
                 std::cout << "Output tensor shape: (" << output.shape()[0] 
                           << ", " << output.shape()[1] << ", " << output.shape()[2] << ")\n";

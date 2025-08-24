@@ -730,11 +730,12 @@ std::string BPETokenizer::decode_from_vector(const Eigen::VectorXi& tokens) cons
 Eigen::VectorXf BPETokenizer::token_frequencies() const {
     // This is a placeholder implementation
     // In a real implementation, you would track token frequencies during training
-    Eigen::VectorXf frequencies(vocab_.size());
+    size_t vocab_size = vocab_size;
+    Eigen::VectorXf frequencies(vocab_size);
     
     // Initialize with equal frequencies (placeholder)
-    for (size_t i = 0; i < vocab_.size(); ++i) {
-        frequencies(i) = 1.0f / vocab_.size();
+    for (size_t i = 0; i < vocab_size; ++i) {
+        frequencies(i) = 1.0f / vocab_size;
     }
     
     return frequencies;
