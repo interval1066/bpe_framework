@@ -9,10 +9,10 @@ FeedForward::FeedForward(size_t d_model, size_t d_ff, float dropout)
     : d_model_(d_model), d_ff_(d_ff), dropout_(dropout) {
     
     // Initialize weight matrices and biases
-    w1_ = Tensor::xavier({d_model_, d_ff_});
-    b1_ = Tensor::zeros({d_ff_});
-    w2_ = Tensor::xavier({d_ff_, d_model_});
-    b2_ = Tensor::zeros({d_model_});
+    w1_ = Tensor::xavier(std::vector<size_t>{d_model_, d_ff_});
+    b1_ = Tensor::zeros(std::vector<size_t>{d_ff_});
+    w2_ = Tensor::xavier(std::vector<size_t>{d_ff_, d_model_});
+    b2_ = Tensor::zeros(std::vector<size_t>{d_model_});
     
     std::cout << "Initialized FeedForward with:\n";
     std::cout << "  d_model: " << d_model_ << "\n";
@@ -34,13 +34,30 @@ Tensor FeedForward::forward(const Tensor& input) {
     size_t seq_len = input.shape()[1];
     
     // First linear transformation: input * w1 + b1
-    Tensor hidden({batch_size, seq_len, d_ff_});
+    Tensor hidden(std::vector<size_t>{batch_size, seq_len, d_ff_});
+    
+    // Calculate strides for flat indexing
+    size_t input_stride_1 = d_model_;  // stride for sequence position in input
+    size_t hidden_stride_1 = d_ff_;    // stride for sequence position in hidden
+    
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t f = 0; f < d_ff_; ++f) {
-                hidden(b, t, f) = b1_(f);
+                // Calculate flat index for hidden
+                size_t hidden_index = b * seq_len * hidden_stride_1 + 
+                                     t * hidden_stride_1 + 
+                                     f;
+                
+                // Initialize with bias
+                hidden(hidden_index) = b1_(f);
+                
                 for (size_t d = 0; d < d_model_; ++d) {
-                    hidden(b, t, f) += input(b, t, d) * w1_(d, f);
+                    // Calculate flat index for input
+                    size_t input_index = b * seq_len * input_stride_1 + 
+                                       t * input_stride_1 + 
+                                       d;
+                    
+                    hidden(hidden_index) += input(input_index) * w1_(d, f);
                 }
             }
         }
@@ -55,13 +72,29 @@ Tensor FeedForward::forward(const Tensor& input) {
     }
     
     // Second linear transformation: hidden * w2 + b2
-    Tensor output({batch_size, seq_len, d_model_});
+    Tensor output(std::vector<size_t>{batch_size, seq_len, d_model_});
+    
+    // Calculate strides for output
+    size_t output_stride_1 = d_model_;  // stride for sequence position in output
+    
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t d = 0; d < d_model_; ++d) {
-                output(b, t, d) = b2_(d);
+                // Calculate flat index for output
+                size_t output_index = b * seq_len * output_stride_1 + 
+                                    t * output_stride_1 + 
+                                    d;
+                
+                // Initialize with bias
+                output(output_index) = b2_(d);
+                
                 for (size_t f = 0; f < d_ff_; ++f) {
-                    output(b, t, d) += hidden(b, t, f) * w2_(f, d);
+                    // Calculate flat index for hidden
+                    size_t hidden_index = b * seq_len * hidden_stride_1 + 
+                                        t * hidden_stride_1 + 
+                                        f;
+                    
+                    output(output_index) += hidden(hidden_index) * w2_(f, d);
                 }
             }
         }
@@ -104,4 +137,3 @@ Tensor FeedForward::apply_dropout(const Tensor& input, float dropout_rate) {
 }
 
 } // namespace lm
-

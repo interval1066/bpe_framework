@@ -9,6 +9,7 @@
 #include <cstdint>  // For uint16_t
 #include <queue>
 #include <functional>
+#include <Eigen/Dense>
 
 namespace lm {
     
@@ -43,6 +44,10 @@ public:
     // Unicode-specific methods
     void set_normalization(bool enabled);
     void set_byte_fallback(bool enabled);
+
+    Eigen::VectorXi encode_to_vector(const std::string& text) const;
+    std::string decode_from_vector(const Eigen::VectorXi& tokens) const;
+    Eigen::VectorXf token_frequencies() const;
 
 private:
     struct Impl;

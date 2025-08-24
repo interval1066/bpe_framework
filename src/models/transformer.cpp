@@ -78,13 +78,18 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     // Convert token IDs to embeddings
     Tensor embeddings(std::vector<size_t>{batch_size, seq_len, d_model_});
     
+    // Calculate the offset for each dimension
+    size_t seq_stride = d_model_;
+    size_t batch_stride = seq_len * d_model_;
+    
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             size_t token_id = static_cast<size_t>(input(b, t));
             if (token_id < vocab_size_) {
                 for (size_t d = 0; d < d_model_; ++d) {
-                    // Use 3D indexing
-                    embeddings(b, t, d) = embedding_(token_id, d);
+                    // Calculate the flat index
+                    size_t index = b * batch_stride + t * seq_stride + d;
+                    embeddings(index) = embedding_(token_id, d);
                 }
             }
         }
@@ -94,8 +99,9 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t d = 0; d < d_model_; ++d) {
-                // Use 3D indexing
-                embeddings(b, t, d) += positional_encoding_(t, d);
+                // Calculate the flat index
+                size_t index = b * batch_stride + t * seq_stride + d;
+                embeddings(index) += positional_encoding_(t, d);
             }
         }
     }
@@ -105,6 +111,12 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
         embeddings = apply_dropout(embeddings, dropout_);
     }
     
+    Tensor Transformer::forward(const Tensor& input) {
+        // Create an empty mask tensor
+        Tensor mask;
+        return forward(input, mask);  // Call the full version with empty mask
+    }
+
     // Pass through transformer blocks
     Tensor hidden_states = embeddings;
     for (auto& block : transformer_blocks_) {
@@ -113,13 +125,20 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     
     // Apply output layer
     Tensor logits(std::vector<size_t>{batch_size, seq_len, vocab_size_});
+    size_t logits_seq_stride = vocab_size_;
+    size_t logits_batch_stride = seq_len * vocab_size_;
+    
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t v = 0; v < vocab_size_; ++v) {
-                logits(b, t, v) = 0.0;
+                // Calculate the flat index for logits
+                size_t logits_index = b * logits_batch_stride + t * logits_seq_stride + v;
+                logits(logits_index) = 0.0;
+                
                 for (size_t d = 0; d < d_model_; ++d) {
-                    // Use 3D indexing
-                    logits(b, t, v) += hidden_states(b, t, d) * output_layer_(d, v);
+                    // Calculate the flat index for hidden_states
+                    size_t hidden_index = b * batch_stride + t * seq_stride + d;
+                    logits(logits_index) += hidden_states(hidden_index) * output_layer_(d, v);
                 }
             }
         }

@@ -16,6 +16,7 @@ public:
     std::vector<Tensor> parameters() const;
     void set_training(bool training);
     Tensor forward(const Tensor& input, const Tensor& mask = Tensor());
+    Tensor forward(const Tensor& input);
     
 private:
     Tensor apply_dropout(const Tensor& input, float dropout_rate);

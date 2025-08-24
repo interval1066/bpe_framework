@@ -706,4 +706,38 @@ void BPETokenizer::Impl::get_pair_counts(
     }
 }
 
+Eigen::VectorXi BPETokenizer::encode_to_vector(const std::string& text) const {
+    auto token_ids = encode(text);
+    Eigen::VectorXi result(token_ids.size());
+    
+    for (size_t i = 0; i < token_ids.size(); ++i) {
+        result(i) = static_cast<int>(token_ids[i]);
+    }
+    
+    return result;
+}
+
+std::string BPETokenizer::decode_from_vector(const Eigen::VectorXi& tokens) const {
+    std::vector<TokenID> token_ids(tokens.size());
+    
+    for (int i = 0; i < tokens.size(); ++i) {
+        token_ids[i] = static_cast<TokenID>(tokens(i));
+    }
+    
+    return decode(token_ids);
+}
+
+Eigen::VectorXf BPETokenizer::token_frequencies() const {
+    // This is a placeholder implementation
+    // In a real implementation, you would track token frequencies during training
+    Eigen::VectorXf frequencies(vocab_.size());
+    
+    // Initialize with equal frequencies (placeholder)
+    for (size_t i = 0; i < vocab_.size(); ++i) {
+        frequencies(i) = 1.0f / vocab_.size();
+    }
+    
+    return frequencies;
+}
+
 } // namespace lm

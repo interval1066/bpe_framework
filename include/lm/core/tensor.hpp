@@ -51,7 +51,7 @@ public:
     float operator()(size_t i) const { return data_(i); }
     float& operator()(size_t i, size_t j) { return data_(i, j); }
     float operator()(size_t i, size_t j) const { return data_(i, j); }
-    
+
     // Shape utilities
     size_t size() const { return data_.size(); }
     size_t dim(size_t axis) const { 
@@ -194,12 +194,47 @@ public:
     }
     
     Tensor softmax(int axis = -1) const {
-        Eigen::MatrixXf exp_values = data_.array().exp();
-        if (axis == 0 || ndim() == 1) {
-            exp_values.array().colwise() /= exp_values.colwise().sum().array();
+        // For numerical stability, subtract the max value
+        Eigen::MatrixXf shifted = data_;
+    
+        if (axis == -1 || ndim() == 1) {
+            // For overall softmax or 1D tensors
+            float max_val = data_.maxCoeff();
+            shifted.array() -= max_val;
+        } else if (axis == 0) {
+            // Column-wise: subtract max of each column
+            for (int j = 0; j < shifted.cols(); ++j) {
+                float max_val = shifted.col(j).maxCoeff();
+                shifted.col(j).array() -= max_val;
+            }
         } else {
-            exp_values.array().rowwise() /= exp_values.rowwise().sum().array();
+            // Row-wise: subtract max of each row
+            for (int i = 0; i < shifted.rows(); ++i) {
+                float max_val = shifted.row(i).maxCoeff();
+                shifted.row(i).array() -= max_val;
+            }
         }
+
+        Eigen::MatrixXf exp_values = shifted.array().exp();
+    
+        if (axis == -1 || ndim() == 1) {
+            // For overall softmax or 1D tensors
+            float sum = exp_values.sum();
+            exp_values /= sum;
+        } else if (axis == 0) {
+            // Column-wise normalization
+            for (int j = 0; j < exp_values.cols(); ++j) {
+                float col_sum = exp_values.col(j).sum();
+                exp_values.col(j) /= col_sum;
+            }
+        } else {
+            // Row-wise normalization
+            for (int i = 0; i < exp_values.rows(); ++i) {
+                float row_sum = exp_values.row(i).sum();
+                exp_values.row(i) /= row_sum;
+            }
+        }
+    
         return Tensor(exp_values, shape_);
     }
     
@@ -265,52 +300,53 @@ public:
     }
     
     // Additional utility for neural networks
-    Tensor argmax(int axis = -1) const {
-        if (axis == -1 || ndim() == 1) {
-            // For overall argmax or 1D tensors
-            Eigen::Index maxIndex;
-            if (ndim() == 1) {
-                // This is a vector, so we can use maxCoeff with index
-                data_.maxCoeff(&maxIndex);
-            } else {
-                // For matrices, we need to flatten first
-                Eigen::VectorXf flattened = Eigen::Map<const Eigen::VectorXf>(data_.data(), data_.size());
-                flattened.maxCoeff(&maxIndex);
+Tensor argmax(int axis = -1) const {
+    if (axis == -1 || ndim() == 1) {
+        // For overall argmax or 1D tensors
+        Eigen::Index maxIndex = 0;
+        float maxValue = data_(0);
+        
+        // Manual implementation for both vectors and matrices
+        for (Eigen::Index i = 0; i < data_.size(); ++i) {
+            if (data_(i) > maxValue) {
+                maxValue = data_(i);
+                maxIndex = i;
             }
-            return Tensor(Eigen::MatrixXf::Constant(1, 1, static_cast<float>(maxIndex)));
-        } else if (axis == 0) {
-            // Column-wise argmax
-            Eigen::RowVectorXf result(data_.cols());
-            for (int i = 0; i < data_.cols(); ++i) {
-                Eigen::Index maxIndex;
-                data_.col(i).maxCoeff(&maxIndex);
-                result(i) = static_cast<float>(maxIndex);
-            }
-            return Tensor(result, {static_cast<size_t>(result.cols())});
-        } else {
-            // Row-wise argmax
-            Eigen::VectorXf result(data_.rows());
-            for (int i = 0; i < data_.rows(); ++i) {
-                Eigen::Index maxIndex;
-                data_.row(i).maxCoeff(&maxIndex);
-                result(i) = static_cast<float>(maxIndex);
-            }
-            return Tensor(result, {static_cast<size_t>(result.rows())});
         }
+        
+        return Tensor(Eigen::MatrixXf::Constant(1, 1, static_cast<float>(maxIndex)));
+    } else if (axis == 0) {
+        // Column-wise argmax
+        Eigen::RowVectorXf result(data_.cols());
+        for (int i = 0; i < data_.cols(); ++i) {
+            Eigen::Index maxIndex = 0;
+            float maxValue = data_(0, i);
+            for (int j = 1; j < data_.rows(); ++j) {
+                if (data_(j, i) > maxValue) {
+                    maxValue = data_(j, i);
+                    maxIndex = j;
+                }
+            }
+            result(i) = static_cast<float>(maxIndex);
+        }
+        return Tensor(result, {static_cast<size_t>(result.cols())});
+    } else {
+        // Row-wise argmax
+        Eigen::VectorXf result(data_.rows());
+        for (int i = 0; i < data_.rows(); ++i) {
+            Eigen::Index maxIndex = 0;
+            float maxValue = data_(i, 0);
+            for (int j = 1; j < data_.cols(); ++j) {
+                if (data_(i, j) > maxValue) {
+                    maxValue = data_(i, j);
+                    maxIndex = j;
+                }
+            }
+            result(i) = static_cast<float>(maxIndex);
+        }
+        return Tensor(result, {static_cast<size_t>(result.rows())});
     }
-
-	// 3D element access
-	float& operator()(size_t i, size_t j, size_t k) {
-	    // Calculate the index in the flattened data
-	    size_t index = i * dim(1) * dim(2) + j * dim(2) + k;
-	    return data()(index);
-	}
-
-	float operator()(size_t i, size_t j, size_t k) const {
-	    // Calculate the index in the flattened data
-	    size_t index = i * dim(1) * dim(2) + j * dim(2) + k;
-	    return data()(index);
-	}
+}
 
 private:
     Eigen::MatrixXf data_;

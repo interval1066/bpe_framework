@@ -10,7 +10,7 @@ public:
     LayerNorm(size_t d_model, float eps = 1e-5f);
     
     std::vector<Tensor> parameters() const;
-    void set_training(bool training);
+    void set_training(/*bool training*/);
     Tensor forward(const Tensor& input);
     
 private:
