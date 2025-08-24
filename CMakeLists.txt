@@ -74,6 +74,11 @@ target_link_libraries(lm_model INTERFACE lm_core_components)
 add_library(lm_core
     src/runtime/init.cpp
     src/runtime/shutdown.cpp
+    src/models/transformer.cpp          # Add this
+    src/models/transformer_block.cpp    # Add this
+    src/models/attention.cpp            # Add this
+    src/models/feed_forward.cpp         # Add this
+    src/models/layer_norm.cpp           # Add this
 )
 
 target_link_libraries(lm_core
