@@ -12,9 +12,8 @@ Transformer::Transformer(size_t vocab_size, size_t d_model, size_t num_heads,
     // Initialize embedding layer
     embedding_ = Tensor::randn({vocab_size_, d_model_}, 0.0, 0.02);
     
-    // Initialize positional encoding
-    positional_encoding_ = Tensor({max_seq_len_, d_model_});
-    for (size_t pos = 0; pos < max_seq_len_; ++pos) {
+    // Initialize positional encoding - FIXED: explicit vector creation
+    positional_encoding_ = Tensor(std::vector<size_t>{max_seq_len_, d_model_});    for (size_t pos = 0; pos < max_seq_len_; ++pos) {
         for (size_t i = 0; i < d_model_; ++i) {
             if (i % 2 == 0) {
                 positional_encoding_(pos, i) = std::sin(pos / std::pow(10000, 2.0 * i / d_model_));
@@ -77,12 +76,14 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     size_t seq_len = input.shape()[1];
     
     // Convert token IDs to embeddings
-    Tensor embeddings({batch_size, seq_len, d_model_});
+    Tensor embeddings(std::vector<size_t>{batch_size, seq_len, d_model_});
+    
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             size_t token_id = static_cast<size_t>(input(b, t));
             if (token_id < vocab_size_) {
                 for (size_t d = 0; d < d_model_; ++d) {
+                    // Use 3D indexing
                     embeddings(b, t, d) = embedding_(token_id, d);
                 }
             }
@@ -93,6 +94,7 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t d = 0; d < d_model_; ++d) {
+                // Use 3D indexing
                 embeddings(b, t, d) += positional_encoding_(t, d);
             }
         }
@@ -110,12 +112,13 @@ Tensor Transformer::forward(const Tensor& input, const Tensor& mask) {
     }
     
     // Apply output layer
-    Tensor logits({batch_size, seq_len, vocab_size_});
+    Tensor logits(std::vector<size_t>{batch_size, seq_len, vocab_size_});
     for (size_t b = 0; b < batch_size; ++b) {
         for (size_t t = 0; t < seq_len; ++t) {
             for (size_t v = 0; v < vocab_size_; ++v) {
                 logits(b, t, v) = 0.0;
                 for (size_t d = 0; d < d_model_; ++d) {
+                    // Use 3D indexing
                     logits(b, t, v) += hidden_states(b, t, d) * output_layer_(d, v);
                 }
             }

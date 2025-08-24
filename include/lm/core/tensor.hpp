@@ -298,10 +298,24 @@ public:
             return Tensor(result, {static_cast<size_t>(result.rows())});
         }
     }
-    
+
+	// 3D element access
+	float& operator()(size_t i, size_t j, size_t k) {
+	    // Calculate the index in the flattened data
+	    size_t index = i * dim(1) * dim(2) + j * dim(2) + k;
+	    return data()(index);
+	}
+
+	float operator()(size_t i, size_t j, size_t k) const {
+	    // Calculate the index in the flattened data
+	    size_t index = i * dim(1) * dim(2) + j * dim(2) + k;
+	    return data()(index);
+	}
+
 private:
     Eigen::MatrixXf data_;
     std::vector<size_t> shape_;
 };
 
 } // namespace lm
+
