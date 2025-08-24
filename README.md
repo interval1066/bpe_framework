@@ -3,7 +3,7 @@ Large Language Model for Agentic AI
 
 Requires: nlohman/json (https://github.com/nlohmann/json & Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu), OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize), and the Eigen header files (https://github.com/PX4/eigen).
 
-Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
 
 #### The test_bpe application does the following:
  1. Includes necessary headers and defines the main function.
