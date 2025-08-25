@@ -95,9 +95,9 @@ Key Validations
     Validation of Unicode compliance
 
 
-# BPE Tokenizer Performance Test Suite
+## BPE Tokenizer Performance Test Suite
 
-## Overview
+### Overview
 
 The performance test application is a comprehensive benchmarking tool designed to evaluate the efficiency and scalability of the Byte Pair Encoding (BPE) tokenizer implementation. The test suite measures critical performance metrics including training time, memory usage, encoding/decoding speed, and serialization performance across various configurations.
 
