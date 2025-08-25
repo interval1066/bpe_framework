@@ -1,5 +1,5 @@
 # bpe_framework
-## "Byte Pair Encoding Framework"
+## Byte Pair Encoding Framework
 Large Language Model for Agentic AI
 
 Fully internationalized framework for Agentic AI research
@@ -79,6 +79,21 @@ Key Validations
     Serialization/Deserialization maintains tokenizer state
     Vocabulary Size matches the specified target (500)
     Token IDs are consistent between sessions
+
+# test_unicode.cpp (if present)
+
+## Lower-level Unicode-specific tests:
+
+    Unicode normalization functions
+
+    Character boundary detection
+
+    Grapheme cluster handling
+
+    Encoding conversion utilities
+
+    Validation of Unicode compliance
+
 
 # BPE Tokenizer Performance Test Suite
 
