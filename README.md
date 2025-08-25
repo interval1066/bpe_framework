@@ -80,9 +80,9 @@ Key Validations
     Vocabulary Size matches the specified target (500)
     Token IDs are consistent between sessions
 
-# test_unicode.cpp (if present)
+## test_unicode.cpp
 
-## Lower-level Unicode-specific tests:
+### Lower-level Unicode-specific tests:
 
     Unicode normalization functions
 
