@@ -1,7 +1,14 @@
 # bpe_framework
+## "Byte Pair Encoding Framework"
 Large Language Model for Agentic AI
 
-Requires: nlohman/json (https://github.com/nlohmann/json & Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu), OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize), and the Eigen header files (https://github.com/PX4/eigen).
+Fully internationalized framework for Agentic AI research
+
+Requires:
+1. nlohman/json (https://github.com/nlohmann/json
+2. Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu)
+3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize)
+4. Eigen header files (https://github.com/PX4/eigen)
 
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
 
@@ -14,69 +21,45 @@ Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
  6. Decodes the tokens back to a string and prints the original, tokens, and decoded string.
  7. Saves the tokenizer to a file ("bpe_model.txt").
  8. Loads the tokenizer from the file and verifies the loaded tokenizer's vocabulary size.
+
  The purpose of this test is to verify that the BPE tokenizer can be trained, encode, decode, and serialize/deserialize correctly.
  
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization
-
     Creates an instance of BPETokenizer
-
     Defines a training corpus with sample English text
 
 2. Training Process
-
     Calls tokenizer.train(corpus, 500) to train the tokenizer
-
     The training process:
-
         Initializes with byte-level vocabulary (0-255)
-
         Analyzes word frequencies in the corpus
-
         Iteratively merges the most frequent character pairs
-
         Builds a vocabulary of 500 tokens (as specified)
 
 3. Encoding Test
-
     Encodes the test string "the quick brown fox"
-
     The encoding process:
-
         Splits text into words
-
         Converts each character to its initial token ID
-
         Applies learned BPE merges to combine tokens
-
         Returns a sequence of integer token IDs
 
 4. Decoding Test
-
     Decodes the token IDs back to text
-
     The decoding process:
-
         Converts each token ID back to its string representation
-
         Concatenates the strings to reconstruct the original text
 
 5. Serialization Test
-
     Saves the trained tokenizer to "bpe_model.txt"
-
     The serialization process:
-
         Writes vocabulary size and token-ID mappings
-
         Records all learned merge rules
 
 6. Deserialization Test
-
     Loads the tokenizer from "bpe_model.txt"
-
     Verifies the loaded tokenizer has the same vocabulary size
-
     Confirms the tokenizer can perform encoding/decoding
 
 Expected Output
@@ -91,22 +74,17 @@ Successfully loaded tokenizer
 Loaded vocabulary size: 500
 
 Key Validations
-
     Training Completes without errors
-
     Encoding/Decoding Round-Trip preserves the original text
-
     Serialization/Deserialization maintains tokenizer state
-
     Vocabulary Size matches the specified target (500)
-
     Token IDs are consistent between sessions
 
 # BPE Tokenizer Performance Test Suite
 
 ## Overview
 
-This performance test application is a comprehensive benchmarking tool designed to evaluate the efficiency and scalability of the Byte Pair Encoding (BPE) tokenizer implementation. The test suite measures critical performance metrics including training time, memory usage, encoding/decoding speed, and serialization performance across various configurations.
+The performance test application is a comprehensive benchmarking tool designed to evaluate the efficiency and scalability of the Byte Pair Encoding (BPE) tokenizer implementation. The test suite measures critical performance metrics including training time, memory usage, encoding/decoding speed, and serialization performance across various configurations.
 
 ## Key Features
 
@@ -163,3 +141,4 @@ The application provides detailed performance reports including:
 This test framework serves as an essential tool for developers and researchers working with BPE tokenizers, providing quantitative data to guide optimization efforts and implementation choices.
 
 Based on the research of Timothy O'Neil, Frederick Warren, et. al.
+
