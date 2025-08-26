@@ -11,18 +11,6 @@ Requires:
 4. Eigen header files (https://github.com/PX4/eigen)
 
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
-
-#### The test_bpe application does the following:
- 1. Includes necessary headers and defines the main function.
- 2. Creates an instance of the BPETokenizer.
- 3. Defines a training corpus (a vector of strings).
- 4. Trains the tokenizer on the corpus with a specified vocabulary size (500 in this case).
- 5. Tests the tokenizer by encoding a sample string ("the quick brown fox").
- 6. Decodes the tokens back to a string and prints the original, tokens, and decoded string.
- 7. Saves the tokenizer to a file ("bpe_model.txt").
- 8. Loads the tokenizer from the file and verifies the loaded tokenizer's vocabulary size.
-
- The purpose of this test is to verify that the BPE tokenizer can be trained, encode, decode, and serialize/deserialize correctly.
  
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization
