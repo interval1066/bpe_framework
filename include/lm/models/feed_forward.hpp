@@ -11,11 +11,11 @@ public:
     
     std::vector<Tensor> parameters() const;
     void set_training(bool training);
-    Tensor forward(const Tensor& input);
+    Tensor forward(const Tensor& input) const;
     
 private:
-    Tensor apply_dropout(const Tensor& input, float dropout_rate);
-    Tensor gelu(const Tensor& input);
+    Tensor apply_dropout(const Tensor& input, float dropout_rate) const;
+    Tensor gelu(const Tensor& input) const;
     
     size_t d_model_;
     size_t d_ff_;

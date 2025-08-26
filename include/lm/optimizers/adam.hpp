@@ -8,8 +8,8 @@ namespace lm {
 class AdamOptimizer {
 public:
     AdamOptimizer(float learning_rate = 0.001, float beta1 = 0.9, float beta2 = 0.999, float epsilon = 1e-8);
-    void step(const std::vector<Tensor>& parameters);
-    void zero_grad(const std::vector<Tensor>& parameters);
+    void step(std::vector<Tensor>& parameters);  // Remove const
+    void zero_grad(std::vector<Tensor>& parameters);  // Remove const
     
 private:
     float learning_rate_, beta1_, beta2_, epsilon_;

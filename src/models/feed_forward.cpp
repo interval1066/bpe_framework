@@ -28,7 +28,7 @@ void FeedForward::set_training(bool training) {
     training_ = training;
 }
 
-Tensor FeedForward::forward(const Tensor& input) {
+Tensor FeedForward::forward(const Tensor& input) const {
     // Get input dimensions
     size_t batch_size = input.shape()[0];
     size_t seq_len = input.shape()[1];
@@ -103,7 +103,7 @@ Tensor FeedForward::forward(const Tensor& input) {
     return output;
 }
 
-Tensor FeedForward::gelu(const Tensor& input) {
+Tensor FeedForward::gelu(const Tensor& input) const {
     // GELU activation function: x * 0.5 * (1.0 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
     const float sqrt_2_over_pi = std::sqrt(2.0f / M_PI);
     Tensor result(input.shape());
@@ -117,7 +117,7 @@ Tensor FeedForward::gelu(const Tensor& input) {
     return result;
 }
 
-Tensor FeedForward::apply_dropout(const Tensor& input, float dropout_rate) {
+Tensor FeedForward::apply_dropout(const Tensor& input, float dropout_rate) const {
     if (dropout_rate <= 0.0) return input;
     
     Tensor output = input;

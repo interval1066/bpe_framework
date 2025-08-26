@@ -25,7 +25,7 @@ void LayerNorm::set_training(/*bool training*/) {
     // This method is here for interface consistency
 }
 
-Tensor LayerNorm::forward(const Tensor& input) {
+Tensor LayerNorm::forward(const Tensor& input) const {
     // Get input dimensions
     size_t batch_size = input.shape()[0];
     size_t seq_len = input.shape()[1];

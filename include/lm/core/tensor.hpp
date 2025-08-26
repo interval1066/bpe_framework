@@ -11,9 +11,32 @@
 
 namespace lm {
 
-class Tensor {
+class Tensor;
+
+Tensor operator*(float scalar, const Tensor& tensor);
+
+// Scalar multiplication (Tensor * float) - already defined as member function
+// Tensor operator*(const Tensor& tensor, float scalar);
+
+    class Tensor {
 public:
-    Tensor() : data_(Eigen::MatrixXf(0, 0)), shape_({0}), requires_grad_(false) {}
+        Tensor() : data_(Eigen::MatrixXf(0, 0)), shape_({0}), requires_grad_(false) {}
+	     Tensor sqrt() const {
+        Tensor result(data_.array().sqrt(), shape_);
+    
+        if (requires_grad_) {
+            result.requires_grad(true);
+            result.backward_fn_ = [this, result]() {
+                if (this->requires_grad_) {
+                    // Gradient of sqrt: 0.5 / sqrt(input)
+                    Eigen::ArrayXf grad_sqrt = 0.5f / (this->data_.array().sqrt() + 1e-12f); // Add small epsilon to avoid division by zero
+                    this->grad_.array() += result.grad_.array() * grad_sqrt;
+                }
+            };
+        }
+    
+        return result;
+    }
     
     Tensor(const std::vector<size_t>& shape, bool requires_grad = false) : requires_grad_(requires_grad) {
         shape_ = shape;
@@ -78,6 +101,23 @@ public:
     float operator()(size_t i) const { return data_(i); }
     float& operator()(size_t i, size_t j) { return data_(i, j); }
     float operator()(size_t i, size_t j) const { return data_(i, j); }
+    
+    // 3D indexing operators
+    float& operator()(size_t i, size_t j, size_t k) {
+        if (shape_.size() != 3) {
+            throw std::runtime_error("3D access requires 3D tensor");
+        }
+        size_t index = i * shape_[1] * shape_[2] + j * shape_[2] + k;
+        return data_(index);
+    }
+    
+    float operator()(size_t i, size_t j, size_t k) const {
+        if (shape_.size() != 3) {
+            throw std::runtime_error("3D access requires 3D tensor");
+        }
+        size_t index = i * shape_[1] * shape_[2] + j * shape_[2] + k;
+        return data_(index);
+    }
 
     // Shape utilities
     size_t size() const { return data_.size(); }
@@ -498,6 +538,7 @@ public:
     
         return result;
     }    
+    
     // Backward propagation
     void backward() {
         if (backward_fn_) {
@@ -611,11 +652,10 @@ public:
 
 private:
     Eigen::MatrixXf data_;
-    mutable Eigen::MatrixXf grad_;  // Make grad_ mutable
+    mutable Eigen::MatrixXf grad_;
     std::vector<size_t> shape_;
     bool requires_grad_;
     std::function<void()> backward_fn_;
 };
 
 } // namespace lm
-

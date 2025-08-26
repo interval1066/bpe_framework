@@ -2,19 +2,19 @@ cmake_minimum_required(VERSION 3.14)
 project(lm_framework LANGUAGES CXX)
 
 # Check for Intel x86-64 hardware
-if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" AND 
-   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "amd64" AND
-   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" AND
-   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "i686" AND
-   NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+set(SUPPORTED_ARCHITECTURES x86_64 amd64 AMD64 i686 i386)
+list(FIND SUPPORTED_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR} ARCH_INDEX)
+if(ARCH_INDEX EQUAL -1)
     message(FATAL_ERROR "This framework requires Intel x86-64 hardware. "
                         "Current processor architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
 # Check for EIGEN_LOC variable
-if(NOT DEFINED EIGEN_LOC OR EIGEN_LOC STREQUAL "")
+if(NOT DEFINED EIGEN_LOC)
     message(FATAL_ERROR "This framework requires the location of the Eigen header files. "
                         "Please set EIGEN_LOC to the path of your Eigen installation.")
+elseif(EIGEN_LOC STREQUAL "")
+    message(FATAL_ERROR "EIGEN_LOC is empty. Please set it to the path of your Eigen installation.")
 endif()
 
 # Set default build type to Release if not specified
@@ -54,6 +54,9 @@ FetchContent_MakeAvailable(googletest)
 # Add subdirectories
 add_subdirectory(src/tokenizer)
 add_subdirectory(src/runtime)
+add_subdirectory(src/optimizers)  # NEW: Add optimizers directory
+add_subdirectory(src/models)      # NEW: Add models directory
+add_subdirectory(src/training)    # NEW: Add training directory
 
 # Header-only core components (Tensor implementation)
 add_library(lm_core_components INTERFACE)
@@ -74,11 +77,6 @@ target_link_libraries(lm_model INTERFACE lm_core_components)
 add_library(lm_core
     src/runtime/init.cpp
     src/runtime/shutdown.cpp
-    src/models/transformer.cpp          # Add this
-    src/models/transformer_block.cpp    # Add this
-    src/models/attention.cpp            # Add this
-    src/models/feed_forward.cpp         # Add this
-    src/models/layer_norm.cpp           # Add this
 )
 
 target_link_libraries(lm_core
@@ -98,7 +96,6 @@ endif()
 
 # Test executables
 add_executable(test_bpe src/test_bpe.cpp)
-
 target_link_libraries(test_bpe
     PRIVATE
         lm_core
@@ -112,6 +109,26 @@ target_link_libraries(test_unicode_bpe
         GTest::gtest_main
 )
 
+# NEW: Add test for optimizers (only if file exists)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/test_optimizers.cpp)
+    add_executable(test_optimizers src/test_optimizers.cpp)
+    target_link_libraries(test_optimizers
+        PRIVATE
+            lm_core
+            GTest::gtest_main
+    )
+endif()
+
+# NEW: Add test for training (only if file exists)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/test_training.cpp)
+    add_executable(test_training src/test_training.cpp)
+    target_link_libraries(test_training
+        PRIVATE
+            lm_core
+            GTest::gtest_main
+    )
+endif()
+
 # Alpha prototype executable
 add_executable(lm_alpha
     src/alpha/repl.cpp
@@ -124,8 +141,31 @@ target_link_libraries(lm_alpha
         nlohmann_json::nlohmann_json
 )
 
+# NEW: Training example executable (only if file exists)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/train_lm.cpp)
+    add_executable(train_lm examples/train_lm.cpp)
+    target_link_libraries(train_lm
+        PRIVATE
+            lm_core
+    )
+endif()
+
 # Install targets
 install(TARGETS lm_core DESTINATION lib)
+
+# Only install these targets if they exist
+if(TARGET lm_optimizers)
+    install(TARGETS lm_optimizers DESTINATION lib)
+endif()
+
+if(TARGET lm_models)
+    install(TARGETS lm_models DESTINATION lib)
+endif()
+
+if(TARGET lm_training)
+    install(TARGETS lm_training DESTINATION lib)
+endif()
+
 install(DIRECTORY include/ DESTINATION include)
 
 # Performance testing target
@@ -141,6 +181,9 @@ add_executable(integration_example src/integration_example.cpp)
 target_link_libraries(integration_example
     PRIVATE
         lm_core
+        lm_models      # Add models library
+        lm_optimizers  # Add optimizers library if needed
+        lm_training    # Add training library if needed
 )
 
 # Add compiler warning flags
@@ -171,3 +214,16 @@ add_dependencies(test_unicode_bpe check_eigen)
 add_dependencies(lm_alpha check_eigen)
 add_dependencies(performance_test check_eigen)
 add_dependencies(integration_example check_eigen)
+
+# Only add dependencies if the targets exist
+if(TARGET train_lm)
+    add_dependencies(train_lm check_eigen)
+endif()
+
+if(TARGET test_optimizers)
+    add_dependencies(test_optimizers check_eigen)
+endif()
+
+if(TARGET test_training)
+    add_dependencies(test_training check_eigen)
+endif()

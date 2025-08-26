@@ -37,7 +37,7 @@ void MultiHeadAttention::set_training(bool training) {
 }
 
 Tensor MultiHeadAttention::forward(const Tensor& query, const Tensor& key, 
-                                  const Tensor& value, const Tensor& mask) {
+    const Tensor& value, const Tensor& mask) const {
     // Get batch size and sequence length
     //size_t batch_size = query.shape()[0];
     //size_t seq_len = query.shape()[1];
@@ -64,7 +64,7 @@ Tensor MultiHeadAttention::forward(const Tensor& query, const Tensor& key,
     return output;
 }
 
-Tensor MultiHeadAttention::split_heads(const Tensor& x) {
+Tensor MultiHeadAttention::split_heads(const Tensor& x) const {
     // x shape: [batch_size, seq_len, d_model]
     size_t batch_size = x.shape()[0];
     size_t seq_len = x.shape()[1];
@@ -126,7 +126,7 @@ Tensor MultiHeadAttention::split_heads(const Tensor& x) {
     return transposed;
 }
 
-Tensor MultiHeadAttention::combine_heads(const Tensor& x) {
+Tensor MultiHeadAttention::combine_heads(const Tensor& x) const {
     // x shape: [batch_size, num_heads, seq_len, d_k]
     size_t batch_size = x.shape()[0];
     size_t num_heads = x.shape()[1];
@@ -197,7 +197,7 @@ Tensor MultiHeadAttention::combine_heads(const Tensor& x) {
 }
 
 Tensor MultiHeadAttention::scaled_dot_product_attention(const Tensor& q, const Tensor& k, 
-                                                       const Tensor& v, const Tensor& mask) {
+                                                       const Tensor& v, const Tensor& mask) const {
     // q, k, v shapes: [batch_size, num_heads, seq_len, d_k]
     size_t batch_size = q.shape()[0];
     size_t num_heads = q.shape()[1];
@@ -369,7 +369,7 @@ Tensor MultiHeadAttention::scaled_dot_product_attention(const Tensor& q, const T
     return output;
 }
 
-Tensor MultiHeadAttention::apply_dropout(const Tensor& input, float dropout_rate) {
+Tensor MultiHeadAttention::apply_dropout(const Tensor& input, float dropout_rate) const {
     if (dropout_rate <= 0.0) return input;
     
     Tensor output = input;

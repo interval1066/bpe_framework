@@ -50,7 +50,7 @@ void TransformerBlock::set_training(bool training) {
     feed_forward_->set_training(training);
 }
 
-Tensor TransformerBlock::forward(const Tensor& input, const Tensor& mask) {
+Tensor TransformerBlock::forward(const Tensor& input, const Tensor& mask) const {
     // Self-attention with residual connection
     Tensor attention_output = attention_->forward(input, input, input, mask);
     Tensor norm1_output = norm1_->forward(input + attention_output);

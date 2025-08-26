@@ -13,14 +13,14 @@ public:
     std::vector<Tensor> parameters() const;
     void set_training(bool training);
     Tensor forward(const Tensor& query, const Tensor& key, const Tensor& value, 
-                   const Tensor& mask = Tensor());
+                   const Tensor& mask = Tensor()) const;
     
 private:
-    Tensor split_heads(const Tensor& x);
-    Tensor combine_heads(const Tensor& x);
+    Tensor split_heads(const Tensor& x) const;
+    Tensor combine_heads(const Tensor& x) const;
     Tensor scaled_dot_product_attention(const Tensor& q, const Tensor& k, 
-                                        const Tensor& v, const Tensor& mask);
-    Tensor apply_dropout(const Tensor& input, float dropout_rate);
+                                        const Tensor& v, const Tensor& mask) const;
+    Tensor apply_dropout(const Tensor& input, float dropout_rate) const;
     
     size_t d_model_;
     size_t num_heads_;

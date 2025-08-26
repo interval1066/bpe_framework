@@ -11,7 +11,7 @@ public:
     
     std::vector<Tensor> parameters() const;
     void set_training(/*bool training*/);
-    Tensor forward(const Tensor& input);
+    Tensor forward(const Tensor& input) const;
     
 private:
     size_t d_model_;

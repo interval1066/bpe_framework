@@ -74,12 +74,21 @@ target_link_libraries(lm_model INTERFACE lm_core_components)
 add_library(lm_core
     src/runtime/init.cpp
     src/runtime/shutdown.cpp
+    src/models/transformer.cpp          # Add Transformer implementation
+    src/models/transformer_block.cpp    # Add Transformer block
+    src/models/attention.cpp            # Add attention mechanism
+    src/models/feed_forward.cpp         # Add feed forward network
+    src/models/layer_norm.cpp           # Add layer normalization
 )
 
 target_link_libraries(lm_core
     PRIVATE
         lm_tokenizer
         lm_model
+        lm_optimizers  # Add optimizers
+        lm_models      # Add models
+        lm_training    # Add training
+        lm_integration_example
         nlohmann_json::nlohmann_json
 )
 
