@@ -80,5 +80,3 @@
 
     Consider building a simple web demo
 
-Would you like me to elaborate on any of these suggestions or help you implement a specific component?
-New chat
