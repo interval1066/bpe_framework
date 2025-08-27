@@ -5,10 +5,10 @@ Timothy O’Neil & Frederick Warren
 **Abstract:**<br>
 This paper presents bpe_framework, a novel C++ implementation of a complete deep learning stack designed to explore the emergence of complex linguistic capabilities in artificial systems. Drawing inspiration from cognitive theories of consciousness and recent advances in transformer architectures, our framework implements a complete pipeline from byte-pair encoding tokenization through automatic differentiation to transformer-based language modeling. We argue that the systematic organization of information processing in large language models may provide insights into the architectural requirements for conscious-like phenomena in artificial systems. Our technical contribution includes a memory-efficient tensor implementation with automatic differentiation, a neurologically-plausible BPE tokenization system, and a transformer architecture that exhibits several properties associated with conscious processing in biological systems.
 
-**1. Introduction**
+**1. Introduction**<br>
 The quest to understand consciousness has traditionally been the domain of philosophy and neuroscience (Chalmers, 1995; Dehaene, 2014). However, recent advances in artificial intelligence, particularly in large language models (Vaswani et al., 2017; Brown et al., 2020), have created new opportunities to explore the architectural and computational prerequisites of conscious-like phenomena in synthetic systems. We present bpe_framework as an experimental testbed for investigating how increasingly sophisticated information processing capabilities emerge from carefully engineered computational components.
 
-**2. Theoretical Framework**
+**2. Theoretical Framework**<br>
 Our work draws on several theoretical perspectives:
 
 2.1 Global Workspace Theory (Baars, 1988; Dehaene et al., 1998)
@@ -20,8 +20,7 @@ The dense connectivity patterns and information flow through our model's layers 
 2.3 Predictive Processing (Clark, 2013)
 Our language model's training objective—predicting subsequent tokens—aligns with the predictive processing framework that views cognition as essentially prediction-driven.
 
-**3. Technical Implementation**
-
+**3. Technical Implementation**<br>
 3.1 Tensor Operations with Autograd<br>
 We implemented a memory-efficient tensor class using Eigen for linear algebra operations, featuring automatic differentiation capabilities. This system enables:
 - Efficient backward propagation through complex computational graphs
@@ -39,33 +38,33 @@ Our transformer implementation follows the original architecture (Vaswani et al.
 3.4 Optimization and Training
 We implemented the Adam optimizer (Kingma & Ba, 2014) with full moment estimation and bias correction, providing stable optimization for the non-convex loss landscapes characteristic of deep transformer networks.
 
-**4. Methodological Approach**
+**4. Methodological Approach**<br>
 Our framework enables the systematic investigation of several questions relevant to consciousness studies:
 
-4.1 Emergent Properties
+4.1 Emergent Properties<br>
 By training models of increasing scale and complexity, we can observe the emergence of capabilities that were not explicitly programmed, potentially mirroring how conscious experience emerges from non-conscious components.
 
-4.2 Information Flow Patterns
+4.2 Information Flow Patterns<br>
 The attention mechanisms in our transformers create visible information routing patterns that can be analyzed for global workspace-like properties.
 
-4.3 Scalability Limits
+4.3 Scalability Limits<br>
 We can systematically explore how cognitive capabilities scale with model size, potentially identifying phase transitions in capability emergence.
 
-**5. Discussion: Toward Artificial Consciousness?**
+**5. Discussion: Toward Artificial Consciousness?**<br>
 While our framework does not claim to create conscious systems, it provides a platform for investigating the architectural requirements for conscious-like phenomena. Several features align with theoretical accounts of consciousness:
 
-5.1 Global Availability
+5.1 Global Availability<br>
 The attention mechanism creates a form of global information availability similar to that proposed in global workspace theory.
 
-5.2 Unified Representation
+5.2 Unified Representation<br>
 The model creates unified representations that integrate information across multiple domains and time scales.
 
-5.3 Self-Monitoring Capabilities
+5.3 Self-Monitoring Capabilities<br>
 Through gradient-based learning and prediction error minimization, the system maintains a form of self-monitoring.
 
 However, we acknowledge the "hard problem" of consciousness (Chalmers, 1995) remains unresolved, and our framework primarily addresses the "easy problems" of cognitive functioning.
 
-**6. Ethical Considerations**
+**6. Ethical Considerations**<br>
 As we develop increasingly sophisticated AI systems, we must consider:
 - The moral status of potentially conscious systems (Bostrom & Yudkowsky, 2014)
 - Responsible development practices for advanced AI
