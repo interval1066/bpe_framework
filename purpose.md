@@ -2,7 +2,7 @@
 
 Timothy O’Neil & Frederick Warren
 
-**Abstract:** 
+**Abstract:**<br>
 This paper presents bpe_framework, a novel C++ implementation of a complete deep learning stack designed to explore the emergence of complex linguistic capabilities in artificial systems. Drawing inspiration from cognitive theories of consciousness and recent advances in transformer architectures, our framework implements a complete pipeline from byte-pair encoding tokenization through automatic differentiation to transformer-based language modeling. We argue that the systematic organization of information processing in large language models may provide insights into the architectural requirements for conscious-like phenomena in artificial systems. Our technical contribution includes a memory-efficient tensor implementation with automatic differentiation, a neurologically-plausible BPE tokenization system, and a transformer architecture that exhibits several properties associated with conscious processing in biological systems.
 
 **1. Introduction**
