@@ -13,11 +13,11 @@ Requires:
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
  
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
-1. Initialization
+1. Initialization:
     Creates an instance of BPETokenizer
     Defines a training corpus with sample English text
 
-2. Training Process
+2. Training Process:
     Calls tokenizer.train(corpus, 500) to train the tokenizer
     The training process:
         Initializes with byte-level vocabulary (0-255)
@@ -25,7 +25,7 @@ Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
         Iteratively merges the most frequent character pairs
         Builds a vocabulary of 500 tokens (as specified)
 
-3. Encoding Test
+3. Encoding Test:
     Encodes the test string "the quick brown fox"
     The encoding process:
         Splits text into words
@@ -33,7 +33,7 @@ Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
         Applies learned BPE merges to combine tokens
         Returns a sequence of integer token IDs
 
-4. Decoding Test
+4. Decoding Test:
     Decodes the token IDs back to text
     The decoding process:
         Converts each token ID back to its string representation
