@@ -105,4 +105,84 @@ void LanguageModel::eval() {
     is_training_ = false;
 }
 
+void LanguageModel::save(const std::string& path) const {
+    std::ofstream file(path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Cannot open file for writing: " + path);
+    }
+    
+    // Write header
+    const char magic[] = "LMOD";
+    file.write(magic, 4);
+    
+    uint32_t version = 1;
+    file.write(reinterpret_cast<const char*>(&version), sizeof(version));
+    
+    // Get named parameters
+    auto params = named_parameters();
+    uint32_t num_params = static_cast<uint32_t>(params.size());
+    file.write(reinterpret_cast<const char*>(&num_params), sizeof(num_params));
+    
+    // Write each parameter
+    for (const auto& [name, tensor] : params) {
+        Tensor::write_string(file, name);
+        tensor.serialize(file);
+    }
+}
+
+void LanguageModel::load(const std::string& path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Cannot open file for reading: " + path);
+    }
+    
+    // Read and verify header
+    char magic[4];
+    file.read(magic, 4);
+    if (std::string(magic, 4) != "LMOD") {
+        throw std::runtime_error("Invalid model file format");
+    }
+    
+    uint32_t version;
+    file.read(reinterpret_cast<char*>(&version), sizeof(version));
+    if (version != 1) {
+        throw std::runtime_error("Unsupported model version: " + std::to_string(version));
+    }
+    
+    // Read number of parameters
+    uint32_t num_params;
+    file.read(reinterpret_cast<char*>(&num_params), sizeof(num_params));
+    
+    // Read each parameter
+    for (uint32_t i = 0; i < num_params; ++i) {
+        std::string name = Tensor::read_string(file);
+        Tensor tensor;
+        tensor.deserialize(file);
+        
+        // Set the parameter
+        set_parameter(name, tensor);
+    }
+}
+
+std::vector<Tensor> LanguageModel::parameters() const {
+    std::vector<Tensor> params;
+    for (const auto& [name, tensor] : parameters_) {
+        params.push_back(tensor);
+    }
+    return params;
+}
+
+std::unordered_map<std::string, Tensor> LanguageModel::named_parameters() const {
+    return parameters_;
+}
+
+void LanguageModel::set_parameter(const std::string& name, const Tensor& param) {
+    auto it = parameters_.find(name);
+    if (it != parameters_.end()) {
+        it->second = param;
+    } else {
+        throw std::runtime_error("Unknown parameter: " + name);
+    }
+}
+
 } // namespace lm

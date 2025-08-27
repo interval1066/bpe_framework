@@ -122,11 +122,14 @@ float LanguageModelTrainer::compute_loss(const Tensor& logits, const Tensor& tar
 }
 
 void LanguageModelTrainer::save_model(const std::string& path) {
-    // Implementation for saving model parameters
+    model_.save(path);
+    std::cout << "Model saved to: " << path << std::endl;
 }
 
 void LanguageModelTrainer::load_model(const std::string& path) {
-    // Implementation for loading model parameters
+    model_.load(path);
+    std::cout << "Model loaded from: " << path << std::endl;
 }
+
 
 } // namespace lm

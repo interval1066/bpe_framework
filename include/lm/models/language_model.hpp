@@ -13,7 +13,15 @@ public:
     
     Tensor forward(const Tensor& input);
     Tensor operator()(const Tensor& input) { return forward(input); }
+
+    void save(const std::string& path) const;
+    void load(const std::string& path);
     
+    // Parameter access methods
+    std::vector<Tensor> parameters() const;
+    std::unordered_map<std::string, Tensor> named_parameters() const;
+    void set_parameter(const std::string& name, const Tensor& param);
+
     std::vector<Tensor> parameters() const;
     
     void train();
@@ -32,6 +40,8 @@ private:
     Tensor output_bias_;
     
     bool is_training_;
+    std::unordered_map<std::string, Tensor> parameters_;
+
 };
 
 } // namespace lm

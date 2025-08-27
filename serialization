@@ -1,0 +1,93 @@
+    Tensor embedding_weights = Tensor::xavier({vocab_size, embed_dim}, true);
+    parameters_["embedding.weight"] = embedding_weights;
+    
+    // Initialize transformer layers
+    for (size_t i = 0; i < num_layers; ++i) {
+        // Initialize query weights
+        Tensor query_weights = Tensor::xavier({embed_dim, hidden_dim}, true);
+        parameters_[fmt::format("transformer.layers.{}.attention.query.weight", i)] = query_weights;
+        
+        // Initialize query bias
+        Tensor query_bias = Tensor::zeros({hidden_dim}, true);
+        parameters_[fmt::format("transformer.layers.{}.attention.query.bias", i)] = query_bias;
+        
+        // Similarly for key, value, output, etc.
+        // ...
+    }
+    
+    // Initialize output layer
+    Tensor output_weights = Tensor::xavier({hidden_dim, vocab_size}, true);
+    parameters_["output.weight"] = output_weights;
+    
+    Tensor output_bias = Tensor::zeros({vocab_size}, true);
+    parameters_["output.bias"] = output_bias;
+Modify LanguageModel Initialization
+
+You need to ensure that all parameters are stored in the parameters_ map during initialization. For example:
+cpp
+
+// In your LanguageModel constructor or initialization method
+LanguageModel::LanguageModel(size_t vocab_size, size_t embed_dim, 
+                           size_t hidden_dim, size_t num_layers) {
+    // Initialize embedding layer
+    Tensor embedding_weights = Tensor::xavier({vocab_size, embed_dim}, true);
+    parameters_["embedding.weight"] = embedding_weights;
+    
+    // Initialize transformer layers
+    for (size_t i = 0; i < num_layers; ++i) {
+        // Initialize query weights
+        Tensor query_weights = Tensor::xavier({embed_dim, hidden_dim}, true);
+        parameters_[fmt::format("transformer.layers.{}.attention.query.weight", i)] = query_weights;
+        
+        // Initialize query bias
+        Tensor query_bias = Tensor::zeros({hidden_dim}, true);
+        parameters_[fmt::format("transformer.layers.{}.attention.query.bias", i)] = query_bias;
+        
+        // Similarly for key, value, output, etc.
+        // ...
+    }
+    
+    // Initialize output layer
+    Tensor output_weights = Tensor::xavier({hidden_dim, vocab_size}, true);
+    parameters_["output.weight"] = output_weights;
+    
+    Tensor output_bias = Tensor::zeros({vocab_size}, true);
+    parameters_["output.bias"] = output_bias;
+}
+
+Note: You'll need to include the fmt library for string formatting, or use another method to create parameter names.
+6. Add Error Handling and Validation
+
+Consider adding these validations to your serialization code:
+cpp
+
+// In the load method, after reading each parameter
+if (tensor.shape() != it->second.shape()) {
+    throw std::runtime_error("Shape mismatch for parameter: " + name);
+}
+
+// Add checks for file operations
+if (file.fail()) {
+    throw std::runtime_error("Error reading from file: " + path);
+}
+
+// Add checks for end of file
+if (file.eof()) {
+    throw std::runtime_error("Unexpected end of file: " + path);
+}
+
+7. Usage Example
+cpp
+
+// Create and train a model
+LanguageModelTrainer trainer(tokenizer, embedding_dim, hidden_dim, num_layers);
+trainer.train(corpus, epochs, batch_size, sequence_length);
+
+// Save the model
+trainer.save_model("trained_model.bin");
+
+// Later, create a new trainer and load the model
+LanguageModelTrainer new_trainer(tokenizer, embedding_dim, hidden_dim, num_layers);
+new_trainer.load_model("trained_model.bin");
+
+// Continue training or use for inference

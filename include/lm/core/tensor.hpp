@@ -650,6 +650,75 @@ public:
         }
     }
 
+    void serialize(std::ostream& stream) const {
+        // Write shape information
+        uint32_t ndim = static_cast<uint32_t>(shape_.size());
+        stream.write(reinterpret_cast<const char*>(&ndim), sizeof(ndim));
+        
+        for (auto dim : shape_) {
+            uint32_t dim32 = static_cast<uint32_t>(dim);
+            stream.write(reinterpret_cast<const char*>(&dim32), sizeof(dim32));
+        }
+        
+        // Write data
+        size_t num_elements = data_.size();
+        stream.write(reinterpret_cast<const char*>(data_.data()), 
+                    num_elements * sizeof(float));
+        
+        // Note: We're not serializing gradients as they're not needed for inference
+    }
+    
+    void deserialize(std::istream& stream) {
+        // Read shape information
+        uint32_t ndim;
+        stream.read(reinterpret_cast<char*>(&ndim), sizeof(ndim));
+        
+        std::vector<size_t> new_shape(ndim);
+        for (uint32_t i = 0; i < ndim; ++i) {
+            uint32_t dim;
+            stream.read(reinterpret_cast<char*>(&dim), sizeof(dim));
+            new_shape[i] = static_cast<size_t>(dim);
+        }
+        
+        // Resize tensor
+        shape_ = new_shape;
+        if (ndim == 1) {
+            data_ = Eigen::VectorXf::Zero(shape_[0]);
+        } else if (ndim == 2) {
+            data_ = Eigen::MatrixXf::Zero(shape_[0], shape_[1]);
+        } else {
+            size_t total_size = 1;
+            for (auto dim : shape_) total_size *= dim;
+            data_ = Eigen::VectorXf::Zero(total_size);
+        }
+        
+        // Read data
+        size_t num_elements = data_.size();
+        stream.read(reinterpret_cast<char*>(data_.data()), 
+                   num_elements * sizeof(float));
+        
+        // Initialize grad if needed
+        if (requires_grad_) {
+            grad_ = Eigen::MatrixXf::Zero(data_.rows(), data_.cols());
+        }
+    }
+    
+    static void write_string(std::ostream& stream, const std::string& str) {
+        uint32_t length = static_cast<uint32_t>(str.size());
+        stream.write(reinterpret_cast<const char*>(&length), sizeof(length));
+        stream.write(str.c_str(), length);
+    }
+    
+    static std::string read_string(std::istream& stream) {
+        uint32_t length;
+        stream.read(reinterpret_cast<char*>(&length), sizeof(length));
+        
+        std::string str(length, '\0');
+        stream.read(&str[0], length);
+        
+        return str;
+    }
+
 private:
     Eigen::MatrixXf data_;
     mutable Eigen::MatrixXf grad_;
