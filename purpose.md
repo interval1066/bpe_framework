@@ -79,7 +79,3 @@ Our bpe_framework provides a robust technical foundation for exploring the emerg
 - Explicit tests for consciousness-related capabilities
 
 We believe that continued development of such frameworks, coupled with thoughtful theoretical analysis, will gradually illuminate the boundary conditions for consciousness in artificial systems.
-
-**References:**
-**Title:** The Search for the Edge of Consciousness with Artificial Intelligence: A Technical Framework for Language Model Emergence
-
