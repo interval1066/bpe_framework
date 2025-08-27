@@ -22,7 +22,7 @@ Our language model's training objective—predicting subsequent tokens—aligns 
 
 **3. Technical Implementation**
 
-3.1 Tensor Operations with Autograd
+3.1 Tensor Operations with Autograd<br>
 We implemented a memory-efficient tensor class using Eigen for linear algebra operations, featuring automatic differentiation capabilities. This system enables:
 - Efficient backward propagation through complex computational graphs
 - Native support for modern activation functions (GELU, Softmax, ReLU)
