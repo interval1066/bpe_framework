@@ -21,8 +21,6 @@ public:
     std::vector<Tensor> parameters() const;
     std::unordered_map<std::string, Tensor> named_parameters() const;
     void set_parameter(const std::string& name, const Tensor& param);
-
-    std::vector<Tensor> parameters() const;
     
     void train();
     void eval();
