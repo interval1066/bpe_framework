@@ -18,7 +18,7 @@ Requires:
 6. BLAS (Basic Linear Algebra Subprograms) support (https://www.netlib.org/blas/)
 	sudo apt install libblas3
 7. The Parallel Hashmap Library (https://github.com/greg7mdp/parallel-hashmap)
-	(sudo apt-get install libparallel-hashmap-dev)
+	sudo apt-get install libparallel-hashmap-dev
 
 ### What’s here:
 
