@@ -21,7 +21,7 @@ Requires:
 	sudo apt-get install libparallel-hashmap-dev
 
 ### What’s here:
- A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds.
+ A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds, fully internationalized. Future plans include hooks for expansion and additional functionality with Python.
  
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization:
