@@ -5,4 +5,4 @@ Turns out Eigen can only do 1 & 2D transforms so I had to "flatten out" the obje
 Got the transformer code wired in. Some really crazy geometry goes into making machines seem like they're talking to you.
 
 ### 8/27/2025 - Lots of Changes
-Completly re-worked the cmakefile chain; now there's only one master cmakefile. No more parameters to feed to the root cmake file, invoke normally with 'cmake ..'. BLAS math library now a requirement (Debian: apt get install). The refactor has introduced some serious speed regressions so t0000000000ext coding session will be all about speed optimization.
+Completly re-worked the cmakefile chain; now there's only one master cmakefile. No more parameters to feed to the root cmake file, invoke normally with 'cmake ..'. BLAS math library now a requirement (Debian: apt get install). The refactor has introduced some serious speed regressions so next coding session will be all about speed optimization.
