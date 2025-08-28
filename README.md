@@ -9,7 +9,7 @@ Requires:
 	(https://github.com/nlohmann/json)
 	(sudo apt install nlohmann-json3-dev)
 2. Internationalzation library for Unicode by Frederick Roubert
- 	(https://github.com/unicode-org/icu, sudo apt install libicu-dev)
+ 	(https://github.com/unicode-org/icu), (sudo apt install libicu-dev)
 3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize)
 	(Must be installed from source on Debian as far as I know)
 4. Eigen header files (https://github.com/PX4/eigen)
