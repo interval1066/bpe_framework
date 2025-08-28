@@ -11,8 +11,6 @@ Requires:
 4. Eigen header files (https://github.com/PX4/eigen)
 5. BLAS (Basic Linear Algebra Subprograms) support (https://www.netlib.org/blas/)
 
-Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
- 
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization:
     Creates an instance of BPETokenizer
