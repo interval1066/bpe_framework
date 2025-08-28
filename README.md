@@ -7,16 +7,17 @@ Fully internationalized framework for Agentic AI research
 Requires:
 1. Dr. Neils Lohmann’s Json for C++
 	(https://github.com/nlohmann/json)
-	(sudo apt install nlohmann-json3-dev)
+	sudo apt install nlohmann-json3-dev
 2. Internationalzation library for Unicode by Frederick Roubert
- 	(https://github.com/unicode-org/icu), (sudo apt install libicu-dev)
+ 	(https://github.com/unicode-org/icu) sudo apt install libicu-dev
 3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize)
 	(Must be installed from source on Debian as far as I know)
-4. Eigen header files (https://github.com/PX4/eigen)
+4. Eigen Library for Linear Math
+   (https://github.com/PX4/eigen)
 	sudo apt install libeigen3-dev
-5. BLAS (Basic Linear Algebra Subprograms) support (https://www.netlib.org/blas/)
+6. BLAS (Basic Linear Algebra Subprograms) support (https://www.netlib.org/blas/)
 	sudo apt install libblas3
-6. The Parallel Hashmap Library (https://github.com/greg7mdp/parallel-hashmap)
+7. The Parallel Hashmap Library (https://github.com/greg7mdp/parallel-hashmap)
 	(sudo apt-get install libparallel-hashmap-dev)
 
 ### What’s here:
