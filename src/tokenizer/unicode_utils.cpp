@@ -1,8 +1,4 @@
-/*# Unicode Utilities Implementation File
-
-Here's the complete `src/tokenizer/unicode_utils.cpp` file:
-
-```cpp*/
+// src/tokenizer/unicode_utils.cpp
 #include "lm/tokenizer/unicode_utils.hpp"
 #include <unicode/uchar.h>
 #include <unicode/unistr.h>
@@ -125,21 +121,3 @@ std::vector<std::string> split_on_character_boundaries(const std::string& text) 
 }
 
 } // namespace lm::unicode
-/*```
-
-This implementation provides comprehensive Unicode support for the BPE tokenizer with:
-
-1. **Character classification** using ICU library functions
-2. **Unicode normalization** to NFC form for consistent processing
-3. **UTF-8 encoding/decoding** with proper error handling
-4. **Unicode-aware text splitting** based on character boundaries
-5. **Robust error handling** for invalid UTF-8 sequences
-
-Key features:
-- **ICU library integration** for professional-grade Unicode handling
-- **Proper UTF-8 sequence processing** with boundary detection
-- **Character classification** for whitespace, punctuation, and control characters
-- **Normalization** to ensure consistent representation of equivalent Unicode sequences
-- **Exception safety** with proper error reporting
-
-This implementation enables the BPE tokenizer to properly handle multilingual text, including complex scripts and emoji, while maintaining compatibility with ASCII text.*/

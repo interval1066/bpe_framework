@@ -10,7 +10,6 @@ namespace lm {
 
 class LanguageModelTrainer {
 public:
-    // Change to accept a reference
     LanguageModelTrainer(const BPETokenizer& tokenizer,
                        size_t embedding_dim,
                        size_t hidden_dim,
@@ -21,18 +20,23 @@ public:
               size_t batch_size, 
               size_t sequence_length);
     
+    void save_model(const std::string& path);
+    void load_model(const std::string& path);
+    
+    // Model accessor methods
+    LanguageModel& model() { return model_; }
+    const LanguageModel& model() const { return model_; }
+    
     Tensor prepare_batch(const std::vector<std::string>& texts, 
                        size_t sequence_length);
     
     float compute_loss(const Tensor& logits, const Tensor& targets);
-    
-    void save_model(const std::string& path);
-    void load_model(const std::string& path);
 
 private:
-    const BPETokenizer& tokenizer_;  // Store a reference instead of a copy
+    const BPETokenizer& tokenizer_;
     LanguageModel model_;
     AdamOptimizer optimizer_;
 };
 
 } // namespace lm
+

@@ -1,229 +1,84 @@
-cmake_minimum_required(VERSION 3.14)
-project(lm_framework LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.16)
+project(bpe_framework)
 
-# Check for Intel x86-64 hardware
-set(SUPPORTED_ARCHITECTURES x86_64 amd64 AMD64 i686 i386)
-list(FIND SUPPORTED_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR} ARCH_INDEX)
-if(ARCH_INDEX EQUAL -1)
-    message(FATAL_ERROR "This framework requires Intel x86-64 hardware. "
-                        "Current processor architecture: ${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-
-# Check for EIGEN_LOC variable
-if(NOT DEFINED EIGEN_LOC)
-    message(FATAL_ERROR "This framework requires the location of the Eigen header files. "
-                        "Please set EIGEN_LOC to the path of your Eigen installation.")
-elseif(EIGEN_LOC STREQUAL "")
-    message(FATAL_ERROR "EIGEN_LOC is empty. Please set it to the path of your Eigen installation.")
-endif()
-
-# Set default build type to Release if not specified
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-    message(STATUS "Build type not specified, defaulting to Release")
-endif()
-
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Enable cross-directory linking
-if(POLICY CMP0079)
-    cmake_policy(SET CMP0079 NEW)
-endif()
 
 # Include directories
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${EIGEN_LOC} # Local Eigen installation
-)
+include_directories(include)
 
-# Find dependencies
-find_package(nlohmann_json 3.9 REQUIRED)
+# Find required packages
+find_package(Eigen3 REQUIRED)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 
-# GoogleTest
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.11.0
+# Since Tensor is header-only, create an interface library for core components
+add_library(lm_core INTERFACE)
+target_include_directories(lm_core INTERFACE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
+
+# Tokenizer library
+add_library(lm_tokenizer STATIC
+    src/tokenizer/bpe_tokenizer.cpp
+    src/tokenizer/unicode_utils.cpp
 )
-FetchContent_MakeAvailable(googletest)
+target_link_libraries(lm_tokenizer PUBLIC lm_core ICU::uc ICU::i18n)
 
-# Add subdirectories
-add_subdirectory(src/tokenizer)
-add_subdirectory(src/runtime)
-add_subdirectory(src/optimizers)  # NEW: Add optimizers directory
-add_subdirectory(src/models)      # NEW: Add models directory
-add_subdirectory(src/training)    # NEW: Add training directory
-
-# Header-only core components (Tensor implementation)
-add_library(lm_core_components INTERFACE)
-target_include_directories(lm_core_components INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${EIGEN_LOC}  # Local Eigen installation
+# Optimizers library
+add_library(lm_optimizers STATIC
+    src/optimizers/adam.cpp
 )
+target_link_libraries(lm_optimizers PUBLIC lm_core)
 
-# Header-only model components
-add_library(lm_model INTERFACE)
-target_include_directories(lm_model INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${EIGEN_LOC}  # Local Eigen installation
+# Models library - add Transformer implementations
+add_library(lm_models STATIC
+    src/models/language_model.cpp
+    src/models/transformer.cpp          # Add this if it exists
+    src/models/transformer_block.cpp    # Add this if it exists
 )
-target_link_libraries(lm_model INTERFACE lm_core_components)
+target_link_libraries(lm_models PUBLIC lm_core lm_optimizers)
 
-# Main library
-add_library(lm_core
-    src/runtime/init.cpp
-    src/runtime/shutdown.cpp
+# Training library
+add_library(lm_training STATIC
+    src/training/trainer.cpp
 )
+target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers)
 
-target_link_libraries(lm_core
-    PRIVATE
-        lm_tokenizer
-        lm_model
-        nlohmann_json::nlohmann_json
+add_executable(performance_test src/performance_test.cpp)
+target_link_libraries(performance_test
+    lm_training
+    lm_models
+    lm_optimizers
+    lm_tokenizer
+    lm_core
 )
 
-# Set optimization flags for the core library
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(lm_core PRIVATE -O3)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_compile_options(lm_core PRIVATE -DNDEBUG)
-    endif()
-endif()
+add_executable(serialization_demo src/serialization_demo.cpp)
+target_link_libraries(serialization_demo
+    lm_training
+    lm_models
+    lm_optimizers
+    lm_tokenizer
+    lm_core
+)
 
-# Test executables
 add_executable(test_bpe src/test_bpe.cpp)
 target_link_libraries(test_bpe
-    PRIVATE
-        lm_core
-        GTest::gtest_main
+    lm_tokenizer
+    lm_core
 )
 
 add_executable(test_unicode_bpe src/test_unicode_bpe.cpp)
 target_link_libraries(test_unicode_bpe
-    PRIVATE
-        lm_core
-        GTest::gtest_main
+    lm_tokenizer
+    lm_core
 )
 
-# NEW: Add test for optimizers (only if file exists)
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/test_optimizers.cpp)
-    add_executable(test_optimizers src/test_optimizers.cpp)
-    target_link_libraries(test_optimizers
-        PRIVATE
-            lm_core
-            GTest::gtest_main
-    )
-endif()
+# Enable testing if needed
+enable_testing()
 
-# NEW: Add test for training (only if file exists)
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/test_training.cpp)
-    add_executable(test_training src/test_training.cpp)
-    target_link_libraries(test_training
-        PRIVATE
-            lm_core
-            GTest::gtest_main
-    )
-endif()
-
-# Alpha prototype executable
-add_executable(lm_alpha
-    src/alpha/repl.cpp
-    src/alpha/config_io.cpp
-)
-
-target_link_libraries(lm_alpha
-    PRIVATE
-        lm_core
-        nlohmann_json::nlohmann_json
-)
-
-# NEW: Training example executable (only if file exists)
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/train_lm.cpp)
-    add_executable(train_lm examples/train_lm.cpp)
-    target_link_libraries(train_lm
-        PRIVATE
-            lm_core
-    )
-endif()
-
-# Install targets
-install(TARGETS lm_core DESTINATION lib)
-
-# Only install these targets if they exist
-if(TARGET lm_optimizers)
-    install(TARGETS lm_optimizers DESTINATION lib)
-endif()
-
-if(TARGET lm_models)
-    install(TARGETS lm_models DESTINATION lib)
-endif()
-
-if(TARGET lm_training)
-    install(TARGETS lm_training DESTINATION lib)
-endif()
-
-install(DIRECTORY include/ DESTINATION include)
-
-# Performance testing target
-add_executable(performance_test src/performance_test.cpp)
-target_link_libraries(performance_test
-    PRIVATE
-        lm_core
-        GTest::gtest_main
-)
-
-# Integration example
-add_executable(integration_example src/integration_example.cpp)
-target_link_libraries(integration_example
-    PRIVATE
-        lm_core
-        lm_models      # Add models library
-        lm_optimizers  # Add optimizers library if needed
-        lm_training    # Add training library if needed
-)
-
-# Add compiler warning flags
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
-endif()
-
-# Add coverage flags for debug builds
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-    endif()
-endif()
-
-# Verify Eigen installation
-add_custom_target(check_eigen
-    COMMAND ${CMAKE_COMMAND} -E echo "Checking Eigen installation at ${EIGEN_LOC}"
-    COMMAND test -f ${EIGEN_LOC}/Eigen/Core || (echo "Eigen not found at specified path: ${EIGEN_LOC}" && exit 1)
-    COMMENT "Verifying Eigen installation"
-)
-
-# Make main targets depend on Eigen check
-add_dependencies(lm_core check_eigen)
-add_dependencies(test_bpe check_eigen)
-add_dependencies(test_unicode_bpe check_eigen)
-add_dependencies(lm_alpha check_eigen)
-add_dependencies(performance_test check_eigen)
-add_dependencies(integration_example check_eigen)
-
-# Only add dependencies if the targets exist
-if(TARGET train_lm)
-    add_dependencies(train_lm check_eigen)
-endif()
-
-if(TARGET test_optimizers)
-    add_dependencies(test_optimizers check_eigen)
-endif()
-
-if(TARGET test_training)
-    add_dependencies(test_training check_eigen)
-endif()
+# Print configuration summary
+message(STATUS "Project configured successfully")
+message(STATUS "Eigen3 found: ${Eigen3_FOUND}")
+message(STATUS "ICU found: ${ICU_FOUND}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <stdexcept>
 
 namespace lm {
 
@@ -9,9 +10,16 @@ LanguageModelTrainer::LanguageModelTrainer(const BPETokenizer& tokenizer,
                                          size_t embedding_dim,
                                          size_t hidden_dim,
                                          size_t num_layers)
-    : tokenizer_(tokenizer),  // Store reference
+    : tokenizer_(tokenizer),
       model_(tokenizer.vocab_size(), embedding_dim, hidden_dim, num_layers),
-      optimizer_(0.001, 0.9, 0.999, 1e-8) {}
+      optimizer_(0.001, 0.9, 0.999, 1e-8) {
+    // Constructor implementation
+    std::cout << "LanguageModelTrainer initialized with:" << std::endl;
+    std::cout << "  Embedding dim: " << embedding_dim << std::endl;
+    std::cout << "  Hidden dim: " << hidden_dim << std::endl;
+    std::cout << "  Num layers: " << num_layers << std::endl;
+    std::cout << "  Vocab size: " << tokenizer.vocab_size() << std::endl;
+}
 
 void LanguageModelTrainer::train(const std::vector<std::string>& corpus, 
                                size_t epochs, 
@@ -70,6 +78,16 @@ void LanguageModelTrainer::train(const std::vector<std::string>& corpus,
     }
 }
 
+void LanguageModelTrainer::save_model(const std::string& path) {
+    model_.save(path);
+    std::cout << "Model saved to: " << path << std::endl;
+}
+
+void LanguageModelTrainer::load_model(const std::string& path) {
+    model_.load(path);
+    std::cout << "Model loaded from: " << path << std::endl;
+}
+
 Tensor LanguageModelTrainer::prepare_batch(const std::vector<std::string>& texts, 
                                          size_t sequence_length) {
     std::vector<std::vector<TokenID>> tokenized_texts;
@@ -120,16 +138,5 @@ float LanguageModelTrainer::compute_loss(const Tensor& logits, const Tensor& tar
     // Average loss
     return loss(0) / (batch_size * seq_length);
 }
-
-void LanguageModelTrainer::save_model(const std::string& path) {
-    model_.save(path);
-    std::cout << "Model saved to: " << path << std::endl;
-}
-
-void LanguageModelTrainer::load_model(const std::string& path) {
-    model_.load(path);
-    std::cout << "Model loaded from: " << path << std::endl;
-}
-
 
 } // namespace lm

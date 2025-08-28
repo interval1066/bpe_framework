@@ -1,4 +1,4 @@
-# bpe_framework
+﻿# bpe_framework
 ## Byte Pair Encoding Framework
 Large Language Model for Agentic AI
 
@@ -9,6 +9,7 @@ Requires:
 2. Internationalzation library for Unicode by Frederick Roubert (https://github.com/unicode-org/icu)
 3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize)
 4. Eigen header files (https://github.com/PX4/eigen)
+5. BLAS (Basic Linear Algebra Subprograms) support (https://www.netlib.org/blas/)
 
 Build: cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DEIGEN_LOC=<eigen3 folder> ..
  
