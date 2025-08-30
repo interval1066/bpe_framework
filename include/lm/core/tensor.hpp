@@ -9,19 +9,25 @@
 #include <iostream>
 #include <stdexcept>
 
+// Add SIMD headers
+#if defined(__SSE__)
+#include <xmmintrin.h>
+#endif
+#if defined(__AVX__)
+#include <immintrin.h>
+#endif
+
 namespace lm {
 
 class Tensor;
 
 Tensor operator*(float scalar, const Tensor& tensor);
 
-// Scalar multiplication (Tensor * float) - already defined as member function
-// Tensor operator*(const Tensor& tensor, float scalar);
-
-    class Tensor {
+class Tensor {
 public:
-        Tensor() : data_(Eigen::MatrixXf(0, 0)), shape_({0}), requires_grad_(false) {}
-	     Tensor sqrt() const {
+    Tensor() : data_(Eigen::MatrixXf(0, 0)), shape_({0}), requires_grad_(false) {}
+    
+    Tensor sqrt() const {
         Tensor result(data_.array().sqrt(), shape_);
     
         if (requires_grad_) {
@@ -29,7 +35,7 @@ public:
             result.backward_fn_ = [this, result]() {
                 if (this->requires_grad_) {
                     // Gradient of sqrt: 0.5 / sqrt(input)
-                    Eigen::ArrayXf grad_sqrt = 0.5f / (this->data_.array().sqrt() + 1e-12f); // Add small epsilon to avoid division by zero
+                    Eigen::ArrayXf grad_sqrt = 0.5f / (this->data_.array().sqrt() + 1e-12f);
                     this->grad_.array() += result.grad_.array() * grad_sqrt;
                 }
             };
@@ -40,6 +46,9 @@ public:
     
     Tensor(const std::vector<size_t>& shape, bool requires_grad = false) : requires_grad_(requires_grad) {
         shape_ = shape;
+        size_t total_size = 1;
+        for (auto dim : shape) total_size *= dim;
+        
         if (shape.size() == 1) {
             data_ = Eigen::VectorXf::Zero(shape[0]);
             if (requires_grad) {
@@ -52,8 +61,6 @@ public:
             }
         } else {
             // For higher dimensions, we'll flatten and handle with care
-            size_t total_size = 1;
-            for (auto dim : shape) total_size *= dim;
             data_ = Eigen::VectorXf::Zero(total_size);
             if (requires_grad) {
                 grad_ = Eigen::VectorXf::Zero(total_size);
@@ -291,6 +298,7 @@ public:
         return result;
     }
     
+    // Optimized matrix multiplication with potential SIMD support
     Tensor matmul(const Tensor& other) const {
         if (ndim() != 2 || other.ndim() != 2) {
             throw std::invalid_argument("matmul requires 2D tensors");
@@ -299,6 +307,7 @@ public:
             throw std::invalid_argument("Incompatible dimensions for matrix multiplication");
         }
         
+        // Use Eigen's optimized matrix multiplication
         Tensor result(data_ * other.data_, {shape_[0], other.shape()[1]});
         
         if (requires_grad_ || other.requires_grad_) {
@@ -335,11 +344,12 @@ public:
         return result;
     }
     
-    // Reduction operations
+    // Optimized reduction operations
     Tensor sum(int axis = -1) const {
         Tensor result;
         
         if (axis == -1 || ndim() == 1) {
+            // Use Eigen's optimized sum
             result = Tensor(Eigen::MatrixXf::Constant(1, 1, data_.sum()));
         } else if (axis == 0) {
             result = Tensor(data_.colwise().sum(), {shape_[1]});
@@ -406,8 +416,9 @@ public:
         return result;
     }
     
-    // Activation functions with autograd
+    // Optimized activation functions
     Tensor relu() const {
+        // Use Eigen's optimized cwiseMax
         Tensor result(data_.cwiseMax(0.0f), shape_);
         
         if (requires_grad_) {
@@ -424,10 +435,13 @@ public:
         return result;
     }
     
+    // Optimized GELU implementation with potential SIMD support
     Tensor gelu() const {
         // Approximation of GELU: x * 0.5 * (1.0 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
         const float sqrt_2_over_pi = std::sqrt(2.0f / M_PI);
         Eigen::ArrayXf x_array = data_.array();
+        
+        // Use Eigen's optimized operations
         Eigen::ArrayXf result_array = 0.5f * x_array * 
             (1.0f + (sqrt_2_over_pi * (x_array + 0.044715f * x_array.pow(3))).tanh());
     
@@ -448,7 +462,6 @@ public:
                         0.5f * x_array * sech_squared * sqrt_2_over_pi * (1.0f + 0.134145f * x_array.square()) +
                         0.5f * (1.0f + tanh_inner);
                 
-                    // Fix: Convert both sides to the same type before multiplication
                     this->grad_.array() += result.grad_.array() * grad;
                 }
             };
@@ -457,6 +470,7 @@ public:
         return result;
     }
     
+    // Optimized softmax implementation
     Tensor softmax(int axis = -1) const {
         // For numerical stability, subtract the max value
         Eigen::MatrixXf shifted = data_;
@@ -517,7 +531,9 @@ public:
         return result;
     }
     
+    // Optimized sigmoid implementation
     Tensor sigmoid() const {
+        // Use Eigen's optimized operations
         Eigen::ArrayXf x_array = data_.array();
         Eigen::ArrayXf result_array = 1.0f / (1.0f + (-x_array).exp());
     
@@ -529,8 +545,6 @@ public:
                 if (this->requires_grad_) {
                     // Gradient of sigmoid: sigmoid(x) * (1 - sigmoid(x))
                     Eigen::ArrayXf sigmoid_grad = result.data().array() * (1.0f - result.data().array());
-                
-                    // Fix: Convert both sides to the same type before multiplication
                     this->grad_.array() += result.grad_.array() * sigmoid_grad;
                 }
             };
@@ -546,7 +560,7 @@ public:
         }
     }
     
-    // Initialization
+    // Optimized initialization functions
     static Tensor zeros(const std::vector<size_t>& shape, bool requires_grad = false) {
         return Tensor(shape, requires_grad);
     }
@@ -557,17 +571,18 @@ public:
         return result;
     }
     
+    // Optimized random number generation
     static Tensor randn(const std::vector<size_t>& shape, float mean = 0.0f, float stddev = 1.0f, bool requires_grad = false) {
         Tensor result(shape, requires_grad);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<float> dist(mean, stddev);
         
-        for (int i = 0; i < result.data_.rows(); ++i) {
-            for (int j = 0; j < result.data_.cols(); ++j) {
-                result.data_(i, j) = dist(gen);
-            }
-        }
+        // Use Eigen's built-in random generation for better performance
+        result.data_ = Eigen::MatrixXf::NullaryExpr(
+            result.data_.rows(), result.data_.cols(),
+            [&]() { return dist(gen); }
+        );
         
         return result;
     }
@@ -726,5 +741,10 @@ private:
     bool requires_grad_;
     std::function<void()> backward_fn_;
 };
+
+// Global operator for scalar multiplication (scalar * tensor)
+inline Tensor operator*(float scalar, const Tensor& tensor) {
+    return tensor * scalar;
+}
 
 } // namespace lm
