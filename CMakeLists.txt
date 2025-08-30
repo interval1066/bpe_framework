@@ -5,6 +5,27 @@ project(bpe_framework)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Add profile build option - must be defined before any usage
+option(ENABLE_PROFILING "Enable profiling with gprof" OFF)
+
+# Set compiler flags based on build type and profiling option
+if(ENABLE_PROFILING)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+    message(STATUS "Profiling enabled: gprof flags added")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g")
+elseif(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os -DNDEBUG")
+endif()
+
 # Include directories
 include_directories(include)
 
@@ -82,3 +103,5 @@ message(STATUS "Project configured successfully")
 message(STATUS "Eigen3 found: ${Eigen3_FOUND}")
 message(STATUS "ICU found: ${ICU_FOUND}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Profiling enabled: ${ENABLE_PROFILING}")
+
