@@ -6,3 +6,6 @@ Got the transformer code wired in. Some really crazy geometry goes into making m
 
 ### 8/27/2025 - Lots of Changes
 Completly re-worked the cmakefile chain; now there's only one master cmakefile. No more parameters to feed to the root cmake file, invoke normally with 'cmake ..'. BLAS math library now a requirement (Debian: apt get install). The refactor has introduced some serious speed regressions so next coding session will be all about speed optimization.
+
+### 8/30/2025 - Optimization
+Optimized the tokenizer and Tensor classes with inline assembly for some of the more time-intensive calculations, more optimizations coming.
