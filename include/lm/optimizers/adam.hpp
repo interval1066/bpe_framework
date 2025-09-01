@@ -11,6 +11,9 @@ public:
     void step(std::vector<Tensor>& parameters);  // Remove const
     void zero_grad(std::vector<Tensor>& parameters);  // Remove const
     
+    // Add getter for learning rate
+    float get_learning_rate() const { return learning_rate_; }
+    
 private:
     float learning_rate_, beta1_, beta2_, epsilon_;
     int timestep_;
