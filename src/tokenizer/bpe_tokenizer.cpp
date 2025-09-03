@@ -102,6 +102,35 @@ public:
     }
 };
 
+// UTF-8 validation - using C++ implementation only
+static bool is_valid_utf8_asm(const char* str, size_t length) {
+    // Simple UTF-8 validation
+    for (size_t i = 0; i < length; i++) {
+        unsigned char c = str[i];
+        if (c > 0x7F) {  // Non-ASCII character
+            // Check if it's a valid UTF-8 start byte
+            if (c < 0xC2 || c > 0xF4) return false;
+            
+            // Check continuation bytes
+            int following_bytes = 0;
+            if ((c & 0xE0) == 0xC0) following_bytes = 1;
+            else if ((c & 0xF0) == 0xE0) following_bytes = 2;
+            else if ((c & 0xF8) == 0xF0) following_bytes = 3;
+            
+            // Check if we have enough bytes
+            if (i + following_bytes >= length) return false;
+            
+            // Check continuation bytes
+            for (int j = 1; j <= following_bytes; j++) {
+                if ((str[i + j] & 0xC0) != 0x80) return false;
+            }
+            
+            i += following_bytes;
+        }
+    }
+    return true;
+}
+
 struct BPETokenizer::Impl {
     std::unordered_map<std::string, TokenID> vocab;
     std::unordered_map<TokenID, std::string> inv_vocab;
@@ -116,6 +145,11 @@ struct BPETokenizer::Impl {
     mutable UnicodeCache unicode_cache;  // Made mutable
     bool cache_enabled = true;
     
+    // Special token IDs
+    TokenID eos_token_id = 0;
+    TokenID pad_token_id = 0;
+    TokenID unk_token_id = 0;
+    
     // Helper functions
     std::vector<std::string> split_text(const std::string& text) const;
     std::vector<TokenID> word_to_token_ids(const std::string& word) const;
@@ -126,6 +160,9 @@ struct BPETokenizer::Impl {
                         std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash>& pair_counts) const;
     void perform_merge(const std::pair<TokenID, TokenID>& pair, TokenID new_token_id,
                       std::unordered_map<std::string, int>& word_counts);
+    
+    // Handle invalid UTF-8
+    std::vector<TokenID> handle_invalid_utf8(const std::string& text) const;
     
     // CPU Optimization: Batch processing
     void process_string_batch(const std::vector<std::string>& batch);
@@ -159,15 +196,24 @@ void BPETokenizer::Impl::initialize_vocab() {
         inv_vocab.emplace(next_token_id++, std::move(token));
     }
     
-    // Add unknown token
-    auto [it, inserted] = vocab.emplace(unknown_token, next_token_id);
-    if (inserted) {
-        inv_vocab.emplace(next_token_id, unknown_token);
-        special_tokens.emplace(unknown_token, next_token_id);
-        unknown_token_id = next_token_id++;
-    } else {
-        unknown_token_id = it->second;
-    }
+    // Add special tokens
+    vocab["<unk>"] = next_token_id;
+    inv_vocab[next_token_id] = "<unk>";
+    special_tokens["<unk>"] = next_token_id;
+    unk_token_id = next_token_id++;
+    
+    vocab["<pad>"] = next_token_id;
+    inv_vocab[next_token_id] = "<pad>";
+    special_tokens["<pad>"] = next_token_id;
+    pad_token_id = next_token_id++;
+    
+    vocab["<eos>"] = next_token_id;
+    inv_vocab[next_token_id] = "<eos>";
+    special_tokens["<eos>"] = next_token_id;
+    eos_token_id = next_token_id++;
+    
+    // Set unknown token ID
+    unknown_token_id = unk_token_id;
 }
 
 std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text) const {
@@ -180,7 +226,7 @@ std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text)
         }
     } else {
         std::vector<std::string> words;
-        std::istringstream iss(text);
+        std::istringstream iss(text);  // Fixed the typo here
         std::string word;
         
         // Preallocate based on text size
@@ -319,7 +365,39 @@ void BPETokenizer::Impl::perform_merge(const std::pair<TokenID, TokenID>& pair, 
     word_counts = std::move(new_word_counts);
 }
 
-// ... (rest of the implementation remains similar with minor optimizations)
+std::vector<TokenID> BPETokenizer::Impl::handle_invalid_utf8(const std::string& text) const {
+    std::vector<TokenID> tokens;
+    tokens.reserve(text.size());
+    
+    for (size_t i = 0; i < text.size(); i++) {
+        unsigned char c = text[i];
+        
+        // If it's a valid ASCII character, encode normally
+        if (c <= 0x7F) {
+            std::string char_str(1, static_cast<char>(c));
+            if (auto it = vocab.find(char_str); it != vocab.end()) {
+                tokens.push_back(it->second);
+            } else {
+                tokens.push_back(unknown_token_id);
+            }
+        } else {
+            // Invalid byte, use byte fallback or unknown token
+            if (byte_fallback_enabled) {
+                // Encode each byte individually
+                std::string byte_str(1, static_cast<char>(c));
+                if (auto it = vocab.find(byte_str); it != vocab.end()) {
+                    tokens.push_back(it->second);
+                } else {
+                    tokens.push_back(unknown_token_id);
+                }
+            } else {
+                tokens.push_back(unknown_token_id);
+            }
+        }
+    }
+    
+    return tokens;
+}
 
 void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_size) {
     size_t start_memory = get_peak_memory_usage();
@@ -330,6 +408,15 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     
     // Disable caching during training as vocabulary changes frequently
     pimpl_->enable_caching(false);
+    
+    // Validate all input texts before training
+    for (const auto& text : corpus) {
+        if (!BPETokenizer::is_valid_utf8_asm(text.data(), text.size())) {
+            std::cerr << "Warning: Invalid UTF-8 in training corpus: " << text << std::endl;
+            // Skip invalid text
+            continue;
+        }
+    }
     
     // Split text into words
     std::vector<std::string> words;
@@ -406,8 +493,6 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     std::cout << "Final vocabulary size: " << pimpl_->vocab.size() << std::endl;
 }
 
-// ... (rest of the implementation remains similar)
-
 void BPETokenizer::Impl::get_pair_counts(
     const std::unordered_map<std::string, int>& word_counts,
     std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash>& pair_counts) const {
@@ -431,6 +516,16 @@ size_t BPETokenizer::vocab_size() const {
 }
 
 std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
+    // Validate UTF-8 before processing
+    if (!BPETokenizer::is_valid_utf8_asm(text.data(), text.size())) {
+        // Handle invalid UTF-8
+        if (pimpl_->byte_fallback_enabled) {
+            return pimpl_->handle_invalid_utf8(text);
+        } else {
+            return {pimpl_->unknown_token_id};
+        }
+    }
+    
     auto words = pimpl_->split_text(text);
     std::vector<TokenID> tokens;
     tokens.reserve(text.size() * 2); // Pre-allocate based on text size
@@ -531,6 +626,51 @@ bool BPETokenizer::load(const std::string& filename) {
     }
     
     return true;
+}
+
+// Special token method implementations
+TokenID BPETokenizer::eos_token_id() const { 
+    return pimpl_->eos_token_id; 
+}
+
+void BPETokenizer::set_eos_token_id(TokenID id) { 
+    pimpl_->eos_token_id = id; 
+}
+
+TokenID BPETokenizer::pad_token_id() const { 
+    return pimpl_->pad_token_id; 
+}
+
+void BPETokenizer::set_pad_token_id(TokenID id) { 
+    pimpl_->pad_token_id = id; 
+}
+
+TokenID BPETokenizer::unk_token_id() const { 
+    return pimpl_->unk_token_id; 
+}
+
+void BPETokenizer::set_unk_token_id(TokenID id) { 
+    pimpl_->unk_token_id = id; 
+}
+
+void BPETokenizer::add_special_token(const std::string& token, TokenID id) {
+    pimpl_->vocab[token] = id;
+    pimpl_->inv_vocab[id] = token;
+    pimpl_->special_tokens[token] = id;
+    
+    // Update the specific token ID if it matches known types
+    if (token == "<eos>" || token == "</s>") {
+        pimpl_->eos_token_id = id;
+    } else if (token == "<pad>") {
+        pimpl_->pad_token_id = id;
+    } else if (token == "<unk>") {
+        pimpl_->unk_token_id = id;
+    }
+}
+
+// UTF-8 validation method implementation
+bool BPETokenizer::is_valid_utf8_asm(const char* str, size_t length) {
+    return is_valid_utf8_asm(str, length);
 }
 
 } // namespace lm

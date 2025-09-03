@@ -1,4 +1,6 @@
 #include "lm/training/trainer.hpp"
+#include "lm/generation/sampler.hpp"
+#include <queue>
 #include <iostream>
 #include <random>
 #include <algorithm>
@@ -271,6 +273,194 @@ float LanguageModelTrainer::compute_loss(const Tensor& logits, const Tensor& tar
     
     // Average loss
     return loss(0) / (batch_size * seq_length);
+}
+
+Tensor LanguageModelTrainer::prepare_inference_batch(const std::vector<std::vector<int>>& token_sequences, 
+                                                   size_t sequence_length) {
+    size_t batch_size = token_sequences.size();
+    
+    // Create batch tensor
+    std::vector<size_t> shape = {sequence_length, batch_size};
+    Tensor batch(shape);
+    
+    // Fill batch
+    for (size_t i = 0; i < batch_size; ++i) {
+        const auto& tokens = token_sequences[i];
+        for (size_t j = 0; j < sequence_length; ++j) {
+            if (j < tokens.size()) {
+                batch(j, i) = static_cast<float>(tokens[j]);
+            } else {
+                // Padding
+                batch(j, i) = 0.0f;
+            }
+        }
+    }
+    
+    return batch;
+}
+
+std::vector<int> LanguageModelTrainer::generate_tokens(const std::string& prompt, 
+                                                     size_t max_length, 
+                                                     Sampler& sampler,
+                                                     size_t sequence_length) {
+    model_.eval();
+    
+    // Tokenize prompt
+    std::vector<TokenID> temp_tokens = tokenizer_.encode(prompt);
+    std::vector<int> tokens(temp_tokens.begin(), temp_tokens.end());
+    std::vector<int> generated = tokens;
+    
+    // Get EOS token ID
+    int eos_token_id = static_cast<int>(tokenizer_.eos_token_id());
+    
+    for (size_t i = 0; i < max_length; ++i) {
+        // Prepare input (last sequence_length tokens)
+        std::vector<int> input_tokens;
+        if (generated.size() > sequence_length) {
+            input_tokens = std::vector<int>(generated.end() - sequence_length, generated.end());
+        } else {
+            input_tokens = generated;
+        }
+        
+        // Create batch
+        std::vector<std::vector<int>> batch = {input_tokens};
+        Tensor input = prepare_inference_batch(batch, sequence_length);
+        
+        // Forward pass
+        Tensor logits = model_.forward(input);
+        
+        // Get last token logits
+        size_t last_pos = input_tokens.size() - 1;
+        Tensor last_logits_slice = logits.slice(last_pos, last_pos + 1, 0);
+        
+        // Extract the values into a 1D tensor
+        size_t vocab_size = last_logits_slice.shape().back();
+        Tensor last_logits({vocab_size});
+        for (size_t k = 0; k < vocab_size; k++) {
+            last_logits(k) = last_logits_slice(0, 0, k);
+        }
+        
+        // Sample next token
+        int next_token = sampler.sample(last_logits);
+        generated.push_back(next_token);
+        
+        // Stop if we generate an end-of-sequence token
+        if (eos_token_id != 0 && next_token == eos_token_id) {
+            break;
+        }
+    }
+    
+    model_.train();
+    return generated;
+}
+
+// Replace the generate method:
+std::string LanguageModelTrainer::generate(const std::string& prompt, 
+                                         size_t max_length, 
+                                         Sampler& sampler,
+                                         size_t sequence_length) {
+    std::vector<int> tokens = generate_tokens(prompt, max_length, sampler, sequence_length);
+    
+    // Convert int tokens to TokenID for decoding
+    std::vector<TokenID> decode_tokens(tokens.begin(), tokens.end());
+    return tokenizer_.decode(decode_tokens);
+}
+
+// Replace the generate_batch method:
+std::vector<std::string> LanguageModelTrainer::generate_batch(const std::vector<std::string>& prompts, 
+                                                            size_t max_length, 
+                                                            Sampler& sampler,
+                                                            size_t sequence_length,
+                                                            size_t batch_size) {
+    model_.eval();
+    
+    std::vector<std::string> results;
+    std::vector<std::vector<int>> all_generated;
+    
+    // Get EOS token ID
+    int eos_token_id = static_cast<int>(tokenizer_.eos_token_id());
+    
+    // Initialize with prompts
+    for (const auto& prompt : prompts) {
+        std::vector<TokenID> temp_tokens = tokenizer_.encode(prompt);
+        std::vector<int> tokens(temp_tokens.begin(), temp_tokens.end());
+        all_generated.push_back(tokens);
+    }
+    
+    // Create a mask for completed sequences
+    std::vector<bool> completed(prompts.size(), false);
+    
+    for (size_t step = 0; step < max_length; ++step) {
+        // Check if all sequences are completed
+        if (std::all_of(completed.begin(), completed.end(), [](bool v) { return v; })) {
+            break;
+        }
+        
+        // Process in batches
+        for (size_t i = 0; i < prompts.size(); i += batch_size) {
+            size_t end = std::min(i + batch_size, prompts.size());
+            
+            // Prepare batch
+            std::vector<std::vector<int>> batch_inputs;
+            std::vector<size_t> batch_indices;
+            
+            for (size_t j = i; j < end; ++j) {
+                if (completed[j]) continue;
+                
+                // Get last sequence_length tokens
+                std::vector<int> input_tokens;
+                if (all_generated[j].size() > sequence_length) {
+                    input_tokens = std::vector<int>(all_generated[j].end() - sequence_length, all_generated[j].end());
+                } else {
+                    input_tokens = all_generated[j];
+                }
+                
+                batch_inputs.push_back(input_tokens);
+                batch_indices.push_back(j);
+            }
+            
+            if (batch_inputs.empty()) continue;
+            
+            // Create tensor batch
+            Tensor input = prepare_inference_batch(batch_inputs, sequence_length);
+            
+            // Forward pass
+            Tensor logits = model_.forward(input);
+            
+            // Get last token logits for each sequence in batch
+            for (size_t b = 0; b < batch_inputs.size(); ++b) {
+                size_t last_pos = batch_inputs[b].size() - 1;
+                Tensor last_logits_slice = logits.slice(last_pos, last_pos + 1, b);
+                
+                // Extract the values into a 1D tensor
+                size_t vocab_size = last_logits_slice.shape().back();
+                Tensor last_logits({vocab_size});
+                for (size_t k = 0; k < vocab_size; k++) {
+                    last_logits(k) = last_logits_slice(0, 0, k);
+                }
+                
+                // Sample next token
+                int next_token = sampler.sample(last_logits);
+                size_t orig_idx = batch_indices[b];
+                all_generated[orig_idx].push_back(next_token);
+                
+                // Mark as completed if EOS token is generated
+                if (eos_token_id != 0 && next_token == eos_token_id) {
+                    completed[orig_idx] = true;
+                }
+            }
+        }
+    }
+    
+    // Decode all generated sequences
+    for (const auto& tokens : all_generated) {
+        // Convert int tokens to TokenID for decoding
+        std::vector<TokenID> decode_tokens(tokens.begin(), tokens.end());
+        results.push_back(tokenizer_.decode(decode_tokens));
+    }
+    
+    model_.train();
+    return results;
 }
 
 } // namespace lm

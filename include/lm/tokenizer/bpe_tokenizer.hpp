@@ -2,18 +2,12 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <map>
 #include <memory>
-#include <utility>
-#include <cstdint>  // For uint16_t
-#include <queue>
-#include <functional>
-#include <Eigen/Dense>
+#include <unordered_map>
 
 namespace lm {
-    
-using TokenID = uint16_t;  // Support for 65k vocabulary
+
+typedef unsigned short TokenID;
 
 class BPETokenizer {
 public:
@@ -21,36 +15,37 @@ public:
     ~BPETokenizer();
 
     // Training methods
-    void train(const std::vector<std::string>& corpus, size_t vocab_size = 30000);
-    void train_from_file(const std::string& filename, size_t vocab_size = 30000);
-
-    // Tokenization methods
+    void train(const std::vector<std::string>& corpus, size_t vocab_size);
+    
+    // Encoding/decoding methods
     std::vector<TokenID> encode(const std::string& text) const;
     std::string decode(const std::vector<TokenID>& tokens) const;
     
-    // Serialization
+    // Vocabulary methods
+    size_t vocab_size() const;
+    
+    // Serialization methods
     bool save(const std::string& filename) const;
     bool load(const std::string& filename);
-
-    // Vocabulary access
-    size_t vocab_size() const;
-    std::string id_to_token(TokenID id) const;
-    TokenID token_to_id(const std::string& token) const;
-
-    // Configuration
-    void set_unknown_token(const std::string& token);
-    void add_special_token(const std::string& token);
     
-    // Unicode-specific methods
-    void set_normalization(bool enabled);
-    void set_byte_fallback(bool enabled);
+    // Special token methods
+    TokenID eos_token_id() const;
+    void set_eos_token_id(TokenID id);
+    
+    TokenID pad_token_id() const;
+    void set_pad_token_id(TokenID id);
+    
+    TokenID unk_token_id() const;
+    void set_unk_token_id(TokenID id);
 
-    Eigen::VectorXi encode_to_vector(const std::string& text) const;
-    std::string decode_from_vector(const Eigen::VectorXi& tokens) const;
-    Eigen::VectorXf token_frequencies() const;
+    // Add special tokens to vocabulary
+    void add_special_token(const std::string& token, TokenID id);
+    
+    // UTF-8 validation method
+    static bool is_valid_utf8_asm(const char* str, size_t length);
 
 private:
-    struct Impl;
+    class Impl;
     std::unique_ptr<Impl> pimpl_;
 };
 

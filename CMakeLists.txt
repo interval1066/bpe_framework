@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(bpe_framework)
 
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    add_compile_definitions(__x86_64__)
+endif()
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -59,11 +63,17 @@ add_library(lm_models STATIC
 )
 target_link_libraries(lm_models PUBLIC lm_core lm_optimizers)
 
+# Generation library (samplers)
+add_library(lm_generation STATIC
+    src/generation/sampler.cpp
+)
+target_link_libraries(lm_generation PUBLIC lm_core)
+
 # Training library
 add_library(lm_training STATIC
     src/training/trainer.cpp
 )
-target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers)
+target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers lm_generation)
 
 add_executable(performance_test src/performance_test.cpp)
 target_link_libraries(performance_test
@@ -71,6 +81,16 @@ target_link_libraries(performance_test
     lm_models
     lm_optimizers
     lm_tokenizer
+    lm_core
+)
+
+add_executable(test_generation src/test_generation.cpp)
+target_link_libraries(test_generation
+    lm_training
+    lm_models
+    lm_optimizers
+    lm_tokenizer
+    lm_generation
     lm_core
 )
 

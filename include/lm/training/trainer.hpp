@@ -10,6 +10,8 @@
 
 namespace lm {
 
+class Sampler;
+
 class LanguageModelTrainer {
 public:
     // Callback type for training progress monitoring
@@ -61,6 +63,20 @@ public:
     const std::vector<float>& get_train_loss_history() const { return train_loss_history_; }
     const std::vector<float>& get_val_loss_history() const { return val_loss_history_; }
 
+    std::string generate(const std::string& prompt, 
+        size_t max_length, Sampler& sampler,
+        size_t sequence_length);
+    
+    std::vector<int> generate_tokens(const std::string& prompt, 
+       size_t max_length, Sampler& sampler, size_t sequence_length);
+    
+    // Batch generation
+    std::vector<std::string> generate_batch(const std::vector<std::string>& prompts, 
+                                           size_t max_length, 
+                                           Sampler& sampler,
+                                           size_t sequence_length,
+                                           size_t batch_size = 1);
+ 
 private:
     const BPETokenizer& tokenizer_;
     LanguageModel model_;
@@ -75,8 +91,10 @@ private:
     split_data(const std::vector<std::string>& corpus, float validation_split);
     
     float run_validation(const std::vector<std::string>& validation_data,
-                        size_t batch_size,
-                        size_t sequence_length);
+        size_t batch_size, size_t sequence_length);
+
+    Tensor prepare_inference_batch(const std::vector<std::vector<int>>& token_sequences, 
+        size_t sequence_length);
 };
 
 } // namespace lm
