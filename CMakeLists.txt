@@ -115,8 +115,18 @@ target_link_libraries(test_unicode_bpe
     lm_core
 )
 
+add_executable(sampler_test src/sampler_test.cpp)
+target_link_libraries(sampler_test
+    lm_training
+    lm_models
+    lm_optimizers
+    lm_tokenizer
+    lm_generation
+    lm_core
+)
+
 # Enable testing if needed
-enable_testing()
+#enable_testing()
 
 # Print configuration summary
 message(STATUS "Project configured successfully")

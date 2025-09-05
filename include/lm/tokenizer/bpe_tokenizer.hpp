@@ -42,7 +42,7 @@ public:
     void add_special_token(const std::string& token, TokenID id);
     
     // UTF-8 validation method
-    static bool is_valid_utf8_asm(const char* str, size_t length);
+    //bool is_valid_utf8_asm(const char* str, size_t length);
 
 private:
     class Impl;

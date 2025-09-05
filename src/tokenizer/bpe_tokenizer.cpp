@@ -103,7 +103,8 @@ public:
 };
 
 // UTF-8 validation - using C++ implementation only
-static bool is_valid_utf8_asm(const char* str, size_t length) {
+namespace {
+bool is_valid_utf8_impl(const char* str, size_t length) {
     // Simple UTF-8 validation
     for (size_t i = 0; i < length; i++) {
         unsigned char c = str[i];
@@ -130,6 +131,7 @@ static bool is_valid_utf8_asm(const char* str, size_t length) {
     }
     return true;
 }
+} // namespace
 
 struct BPETokenizer::Impl {
     std::unordered_map<std::string, TokenID> vocab;
@@ -226,7 +228,7 @@ std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text)
         }
     } else {
         std::vector<std::string> words;
-        std::istringstream iss(text);  // Fixed the typo here
+        std::istringstream iss(text);
         std::string word;
         
         // Preallocate based on text size
@@ -411,7 +413,7 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     
     // Validate all input texts before training
     for (const auto& text : corpus) {
-        if (!BPETokenizer::is_valid_utf8_asm(text.data(), text.size())) {
+        if (!is_valid_utf8_impl(text.data(), text.size())) {
             std::cerr << "Warning: Invalid UTF-8 in training corpus: " << text << std::endl;
             // Skip invalid text
             continue;
@@ -509,15 +511,13 @@ void BPETokenizer::Impl::get_pair_counts(
     }
 }
 
-// Add these missing member function implementations at the end of the bpe_tokenizer.cpp file
-
 size_t BPETokenizer::vocab_size() const {
     return pimpl_->vocab.size();
 }
 
 std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
     // Validate UTF-8 before processing
-    if (!BPETokenizer::is_valid_utf8_asm(text.data(), text.size())) {
+    if (!is_valid_utf8_impl(text.data(), text.size())) {
         // Handle invalid UTF-8
         if (pimpl_->byte_fallback_enabled) {
             return pimpl_->handle_invalid_utf8(text);
@@ -666,11 +666,6 @@ void BPETokenizer::add_special_token(const std::string& token, TokenID id) {
     } else if (token == "<unk>") {
         pimpl_->unk_token_id = id;
     }
-}
-
-// UTF-8 validation method implementation
-bool BPETokenizer::is_valid_utf8_asm(const char* str, size_t length) {
-    return is_valid_utf8_asm(str, length);
 }
 
 } // namespace lm
