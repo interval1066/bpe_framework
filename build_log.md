@@ -9,3 +9,6 @@ Completly re-worked the cmakefile chain; now there's only one master cmakefile. 
 
 ### 8/30/2025 - Optimization
 Optimized the tokenizer and Tensor classes with inline assembly for some of the more time-intensive calculations, more optimizations coming.
+
+### 9/4/2025 – Expanded Tokenization
+Spent several days chasing down some funky little errors with the tokizer while expanding its capabilities (in so doing created some issues with the internationalization code), finally cracked it a few hours ago.
