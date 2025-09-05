@@ -3,6 +3,7 @@
 Large Language Model for Agentic AI
 
 Fully internationalized framework for Agentic AI research
+Developed on Devian based Linux Mint
 
 Requires:
 1. Dr. Neils Lohmann’s Json for C++
