@@ -35,10 +35,10 @@ Also contains a Code::Blocks project file, other IDEs coming.
 2. Training Process:
     Calls tokenizer.train(corpus, 500) to train the tokenizer
     The training process:
-        Initializes with byte-level vocabulary (0-255)
+        Initializes with a byte-level vocabulary (0-255)
         Analyzes word frequencies in the corpus
         Iteratively merges the most frequent character pairs
-        Builds a vocabulary of 500 tokens (as specified)
+        Builds a vocabulary of 500 tokens
 
 3. Encoding Test:
     Encodes the test string "the quick brown fox"
