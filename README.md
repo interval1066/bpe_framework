@@ -25,7 +25,7 @@ Requires:
  A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds, fully internationalized. Future plans include hooks for expansion and additional functionality with Python, other languages.
 
 #### To Build:
-Create a build directory in the top level bpe_framework 
+Create a build directory in the top level bpe_framework and issue "cmake ..". then "make". 
 Also contains a Code::Blocks project file, other IDEs coming.
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization:
