@@ -132,7 +132,7 @@ int main() {
         // Test EOS token handling
         std::cout << "=== Testing EOS Token Handling ===\n";
         std::string eos_prompt = "Test";
-        std::vector<int> tokens = trainer.generate_tokens(eos_prompt, 50, greedy_sampler, 16);
+        std::vector<int> tokens = trainer.generate_and_return_tokens(eos_prompt, 50, greedy_sampler, 16);
         
         std::cout << "Generated " << tokens.size() << " tokens\n";
         

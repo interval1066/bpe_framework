@@ -1,11 +1,13 @@
 #include "lm/training/trainer.hpp"
 #include "lm/generation/sampler.hpp"
+#include "lm/conversation.hpp"
 #include <queue>
 #include <iostream>
 #include <random>
 #include <algorithm>
 #include <stdexcept>
 #include <cmath>
+#include <functional>
 
 namespace lm {
 
@@ -354,7 +356,6 @@ std::vector<int> LanguageModelTrainer::generate_tokens(const std::string& prompt
     return generated;
 }
 
-// Replace the generate method:
 std::string LanguageModelTrainer::generate(const std::string& prompt, 
                                          size_t max_length, 
                                          Sampler& sampler,
@@ -366,7 +367,6 @@ std::string LanguageModelTrainer::generate(const std::string& prompt,
     return tokenizer_.decode(decode_tokens);
 }
 
-// Replace the generate_batch method:
 std::vector<std::string> LanguageModelTrainer::generate_batch(const std::vector<std::string>& prompts, 
                                                             size_t max_length, 
                                                             Sampler& sampler,
@@ -463,5 +463,78 @@ std::vector<std::string> LanguageModelTrainer::generate_batch(const std::vector<
     return results;
 }
 
-} // namespace lm
+std::vector<std::string> LanguageModelTrainer::prepare_conversation_corpus(
+    const std::vector<Conversation>& conversations,
+    size_t context_turns,
+    size_t max_sequence_length) {
+    
+    std::vector<std::string> corpus;
+    
+    for (const auto& conv : conversations) {
+        if (conv.turns.size() < 2) continue;
+        
+        // Create training examples from conversation turns
+        for (size_t i = 1; i < conv.turns.size(); i++) {
+            // Get context window
+            size_t start_idx = (i > context_turns) ? i - context_turns : 0;
+            auto context_window = std::vector<ConversationTurn>(
+                conv.turns.begin() + start_idx, conv.turns.begin() + i);
+            
+            // Format context and target
+            std::string context = conversation_utils::extract_text(context_window);
+            std::string target = conv.turns[i].text;
+            
+            // Create training example
+            std::string example = context + " " + target;
+            
+            // Truncate if too long (optional)
+            if (max_sequence_length > 0 && example.size() > max_sequence_length) {
+                example = example.substr(0, max_sequence_length);
+            }
+            
+            corpus.push_back(example);
+        }
+    }
+    
+    return corpus;
+}
 
+void LanguageModelTrainer::train_on_conversations(
+    const std::vector<Conversation>& conversations,
+    size_t epochs,
+    size_t batch_size,
+    size_t sequence_length,
+    size_t context_turns,
+    float validation_split,
+    size_t validation_freq,
+    size_t early_stopping_patience,
+    const ProgressCallback& callback) {
+    
+    // Prepare training corpus from conversations
+    std::vector<std::string> corpus = prepare_conversation_corpus(
+        conversations, context_turns, sequence_length);
+    
+    // Use existing training method
+    train(corpus, epochs, batch_size, sequence_length, 
+          validation_split, validation_freq, early_stopping_patience, callback);
+}
+
+std::string LanguageModelTrainer::continue_conversation(
+    const Conversation& conversation,
+    Sampler& sampler,
+    size_t max_length,
+    size_t sequence_length,
+    size_t context_turns) {
+    
+    // Get the most recent turns as context
+    auto context_window = conversation_utils::get_context_window(
+        conversation.turns, context_turns);
+    
+    // Format context
+    std::string context = conversation_utils::extract_text(context_window);
+    
+    // Generate continuation
+    return generate(context, max_length, sampler, sequence_length);
+}
+
+} // namespace lm

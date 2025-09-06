@@ -30,9 +30,7 @@ int main() {
         size_t num_layers = 2;
         
         lm::LanguageModelTrainer trainer(tokenizer, embedding_dim, hidden_dim, num_layers);
-        
-        std::cout << "Model created with " << trainer.model().parameters().size() 
-                  << " parameters" << std::endl;
+        std::cout << "Model created with " << trainer.get_parameter_count() << " parameters." << std::endl;
         
         // Save the model before training
         std::string initial_model_path = "initial_model.bin";
@@ -56,8 +54,8 @@ int main() {
         new_trainer.load_model(trained_model_path);
         
         // Verify that the parameters are the same
-        auto original_params = trainer.model().parameters();
-        auto loaded_params = new_trainer.model().parameters();
+        auto original_params = trainer.get_parameters();
+        auto loaded_params = new_trainer.get_parameters();
         
         std::cout << "Verifying parameter consistency..." << std::endl;
         
@@ -109,23 +107,18 @@ int main() {
         std::cout << "\nTesting text generation with loaded model..." << std::endl;
         
         // Set model to evaluation mode
-        new_trainer.model().eval();
+        new_trainer.eval();
         
         // Generate some text
         std::string prompt = "Artificial intelligence";
         std::cout << "Prompt: " << prompt << std::endl;
         
-        // Tokenize the prompt
-        auto tokens = tokenizer.encode(prompt);
-        
-        // Convert to tensor
-        lm::Tensor input_tensor({static_cast<size_t>(tokens.size())});
-        for (size_t i = 0; i < tokens.size(); ++i) {
-            input_tensor(i) = static_cast<float>(tokens[i]);
-        }
+        // Prepare input batch
+        std::vector<std::string> test_inputs = {prompt};
+        auto input_tensor = trainer.prepare_input_batch(test_inputs, 10);
         
         // Forward pass (just for demonstration)
-        auto output = new_trainer.model().forward(input_tensor);
+        auto output = new_trainer.forward(input_tensor);
         std::cout << "Model output shape: [";
         for (auto dim : output.shape()) {
             std::cout << dim << " ";

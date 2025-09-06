@@ -12,3 +12,6 @@ Optimized the tokenizer and Tensor classes with inline assembly for some of the 
 
 ### 9/4/2025 – Expanded Tokenization
 Spent several days chasing down some funky little errors with the tokizer while expanding its capabilities (in so doing created some issues with the internationalization code), finally cracked it a few hours ago.
+
+### 9/4/2025 - Conversation and ConversationTurn structures implemented
+Put in the foundational structures for getting conversations going on this framework. Also straitened out some lingering issues with the Training class.

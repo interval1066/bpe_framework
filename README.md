@@ -3,7 +3,6 @@
 Large Language Model for Agentic AI
 
 Fully internationalized framework for Agentic AI research
-Developed on Devian based Linux Mint
 
 Requires:
 1. Dr. Neils Lohmann’s Json for C++
@@ -25,7 +24,8 @@ Requires:
  A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds, fully internationalized. Future plans include hooks for expansion and additional functionality with Python, other languages.
 
 #### To Build:
-Create a build directory in the top level bpe_framework and issue "cmake ..". then "make". 
+Create a build directory in the top level bpe_framework; cmake .. -DCMAKE_BUILD_TYPE=Release (or cmake .. -DCMAKE_BUILD_TYPE=Debug)
+
 Also contains a Code::Blocks project file, other IDEs coming.
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization:
@@ -35,10 +35,10 @@ Also contains a Code::Blocks project file, other IDEs coming.
 2. Training Process:
     Calls tokenizer.train(corpus, 500) to train the tokenizer
     The training process:
-        Initializes with a byte-level vocabulary (0-255)
+        Initializes with byte-level vocabulary (0-255)
         Analyzes word frequencies in the corpus
         Iteratively merges the most frequent character pairs
-        Builds a vocabulary of 500 tokens
+        Builds a vocabulary of 500 tokens (as specified)
 
 3. Encoding Test:
     Encodes the test string "the quick brown fox"

@@ -1,101 +1,149 @@
 #pragma once
 
+#include <vector>
+#include <string>
+#include <functional>
 #include "lm/models/language_model.hpp"
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include "lm/optimizers/adam.hpp"
-#include <vector>
-#include <string>
-#include <memory>
-#include <functional>
+#include "lm/conversation.hpp"
+#include "lm/generation/sampler.hpp"
 
 namespace lm {
 
-class Sampler;
+using ProgressCallback = std::function<void(size_t epoch, float train_loss, float val_loss, float lr)>;
 
 class LanguageModelTrainer {
 public:
-    // Callback type for training progress monitoring
-    using ProgressCallback = std::function<void(
-        size_t epoch, 
-        float train_loss, 
-        float val_loss, 
-        float learning_rate
-    )>;
-    
+    // Constructor
     LanguageModelTrainer(const BPETokenizer& tokenizer,
-                       size_t embedding_dim,
-                       size_t hidden_dim,
-                       size_t num_layers);
-    
-    // Main training method with validation
-    void train(const std::vector<std::string>& corpus, 
-              size_t epochs, 
-              size_t batch_size, 
+                        size_t embedding_dim,
+                        size_t hidden_dim,
+                        size_t num_layers);
+
+    // Training methods
+    void train(const std::vector<std::string>& corpus,
+              size_t epochs,
+              size_t batch_size,
               size_t sequence_length,
-              float validation_split = 0.15f,
+              float validation_split = 0.1f,
               size_t validation_freq = 1,
               size_t early_stopping_patience = 0,
               const ProgressCallback& callback = nullptr);
-    
-    // Evaluate on a separate dataset
+
+    void train_on_conversations(
+        const std::vector<Conversation>& conversations,
+        size_t epochs,
+        size_t batch_size,
+        size_t sequence_length,
+        size_t context_turns = 5,
+        float validation_split = 0.1f,
+        size_t validation_freq = 1,
+        size_t early_stopping_patience = 0,
+        const ProgressCallback& callback = nullptr);
+
+    // Evaluation methods
     float evaluate(const std::vector<std::string>& corpus,
                   size_t batch_size,
                   size_t sequence_length);
-    
-    // Test the model on held-out data
+
     std::pair<float, float> test(const std::vector<std::string>& corpus,
                                 size_t batch_size,
                                 size_t sequence_length);
-    
+
+    // Generation methods
+    std::string generate(const std::string& prompt,
+                        size_t max_length,
+                        Sampler& sampler,
+                        size_t sequence_length);
+
+    std::vector<std::string> generate_batch(const std::vector<std::string>& prompts,
+                                           size_t max_length,
+                                           Sampler& sampler,
+                                           size_t sequence_length,
+                                           size_t batch_size);
+
+    std::string continue_conversation(
+        const Conversation& conversation,
+        Sampler& sampler,
+        size_t max_length = 50,
+        size_t sequence_length = 256,
+        size_t context_turns = 5);
+
+    // Utility methods
+    std::vector<std::string> prepare_conversation_corpus(
+        const std::vector<Conversation>& conversations,
+        size_t context_turns,
+        size_t max_sequence_length = 0);
+
+    // Model persistence
     void save_model(const std::string& path);
     void load_model(const std::string& path);
+
+    // Get training history
+    const std::vector<float>& train_loss_history() const { return train_loss_history_; }
+    const std::vector<float>& val_loss_history() const { return val_loss_history_; }
+
+    // Public methods for model access
+    void eval() {
+        model_.eval();
+    }
+
+    void train_mode() {
+        model_.train();
+    }
+
+    inline Tensor forward(const Tensor& input) {
+        return model_.forward(input);
+    }
+
+    inline std::vector<Tensor> get_parameters() const {
+        return model_.parameters();
+    }
+
+    inline Tensor prepare_input_batch(const std::vector<std::string>& texts, size_t sequence_length) {
+        return prepare_batch(texts, sequence_length);
+    }
+
+    inline size_t get_parameter_count() const {
+        return model_.parameters().size();
+    }
+
+    inline std::vector<int> generate_and_return_tokens(const std::string& prompt, 
+                                          size_t max_length, 
+                                          Sampler& sampler,
+                                          size_t sequence_length) {
+        return generate_tokens(prompt, max_length, sampler, sequence_length);
+    }
+
+private:
+    // Private methods
+    std::pair<std::vector<std::string>, std::vector<std::string>> split_data(
+        const std::vector<std::string>& corpus, float validation_split);
     
-    // Model accessor methods
-    LanguageModel& model() { return model_; }
-    const LanguageModel& model() const { return model_; }
+    float run_validation(const std::vector<std::string>& validation_data,
+                        size_t batch_size,
+                        size_t sequence_length);
     
-    Tensor prepare_batch(const std::vector<std::string>& texts, 
+    Tensor prepare_batch(const std::vector<std::string>& texts,
                        size_t sequence_length);
+    
+    Tensor prepare_inference_batch(const std::vector<std::vector<int>>& token_sequences,
+                                 size_t sequence_length);
     
     float compute_loss(const Tensor& logits, const Tensor& targets);
     
-    // Get training history
-    const std::vector<float>& get_train_loss_history() const { return train_loss_history_; }
-    const std::vector<float>& get_val_loss_history() const { return val_loss_history_; }
+    std::vector<int> generate_tokens(const std::string& prompt,
+                                   size_t max_length,
+                                   Sampler& sampler,
+                                   size_t sequence_length);
 
-    std::string generate(const std::string& prompt, 
-        size_t max_length, Sampler& sampler,
-        size_t sequence_length);
-    
-    std::vector<int> generate_tokens(const std::string& prompt, 
-       size_t max_length, Sampler& sampler, size_t sequence_length);
-    
-    // Batch generation
-    std::vector<std::string> generate_batch(const std::vector<std::string>& prompts, 
-                                           size_t max_length, 
-                                           Sampler& sampler,
-                                           size_t sequence_length,
-                                           size_t batch_size = 1);
- 
-private:
+    // Member variables
     const BPETokenizer& tokenizer_;
     LanguageModel model_;
     AdamOptimizer optimizer_;
-    
-    // Training history
     std::vector<float> train_loss_history_;
     std::vector<float> val_loss_history_;
-    
-    // Helper methods
-    std::pair<std::vector<std::string>, std::vector<std::string>> 
-    split_data(const std::vector<std::string>& corpus, float validation_split);
-    
-    float run_validation(const std::vector<std::string>& validation_data,
-        size_t batch_size, size_t sequence_length);
-
-    Tensor prepare_inference_batch(const std::vector<std::vector<int>>& token_sequences, 
-        size_t sequence_length);
 };
 
 } // namespace lm
-
