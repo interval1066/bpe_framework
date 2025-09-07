@@ -24,7 +24,8 @@ Requires:
  A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds, fully internationalized. Future plans include hooks for expansion and additional functionality with Python, other languages.
 
 #### To Build:
-Create a build directory in the top level bpe_framework; cmake .. -DCMAKE_BUILD_TYPE=Release (or cmake .. -DCMAKE_BUILD_TYPE=Debug)
+Create a build directory in the top level bpe_framework; cmake ..
+-DCMAKE_BUILD_TYPE=Release (or cmake .. -DCMAKE_BUILD_TYPE=Debug)
 
 Also contains a Code::Blocks project file, other IDEs coming.
 
@@ -137,6 +138,8 @@ This performance test is ideal for:
 - Identifying performance bottlenecks in tokenization pipelines
 - Testing scalability of tokenizer implementations
 - Comparing optimization techniques
+
+Run in release mode or it will run for a very long time.
 
 ## Technical Implementation
 

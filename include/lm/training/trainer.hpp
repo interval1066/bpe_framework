@@ -2,10 +2,8 @@
 #pragma once
 
 #include <string>
-#include <cereal/types/vector.hpp>
-#include <cereal/archives/binary.hpp>
+#include "../models/language_model.hpp"
 #include "../optimizers/adam.hpp"
-#include "../models/language_model.hpp"  // Add this include
 
 namespace lm {
 namespace training {
@@ -15,27 +13,24 @@ struct TrainingCheckpoint {
     size_t iteration;
     float loss;
     
-    // Cereal serialization
     template <class Archive>
     void serialize(Archive& archive) {
-        archive(
-            cereal::make_nvp("epoch", epoch),
-            cereal::make_nvp("iteration", iteration),
-            cereal::make_nvp("loss", loss)
-        );
+        archive(epoch, iteration, loss);
     }
 };
 
 class Trainer {
 private:
-    LanguageModel& model;  // Remove models:: prefix
+    LanguageModel& model;
     AdamOptimizer& optimizer;
-    // ... other members
     
 public:
-    Trainer(LanguageModel& model, AdamOptimizer& optimizer);  // Remove models:: prefix
+    Trainer(LanguageModel& model, AdamOptimizer& optimizer);
     
-    void train(size_t num_epochs);
+    void train(const std::vector<std::string>& corpus, 
+               size_t num_epochs, 
+               size_t batch_size, 
+               size_t sequence_length);
     
     void save_checkpoint(const std::string& path, 
                         const TrainingCheckpoint& checkpoint) const;
@@ -44,3 +39,4 @@ public:
 
 } // namespace training
 } // namespace lm
+

@@ -37,6 +37,7 @@ include_directories(include/lm/models)
 include_directories(include/lm/training)
 include_directories(include/lm/optimizers)
 include_directories(include/lm/core)
+include_directories(include/lm/tokenizer)
 
 # Find required packages
 find_package(Eigen3 REQUIRED)
@@ -96,9 +97,11 @@ target_link_libraries(lm_optimizers PUBLIC lm_core)
 
 # Models library - add Transformer implementations
 add_library(lm_models STATIC
-    src/models/language_model.cpp
-    src/models/transformer.cpp          # Add this if it exists
-    src/models/transformer_block.cpp    # Add this if it exists
+    src/models/transformer.cpp
+    src/models/transformer_block.cpp
+    src/models/attention.cpp
+    src/models/feed_forward.cpp
+    src/models/layer_norm.cpp
 )
 target_link_libraries(lm_models PUBLIC lm_core lm_optimizers)
 

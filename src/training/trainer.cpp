@@ -5,8 +5,26 @@
 namespace lm {
 namespace training {
 
-Trainer::Trainer(LanguageModel& model, AdamOptimizer& optimizer)  // Remove models:: prefix
+Trainer::Trainer(LanguageModel& model, AdamOptimizer& optimizer) 
     : model(model), optimizer(optimizer) {}
+
+void Trainer::train(const std::vector<std::string>& corpus, 
+                   size_t num_epochs, 
+                   size_t batch_size, 
+                   size_t sequence_length) {
+    // Simplified training loop
+    for (size_t epoch = 0; epoch < num_epochs; epoch++) {
+        // For each batch in the corpus
+        // 1. Tokenize the batch
+        // 2. Forward pass
+        // 3. Compute loss
+        // 4. Backward pass
+        // 5. Optimizer step
+        
+        // Placeholder implementation
+        std::cout << "Training epoch " << epoch + 1 << "/" << num_epochs << std::endl;
+    }
+}
 
 void Trainer::save_checkpoint(const std::string& path, 
                              const TrainingCheckpoint& checkpoint) const {
@@ -20,7 +38,7 @@ void Trainer::save_checkpoint(const std::string& path,
     auto params = model.get_parameters();
     archive(params);
     
-    // Save optimizer state to a separate file
+    // Save optimizer state
     optimizer.save_state(path + ".optim");
 }
 
@@ -40,28 +58,6 @@ TrainingCheckpoint Trainer::load_checkpoint(const std::string& path) {
     optimizer.load_state(path + ".optim");
     
     return checkpoint;
-}
-
-void Trainer::train(size_t num_epochs) {
-    TrainingCheckpoint checkpoint {0, 0, 0.0f};
-    
-    // Try to resume from checkpoint
-    try {
-        checkpoint = load_checkpoint("checkpoint.bin");
-        std::cout << "Resumed from epoch " << checkpoint.epoch << std::endl;
-    } catch (...) {
-        std::cout << "Starting new training" << std::endl;
-    }
-    
-    for (size_t epoch = checkpoint.epoch; epoch < num_epochs; ++epoch) {
-        // Training logic...
-        
-        // Save checkpoint periodically
-        if (epoch % 10 == 0) {
-            checkpoint.epoch = epoch;
-            save_checkpoint("checkpoint.bin", checkpoint);
-        }
-    }
 }
 
 } // namespace training

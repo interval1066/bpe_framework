@@ -4,10 +4,9 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include "token_types.hpp"
 
 namespace lm {
-
-typedef unsigned short TokenID;
 
 class BPETokenizer {
 public:

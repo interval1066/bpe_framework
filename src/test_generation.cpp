@@ -52,12 +52,13 @@ int main() {
         std::cout << "\n=== Testing Samplers ===\n";
         
         // Create a simple tensor for testing samplers
-        std::vector<size_t> shape = {1, 10};
+        // Use explicit shape initialization to avoid Eigen assertion errors
+        std::vector<size_t> shape = {10}; // 1D tensor with 10 elements
         Tensor logits(shape);
         
-        // Initialize with some values
+        // Initialize with some values - use 1D indexing
         for (int i = 0; i < 10; i++) {
-            logits.data()(0, i) = static_cast<float>(i) / 10.0f;
+            logits(i) = static_cast<float>(i) / 10.0f;
         }
         
         // Test greedy sampler
@@ -107,3 +108,4 @@ int main() {
     
     return 0;
 }
+

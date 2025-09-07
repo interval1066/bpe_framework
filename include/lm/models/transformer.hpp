@@ -1,34 +1,57 @@
+// include/lm/models/transformer.hpp
 #pragma once
 
-#include "lm/core/tensor.hpp"
-#include "lm/models/transformer_block.hpp"
+#include "language_model.hpp"
+#include "transformer_block.hpp"
+#include "attention.hpp"
+#include "feed_forward.hpp"
+#include "layer_norm.hpp"
 #include <vector>
 #include <memory>
-#include <cmath>
 
 namespace lm {
 
-class Transformer {
-public:
-    Transformer(size_t vocab_size, size_t d_model, size_t num_heads, 
-                size_t d_ff, size_t num_layers, size_t max_seq_len, float dropout = 0.1f);
+    class Transformer : public LanguageModel {
+        size_t vocab_size_,
+            d_model_,
+            num_heads_,
+            d_ff_,
+            num_layers_,
+            max_seq_length_;
+        float dropout_;
     
-    std::vector<Tensor> parameters() const;
-    void set_training(bool training);
-    Tensor forward(const Tensor& input, const Tensor& mask);
-    Tensor forward(const Tensor& input);
+        // Embedding layers
+        Tensor token_embeddings_;
+        Tensor positional_embeddings_;
     
-private:
-    Tensor apply_dropout(const Tensor& input, float dropout_rate);
+        // Transformer blocks
+        std::vector<TransformerBlock> layers_;
+
+        // Final layer norm and output projection
+        LayerNorm final_layer_norm_;
+        Tensor output_projection_;
     
-    size_t vocab_size_, d_model_, num_heads_, d_ff_, num_layers_, max_seq_len_;
-    float dropout_;
-    bool training_ = false;
+    public:
+        Transformer(size_t vocab_size, size_t d_model, size_t num_heads, 
+               size_t d_ff, size_t num_layers, float dropout, size_t max_seq_length);
     
-    Tensor embedding_;
-    Tensor positional_encoding_;
-    Tensor output_layer_;
-    std::vector<std::unique_ptr<TransformerBlock>> transformer_blocks_;
-};
+        // LanguageModel interface implementation
+        std::vector<Tensor> get_parameters() const override;
+        void set_parameters(const std::vector<Tensor>& params) override;
+        Tensor forward(const std::vector<TokenID>& input) override;
+        Tensor forward(const std::vector<TokenID>& input, 
+                  const std::vector<TokenID>& targets) override;
+    
+        size_t get_vocab_size() const override { return vocab_size_; }
+        size_t get_max_sequence_length() const override { return max_seq_length_; }
+    
+        void save(const std::string& path) const override;
+        void load(const std::string& path) override;
+    
+        // Additional methods specific to Transformer
+        Tensor embed(const std::vector<TokenID>& tokens) const;
+        Tensor apply_positional_encoding(const Tensor& embeddings, size_t seq_length) const;
+    };
 
 } // namespace lm
+

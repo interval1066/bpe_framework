@@ -1,45 +1,34 @@
+// include/lm/models/language_model.hpp
 #pragma once
 
-#include "lm/core/tensor.hpp"
-#include <string>
-#include <unordered_map>
 #include <vector>
+#include <cstdint>
+#include <string>
+#include "../core/tensor.hpp"
 
 namespace lm {
 
+using TokenID = uint32_t;
+
 class LanguageModel {
 public:
-    LanguageModel(size_t vocab_size, size_t embed_dim, size_t hidden_dim, size_t num_layers);
+    virtual ~LanguageModel() = default;
     
-    Tensor forward(const Tensor& input);
-    void train();
-    void eval();
-    
-    // Parameter access methods
-    std::vector<Tensor> parameters() const;
-    std::unordered_map<std::string, Tensor> named_parameters() const;
-    void set_parameter(const std::string& name, const Tensor& param);
-
+    // Pure virtual methods that must be implemented
     virtual std::vector<Tensor> get_parameters() const = 0;
     virtual void set_parameters(const std::vector<Tensor>& params) = 0;
-
-    // Serialization methods
-    void save(const std::string& path) const;
-    void load(const std::string& path);
-
-private:
-    std::unordered_map<std::string, Tensor> parameters_;
-    bool is_training_ = true;
+    virtual Tensor forward(const std::vector<TokenID>& input) = 0;
+    virtual Tensor forward(const std::vector<TokenID>& input, 
+                          const std::vector<TokenID>& targets) = 0;
     
-    // Placeholder for actual model components
-    Tensor embedding_forward(const Tensor& input);
-    Tensor output_forward(const Tensor& input);
+    // Optional virtual methods with default implementations
+    virtual size_t get_vocab_size() const { return 0; }
+    virtual size_t get_max_sequence_length() const { return 0; }
     
-    // Placeholder for transformer layers
-    struct TransformerLayer {
-        Tensor forward(const Tensor& input) { return input; } // Simplified
-    };
-    std::vector<TransformerLayer> transformer_layers_;
+    // Serialization
+    virtual void save(const std::string& path) const = 0;
+    virtual void load(const std::string& path) = 0;
 };
 
 } // namespace lm
+
