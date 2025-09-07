@@ -32,6 +32,11 @@ endif()
 
 # Include directories
 include_directories(include)
+include_directories(include/lm)
+include_directories(include/lm/models)
+include_directories(include/lm/training)
+include_directories(include/lm/optimizers)
+include_directories(include/lm/core)
 
 # Find required packages
 find_package(Eigen3 REQUIRED)

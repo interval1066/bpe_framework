@@ -8,6 +8,10 @@
 #include <functional>
 #include <iostream>
 #include <stdexcept>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/functional.hpp>
 
 // Add SIMD headers
 #if defined(__SSE__)
@@ -571,6 +575,11 @@ public:
         return result;
     }
     
+    // Add zeros_like method for compatibility with Adam optimizer
+    static Tensor zeros_like(const Tensor& other, bool requires_grad = false) {
+        return Tensor::zeros(other.shape(), requires_grad);
+    }
+    
     // Optimized random number generation
     static Tensor randn(const std::vector<size_t>& shape, float mean = 0.0f, float stddev = 1.0f, bool requires_grad = false) {
         Tensor result(shape, requires_grad);
@@ -734,6 +743,44 @@ public:
         return str;
     }
 
+    // Cereal serialization method
+    template <class Archive>
+    void serialize(Archive& archive) {
+        // Serialize basic data members
+        archive(
+            cereal::make_nvp("shape", shape_),
+            cereal::make_nvp("requires_grad", requires_grad_)
+        );
+        
+        // Serialize the data matrix
+        size_t rows = data_.rows();
+        size_t cols = data_.cols();
+        archive(rows, cols);
+        
+        if (Archive::is_loading::value) {
+            // We're loading, so resize the matrix
+            data_.resize(rows, cols);
+        }
+        
+        // Serialize the matrix data
+        archive(cereal::binary_data(data_.data(), rows * cols * sizeof(float)));
+        
+        // Serialize gradient if needed
+        if (requires_grad_) {
+            size_t grad_rows = grad_.rows();
+            size_t grad_cols = grad_.cols();
+            archive(grad_rows, grad_cols);
+            
+            if (Archive::is_loading::value) {
+                grad_.resize(grad_rows, grad_cols);
+            }
+            
+            archive(cereal::binary_data(grad_.data(), grad_rows * grad_cols * sizeof(float)));
+        }
+        
+        // Note: We don't serialize backward_fn_ as it's a runtime computation graph
+    }
+
 private:
     Eigen::MatrixXf data_;
     mutable Eigen::MatrixXf grad_;
@@ -748,3 +795,4 @@ inline Tensor operator*(float scalar, const Tensor& tensor) {
 }
 
 } // namespace lm
+

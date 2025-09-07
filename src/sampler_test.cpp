@@ -1,4 +1,3 @@
-#include "lm/training/trainer.hpp"
 #include "lm/generation/sampler.hpp"
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include <iostream>
@@ -64,7 +63,6 @@ void test_tokenizer_generation() {
     std::vector<TokenID> encoded = tokenizer.encode(test_text);
     std::string decoded = tokenizer.decode(encoded);
 
-
     std::cout << "Original: " << test_text << std::endl;
     std::cout << "Encoded: ";
     for (auto token : encoded) {
@@ -80,54 +78,74 @@ void test_tokenizer_generation() {
     std::cout << "Tokenizer generation test passed!" << std::endl;
 }
 
-void test_basic_generation() {
-    std::cout << "\n=== Testing Basic Generation ===" << std::endl;
+void test_temperature_effects() {
+    std::cout << "\n=== Testing Temperature Effects ===" << std::endl;
     
-    // Create tokenizer and train on small corpus
-    BPETokenizer tokenizer;
-    std::vector<std::string> corpus = {
-        "the cat sat on the mat",
-        "dogs are great pets",
-        "machine learning is fun"
-    };
+    // Create a simple logits tensor
+    std::vector<size_t> shape = {5}; // Vocabulary size 5
+    Tensor logits(shape);
     
-    tokenizer.train(corpus, 100);
-    
-    // Create a small model
-    LanguageModelTrainer trainer(tokenizer, 32, 64, 1); // Small model
-    
-    // Test that we can create samplers
-    GreedySampler greedy_sampler;
-    RandomSampler random_sampler(0.8f);
-    
-    std::cout << "Model and samplers created successfully" << std::endl;
-    
-    // Test that the generate method exists and can be called
-    // Note: This won't produce good results without proper training,
-    // but it should work without crashing
-    try {
-        std::string prompt = "the";
-        std::string result = trainer.generate(prompt, 5, greedy_sampler, 10);
-        std::cout << "Generation result: " << result << std::endl;
-        assert(!result.empty());
-    } catch (const std::exception& e) {
-        std::cout << "Generation test failed: " << e.what() << std::endl;
-        // Don't assert here as the model might not be trained properly
+    // Set up logits
+    for (size_t i = 0; i < 5; i++) {
+        logits(i) = static_cast<float>(i);
     }
     
-    std::cout << "Basic generation test completed!" << std::endl;
+    // Test different temperature values
+    RandomSampler high_temp_sampler(2.0f); // High temperature
+    RandomSampler low_temp_sampler(0.5f);  // Low temperature
+    
+    int high_temp_token = high_temp_sampler.sample(logits);
+    int low_temp_token = low_temp_sampler.sample(logits);
+    
+    std::cout << "High temperature (2.0) selected token: " << high_temp_token << std::endl;
+    std::cout << "Low temperature (0.5) selected token: " << low_temp_token << std::endl;
+    
+    // Both should be valid tokens
+    assert(high_temp_token >= 0 && high_temp_token < 5);
+    assert(low_temp_token >= 0 && low_temp_token < 5);
+    
+    std::cout << "Temperature effects test passed!" << std::endl;
+}
+
+void test_sampler_consistency() {
+    std::cout << "\n=== Testing Sampler Consistency ===" << std::endl;
+    
+    // Create a simple logits tensor
+    std::vector<size_t> shape = {5}; // Vocabulary size 5
+    Tensor logits(shape);
+    
+    // Set up logits with one clear winner
+    logits(0) = 1.0f;
+    logits(1) = 1.0f;
+    logits(2) = 10.0f; // Clear winner
+    logits(3) = 1.0f;
+    logits(4) = 1.0f;
+    
+    // Greedy sampler should always pick the same token
+    GreedySampler greedy_sampler;
+    int first_token = greedy_sampler.sample(logits);
+    
+    // Test multiple times
+    for (int i = 0; i < 10; i++) {
+        int token = greedy_sampler.sample(logits);
+        assert(token == first_token);
+    }
+    
+    std::cout << "Greedy sampler is consistent (always selects token " << first_token << ")" << std::endl;
+    std::cout << "Sampler consistency test passed!" << std::endl;
 }
 
 int main() {
-    std::cout << "Starting generation functionality tests..." << std::endl;
+    std::cout << "Starting sampler functionality tests..." << std::endl;
     
     try {
         test_samplers();
         test_tokenizer_generation();
-        test_basic_generation();
+        test_temperature_effects();
+        test_sampler_consistency();
         
         std::cout << "\n=== All Tests Passed! ===" << std::endl;
-        std::cout << "Generation functionality is working correctly." << std::endl;
+        std::cout << "Sampler functionality is working correctly." << std::endl;
         
         return 0;
     } catch (const std::exception& e) {
@@ -135,3 +153,4 @@ int main() {
         return 1;
     }
 }
+

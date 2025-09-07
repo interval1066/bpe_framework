@@ -19,7 +19,10 @@ public:
     std::vector<Tensor> parameters() const;
     std::unordered_map<std::string, Tensor> named_parameters() const;
     void set_parameter(const std::string& name, const Tensor& param);
-    
+
+    virtual std::vector<Tensor> get_parameters() const = 0;
+    virtual void set_parameters(const std::vector<Tensor>& params) = 0;
+
     // Serialization methods
     void save(const std::string& path) const;
     void load(const std::string& path);

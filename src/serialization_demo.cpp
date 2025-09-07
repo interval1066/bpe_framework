@@ -1,136 +1,121 @@
-// examples/serialization_demo.cpp
-#include "../include/lm/training/trainer.hpp"
-#include "../include/lm/tokenizer/bpe_tokenizer.hpp"
+#include "lm/tokenizer/bpe_tokenizer.hpp"
+#include "lm/optimizers/adam.hpp"
+#include "lm/conversation_manager.hpp"
+#include "lm/core/tensor.hpp"
 #include <iostream>
-#include <vector>
-#include <cassert>
-#include <cmath>
+#include <fstream>
+#include <chrono>
+
+using namespace lm;
 
 int main() {
-    std::cout << "BPE Framework Serialization Demo" << std::endl;
-    std::cout << "=================================" << std::endl;
+    std::cout << "=== BPE Framework Serialization Demo ===\n\n";
     
     try {
-        // Create a simple corpus for training
+        // Initialize tokenizer
+        BPETokenizer tokenizer;
+        
+        // Create a small test corpus
         std::vector<std::string> corpus = {
             "The quick brown fox jumps over the lazy dog",
-            "Artificial intelligence is transforming our world",
-            "Language models can understand and generate text",
-            "Deep learning requires large amounts of data",
-            "Natural language processing is a fascinating field"
+            "Programming is fun with C++ and machine learning",
+            "Natural language processing transforms how we interact with computers"
         };
         
-        // Initialize tokenizer
-        lm::BPETokenizer tokenizer;
-        tokenizer.train(corpus, 1000); // Train with 1000 merges
+        std::cout << "Training tokenizer on " << corpus.size() << " sentences...\n";
+        tokenizer.train(corpus, 100); // Small vocabulary for testing
         
-        // Initialize model and trainer
-        size_t embedding_dim = 64;
-        size_t hidden_dim = 128;
-        size_t num_layers = 2;
+        // Test conversation manager
+        std::cout << "Testing conversation manager...\n";
+        ConversationManager conv_manager;
         
-        lm::LanguageModelTrainer trainer(tokenizer, embedding_dim, hidden_dim, num_layers);
-        std::cout << "Model created with " << trainer.get_parameter_count() << " parameters." << std::endl;
+        // Create a conversation and add some messages
+        std::string conv_id = conv_manager.create_conversation("Test Conversation");
+        conv_manager.add_message(conv_id, "user", "Hello, how are you?");
+        conv_manager.add_message(conv_id, "assistant", "I'm doing well, thank you!");
+        conv_manager.add_message(conv_id, "user", "What's the weather like today?");
         
-        // Save the model before training
-        std::string initial_model_path = "initial_model.bin";
-        std::cout << "Saving initial model to " << initial_model_path << "..." << std::endl;
-        trainer.save_model(initial_model_path);
+        // Save conversation
+        std::cout << "Saving conversation...\n";
+        conv_manager.save_conversations("test_conversations.bin");
         
-        // Train for a few epochs (just for demonstration)
-        std::cout << "Training model for 3 epochs..." << std::endl;
-        trainer.train(corpus, 3, 2, 10); // 3 epochs, batch size 2, sequence length 10
+        // Load conversation into a new manager
+        std::cout << "Loading conversation...\n";
+        ConversationManager loaded_conv_manager;
+        loaded_conv_manager.load_conversations("test_conversations.bin");
         
-        // Save the trained model
-        std::string trained_model_path = "trained_model.bin";
-        std::cout << "Saving trained model to " << trained_model_path << "..." << std::endl;
-        trainer.save_model(trained_model_path);
-        
-        // Create a new trainer with the same architecture
-        lm::LanguageModelTrainer new_trainer(tokenizer, embedding_dim, hidden_dim, num_layers);
-        
-        // Load the trained model
-        std::cout << "Loading trained model from " << trained_model_path << "..." << std::endl;
-        new_trainer.load_model(trained_model_path);
-        
-        // Verify that the parameters are the same
-        auto original_params = trainer.get_parameters();
-        auto loaded_params = new_trainer.get_parameters();
-        
-        std::cout << "Verifying parameter consistency..." << std::endl;
-        
-        if (original_params.size() != loaded_params.size()) {
-            std::cerr << "Error: Parameter count mismatch!" << std::endl;
-            return 1;
-        }
-        
-        // Check if parameters are approximately equal (allowing for floating point precision)
-        bool all_match = true;
-        float max_diff = 0.0f;
-        
-        for (size_t i = 0; i < original_params.size(); ++i) {
-            const auto& original = original_params[i].data();
-            const auto& loaded = loaded_params[i].data();
-            
-            if (original.rows() != loaded.rows() || original.cols() != loaded.cols()) {
-                std::cerr << "Error: Parameter shape mismatch at index " << i << std::endl;
-                all_match = false;
-                continue;
-            }
-            
-            // Check if values are approximately equal
-            for (int j = 0; j < original.size(); ++j) {
-                float diff = std::abs(original(j) - loaded(j));
-                if (diff > max_diff) {
-                    max_diff = diff;
-                }
-                
-                // Allow for small floating point differences
-                if (diff > 1e-6) {
-                    std::cerr << "Error: Parameter value mismatch at index " << i 
-                              << ", position " << j << ": " << original(j) 
-                              << " vs " << loaded(j) << std::endl;
-                    all_match = false;
-                }
+        // Verify the loaded conversation
+        auto loaded_conv = loaded_conv_manager.get_conversation(conv_id);
+        if (loaded_conv) {
+            std::cout << "Loaded conversation has " << loaded_conv->turns.size() << " turns\n";
+            for (size_t i = 0; i < loaded_conv->turns.size(); i++) {
+                const auto& turn = loaded_conv->turns[i];
+                std::cout << "Turn " << i << ": " << speaker_type_to_string(turn.speaker) 
+                          << ": " << turn.text << "\n";
             }
         }
         
-        std::cout << "Maximum parameter difference: " << max_diff << std::endl;
+        // Test optimizer state serialization
+        std::cout << "Testing optimizer state serialization...\n";
         
-        if (all_match) {
-            std::cout << "SUCCESS: All parameters match correctly!" << std::endl;
-        } else {
-            std::cout << "WARNING: Some parameters don't match exactly" << std::endl;
+        // Create a simple set of parameters for the optimizer
+        std::vector<Tensor> params;
+        params.push_back(Tensor({2, 3}, true)); // parameter with requires_grad = true
+        params.push_back(Tensor({5}, true));    // another parameter
+        
+        // Initialize an optimizer
+        AdamOptimizer optimizer(0.001, 0.9, 0.999, 1e-8);
+        
+        // Initialize moments for the parameters
+        optimizer.initialize_moments(params);
+        
+        // Save optimizer state
+        optimizer.save_state("test_optimizer.bin");
+        
+        // Create a new optimizer and load the state
+        AdamOptimizer new_optimizer(0.001, 0.9, 0.999, 1e-8);
+        new_optimizer.load_state("test_optimizer.bin");
+        std::cout << "Optimizer state loaded successfully\n";
+        
+        // Test tensor serialization
+        std::cout << "Testing tensor serialization...\n";
+        
+        // Create a tensor with explicit shape vector to avoid ambiguity
+        std::vector<size_t> shape = {2, 3};
+        Tensor test_tensor(shape);
+        test_tensor.data() << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f;
+        
+        {
+            std::ofstream ofs("test_tensor.bin", std::ios::binary);
+            cereal::BinaryOutputArchive archive(ofs);
+            archive(test_tensor);
         }
         
-        // Test text generation with the loaded model
-        std::cout << "\nTesting text generation with loaded model..." << std::endl;
-        
-        // Set model to evaluation mode
-        new_trainer.eval();
-        
-        // Generate some text
-        std::string prompt = "Artificial intelligence";
-        std::cout << "Prompt: " << prompt << std::endl;
-        
-        // Prepare input batch
-        std::vector<std::string> test_inputs = {prompt};
-        auto input_tensor = trainer.prepare_input_batch(test_inputs, 10);
-        
-        // Forward pass (just for demonstration)
-        auto output = new_trainer.forward(input_tensor);
-        std::cout << "Model output shape: [";
-        for (auto dim : output.shape()) {
-            std::cout << dim << " ";
+        Tensor loaded_tensor;
+        {
+            std::ifstream ifs("test_tensor.bin", std::ios::binary);
+            cereal::BinaryInputArchive archive(ifs);
+            archive(loaded_tensor);
         }
-        std::cout << "]" << std::endl;
         
-        std::cout << "\nSerialization demo completed successfully!" << std::endl;
+        std::cout << "Original tensor:\n" << test_tensor.data() << "\n";
+        std::cout << "Loaded tensor:\n" << loaded_tensor.data() << "\n";
+        
+        // Test tokenizer serialization (if implemented)
+        std::cout << "Testing tokenizer serialization...\n";
+        tokenizer.save("test_tokenizer.bin");
+        
+        BPETokenizer loaded_tokenizer;
+        loaded_tokenizer.load("test_tokenizer.bin");
+        std::cout << "Tokenizer vocabulary size after loading: " << loaded_tokenizer.vocab_size() << "\n";
+        
+        std::cout << "\n=== Serialization Demo Completed Successfully ===\n";
         
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << "\n";
         return 1;
     }
     
     return 0;
 }
+

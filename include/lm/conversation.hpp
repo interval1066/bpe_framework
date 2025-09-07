@@ -12,6 +12,7 @@
 #include <cereal/types/chrono.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/archives/binary.hpp>
+#include <cereal/types/utility.hpp> // For std::pair serialization
 
 namespace lm {
 
@@ -183,3 +184,4 @@ inline std::vector<ConversationTurn> get_context_window(
 } // namespace conversation_utils
 
 } // namespace lm
+
