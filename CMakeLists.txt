@@ -37,6 +37,40 @@ include_directories(include)
 find_package(Eigen3 REQUIRED)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 
+# Cereal serialization library (header-only)
+# We'll manually download it to avoid Boost dependency issues
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/cereal/include/cereal/cereal.hpp)
+    message(STATUS "Downloading Cereal library...")
+    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/third_party/cereal)
+    
+    # Download the specific version of Cereal
+    file(DOWNLOAD 
+        https://github.com/USCiLab/cereal/archive/refs/tags/v1.3.2.tar.gz
+        ${CMAKE_SOURCE_DIR}/third_party/cereal_v1.3.2.tar.gz
+        SHOW_PROGRESS
+    )
+    
+    # Extract the archive
+    execute_process(
+        COMMAND tar -xf ${CMAKE_SOURCE_DIR}/third_party/cereal_v1.3.2.tar.gz -C ${CMAKE_SOURCE_DIR}/third_party
+    )
+    
+    # Move the include directory
+    file(RENAME 
+        ${CMAKE_SOURCE_DIR}/third_party/cereal-1.3.2/include 
+        ${CMAKE_SOURCE_DIR}/third_party/cereal/include
+    )
+    
+    # Clean up
+    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/third_party/cereal-1.3.2)
+    file(REMOVE ${CMAKE_SOURCE_DIR}/third_party/cereal_v1.3.2.tar.gz)
+endif()
+
+# Add the manually downloaded Cereal include directory
+set(CEREAL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third_party/cereal/include)
+include_directories(${CEREAL_INCLUDE_DIR})
+message(STATUS "Using Cereal from: ${CEREAL_INCLUDE_DIR}")
+
 # Since Tensor is header-only, create an interface library for core components
 add_library(lm_core INTERFACE)
 target_include_directories(lm_core INTERFACE ${CMAKE_SOURCE_DIR}/include)
@@ -75,6 +109,12 @@ add_library(lm_training STATIC
 )
 target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers lm_generation)
 
+# Conversation management library
+add_library(lm_conversation STATIC
+    src/conversation_manager.cpp
+)
+target_link_libraries(lm_conversation PUBLIC lm_core)
+
 add_executable(performance_test src/performance_test.cpp)
 target_link_libraries(performance_test
     lm_training
@@ -100,6 +140,7 @@ target_link_libraries(serialization_demo
     lm_models
     lm_optimizers
     lm_tokenizer
+    lm_conversation
     lm_core
 )
 
@@ -132,6 +173,6 @@ target_link_libraries(sampler_test
 message(STATUS "Project configured successfully")
 message(STATUS "Eigen3 found: ${Eigen3_FOUND}")
 message(STATUS "ICU found: ${ICU_FOUND}")
+message(STATUS "Cereal include: ${CEREAL_INCLUDE_DIR}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Profiling enabled: ${ENABLE_PROFILING}")
-

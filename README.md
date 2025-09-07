@@ -27,6 +27,7 @@ Requires:
 Create a build directory in the top level bpe_framework; cmake .. -DCMAKE_BUILD_TYPE=Release (or cmake .. -DCMAKE_BUILD_TYPE=Debug)
 
 Also contains a Code::Blocks project file, other IDEs coming.
+
 #### The test_bpe application is a comprehensive test program that validates the functionality of the BPE tokenizer implementation in the LM Framework. Here's how it works:
 1. Initialization:
     Creates an instance of BPETokenizer

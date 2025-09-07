@@ -1,3 +1,4 @@
+// include/lm/conversation.hpp
 #pragma once
 
 #include <string>
@@ -5,6 +6,12 @@
 #include <map>
 #include <chrono>
 #include <memory>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/chrono.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/binary.hpp>
 
 namespace lm {
 
@@ -47,6 +54,18 @@ struct ConversationTurn {
                     const std::map<std::string, std::string>& metadata = {})
         : speaker(speaker_type), text(text), metadata(metadata) {
         timestamp = std::chrono::system_clock::now();
+    }
+    
+    // Cereal serialization
+    template <class Archive>
+    void serialize(Archive& archive) {
+        archive(
+            cereal::make_nvp("speaker", reinterpret_cast<int&>(speaker)),
+            cereal::make_nvp("text", text),
+            cereal::make_nvp("tokens", tokens),
+            cereal::make_nvp("timestamp", timestamp),
+            cereal::make_nvp("metadata", metadata)
+        );
     }
 };
 
@@ -103,6 +122,19 @@ struct Conversation {
         auto duration = end_time - start_time;
         return std::chrono::duration<double>(duration).count();
     }
+    
+    // Cereal serialization
+    template <class Archive>
+    void serialize(Archive& archive) {
+        archive(
+            cereal::make_nvp("turns", turns),
+            cereal::make_nvp("domain", domain),
+            cereal::make_nvp("language", language),
+            cereal::make_nvp("metadata", metadata),
+            cereal::make_nvp("start_time", start_time),
+            cereal::make_nvp("end_time", end_time)
+        );
+    }
 };
 
 // Helper functions for conversation processing
@@ -151,4 +183,3 @@ inline std::vector<ConversationTurn> get_context_window(
 } // namespace conversation_utils
 
 } // namespace lm
-
