@@ -166,6 +166,15 @@ target_link_libraries(sampler_test
     lm_core
 )
 
+add_executable(test_conversation src/test_conversation.cpp)
+target_link_libraries(test_conversation
+    lm_conversation
+    lm_core
+)
+
+# Update the print configuration summary to include the new test
+message(STATUS "Conversation test: test_conversation")
+
 # Enable testing if needed
 #enable_testing()
 
