@@ -14,7 +14,7 @@ Optimized the tokenizer and Tensor classes with inline assembly for some of the 
 Spent several days chasing down some funky little errors with the tokenizer while expanding its capabilities (in so doing created some issues with the internationalization code), finally cracked it a few hours ago.
 
 ### 9/4/2025 - Conversation and ConversationTurn structures implemented
-Put in the foundational structures for getting conversations going on this framework. Also straitened out some lingering issues with the Training class.
+Put in the foundational structures for getting conversations going on this framework. Also straitened out some lingering issues with the Training class. Started using the Ceral C++ serialization library, this is automatically downloaded for you while CMake runs.
 
 ### 9/7/2025 - Using Efficient Token Sequence-Based Approach
 Hashing the tokens rather than string manipulation is a completely faster approach and I don't even feel the need to use inline assembly. 1000% more
