@@ -158,7 +158,6 @@ struct BPETokenizer::Impl {
     std::vector<std::string> split_text(const std::string& text) const;
     std::vector<TokenID> word_to_token_ids(const std::string& word) const;
     void initialize_vocab();
-
     void count_word_frequencies(const std::vector<std::string>& words,
                                std::unordered_map<std::string, int>& word_counts) const;
     void get_pair_counts(const std::unordered_map<std::string, int>& word_counts,
@@ -191,28 +190,6 @@ struct BPETokenizer::Impl {
     void log_token_decoding(TokenID token_id, const std::string& decoded) const;
     void log_final_decoding(const std::string& text) const;
 };
-
-// Add debug logging to the decode method
-std::string BPETokenizer::decode(const std::vector<TokenID>& tokens) const {
-    pimpl_->log_decode_start(tokens);
-    
-    std::string text;
-    text.reserve(tokens.size() * 3); // Estimate average token length
-    
-    for (TokenID token_id : tokens) {
-        std::string token_text;
-        if (pimpl_->inv_vocab.find(token_id) != pimpl_->inv_vocab.end()) {
-            token_text = pimpl_->inv_vocab.at(token_id);
-        } else {
-            token_text = pimpl_->unknown_token;
-        }
-        pimpl_->log_token_decoding(token_id, token_text);
-        text += token_text;
-    }
-    
-    pimpl_->log_final_decoding(text);
-    return text;
-}
 
 // Debug logging implementations
 void BPETokenizer::Impl::log_encode_start(const std::string& text) const {
@@ -290,56 +267,6 @@ void BPETokenizer::Impl::log_final_decoding(const std::string& text) const {
     if (!debug_logging) return;
     std::cout << "[DECODE] Final result: '" << text << "'" << std::endl;
 }
-
-// Add debug logging to the encode method
-/*std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
-    pimpl_->log_encode_start(text);
-    
-    // Validate UTF-8 before processing
-    if (!is_valid_utf8_impl(text.data(), text.size())) {
-        // Handle invalid UTF-8
-        if (pimpl_->byte_fallback_enabled) {
-            return pimpl_->handle_invalid_utf8(text);
-        } else {
-            return {pimpl_->unknown_token_id};
-        }
-    }
-    
-    auto words = pimpl_->split_text(text);
-    pimpl_->log_word_split(words);
-    
-    std::vector<TokenID> tokens;
-    tokens.reserve(text.size() * 2); // Pre-allocate based on text size
-    
-    for (const auto& word : words) {
-        auto word_tokens = pimpl_->word_to_token_ids(word);
-        pimpl_->log_word_tokens(word, word_tokens);
-        
-        // Apply BPE merges more efficiently
-        bool changed;
-        do {
-            changed = false;
-            for (size_t i = 0; i < word_tokens.size() - 1; i++) {
-                auto pair = std::make_pair(word_tokens[i], word_tokens[i+1]);
-                bool found = pimpl_->merges.find(pair) != pimpl_->merges.end();
-                pimpl_->log_merge_attempt(i, word_tokens[i], word_tokens[i+1], found);
-                
-                if (found) {
-                    word_tokens[i] = pimpl_->merges.at(pair);
-                    word_tokens.erase(word_tokens.begin() + i + 1);
-                    changed = true;
-                    pimpl_->log_merge_result(word_tokens);
-                    break;
-                }
-            }
-        } while (changed);
-        
-        tokens.insert(tokens.end(), word_tokens.begin(), word_tokens.end());
-    }
-    
-    pimpl_->log_final_tokens(tokens);
-    return tokens;
-}*/
 
 // Add debug methods to the BPETokenizer class
 void BPETokenizer::enable_debug_logging(bool enable) {
@@ -474,58 +401,6 @@ std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text)
     }
 }
 
-std::vector<TokenID> BPETokenizer::Impl::word_to_token_ids(const std::string& word) const {
-    std::vector<TokenID> tokens;
-    tokens.reserve(word.size());
-    
-    if (normalization_enabled) {
-        std::string normalized;
-        if (cache_enabled) {
-            normalized = unicode_cache.get_normalized(word);
-        } else {
-            normalized = unicode::normalize(word);
-        }
-        
-        // Proper Unicode segmentation
-        std::vector<std::string> characters;
-        if (cache_enabled) {
-            characters = unicode_cache.get_split(normalized);
-        } else {
-            characters = unicode::unicode_split(normalized);
-        }
-        
-        for (const auto& character : characters) {
-            if (auto it = vocab.find(character); it != vocab.end()) {
-                tokens.push_back(it->second);
-            } else if (byte_fallback_enabled) {
-                // Handle unknown Unicode characters by byte encoding
-                for (unsigned char c : character) {
-                    std::string byte_str(1, static_cast<char>(c));
-                    if (auto byte_it = vocab.find(byte_str); byte_it != vocab.end()) {
-                        tokens.push_back(byte_it->second);
-                    } else {
-                        tokens.push_back(unknown_token_id);
-                    }
-                }
-            } else {
-                tokens.push_back(unknown_token_id);
-            }
-        }
-    } else {
-        // Non-Unicode mode
-        for (char c : word) {
-            std::string token(1, c);
-            if (auto it = vocab.find(token); it != vocab.end()) {
-                tokens.push_back(it->second);
-            } else {
-                tokens.push_back(unknown_token_id);
-            }
-        }
-    }
-    
-    return tokens;
-}
-
 void BPETokenizer::Impl::count_word_frequencies(
     const std::vector<std::string>& words,
     std::unordered_map<std::string, int>& word_counts) const {
@@ -544,14 +419,14 @@ void BPETokenizer::Impl::count_word_frequencies(
 
 void BPETokenizer::Impl::perform_merge(const std::pair<TokenID, TokenID>& pair, TokenID new_token_id,
                                       std::unordered_map<std::string, int>& word_counts) {
-    std::string new_token = inv_vocab.at(pair.first) + inv_vocab.at(pair.second);
+    std::string new_token = this->inv_vocab.at(pair.first) + this->inv_vocab.at(pair.second);
     
     // Add new token to vocabulary
-    vocab[new_token] = new_token_id;
-    inv_vocab[new_token_id] = new_token;
-    merges[pair] = new_token_id;
+    this->vocab[new_token] = new_token_id;
+    this->inv_vocab[new_token_id] = new_token;
+    this->merges[pair] = new_token_id;
     
-    // Update word counts with new merges
+    // Update word counts by replacing occurrences of the pair
     std::unordered_map<std::string, int> new_word_counts;
     
     for (const auto& [word, count] : word_counts) {
@@ -559,18 +434,18 @@ void BPETokenizer::Impl::perform_merge(const std::pair<TokenID, TokenID>& pair, 
         size_t pos = 0;
         
         while (pos < word.size()) {
-            // Check if we found the pair to merge
-            size_t found_pos = word.find(inv_vocab.at(pair.first) + inv_vocab.at(pair.second), pos);
-            if (found_pos != std::string::npos) {
-                // Add the part before the match
-                new_word += word.substr(pos, found_pos - pos);
-                // Add the merged token
+            // Check if we found the pair at this position
+            size_t first_len = this->inv_vocab.at(pair.first).size();
+            size_t second_len = this->inv_vocab.at(pair.second).size();
+            
+            if (pos + first_len + second_len <= word.size() &&
+                word.substr(pos, first_len) == this->inv_vocab.at(pair.first) &&
+                word.substr(pos + first_len, second_len) == this->inv_vocab.at(pair.second)) {
                 new_word += new_token;
-                pos = found_pos + inv_vocab.at(pair.first).size() + inv_vocab.at(pair.second).size();
+                pos += first_len + second_len;
             } else {
-                // Add the remaining part
-                new_word += word.substr(pos);
-                break;
+                new_word += word[pos];
+                pos++;
             }
         }
         
@@ -670,12 +545,13 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
             [](const auto& a, const auto& b) { return a.second < b.second; }
         );
         
-        // Debug output
-        if (iteration % 100 == 0) {
-            std::cout << "Iteration " << iteration 
-                      << ", Vocab size: " << pimpl_->vocab.size()
-                      << ", Most frequent pair: (" << max_pair->first.first 
-                      << "," << max_pair->first.second << ") count: " 
+        // Debug output - show what we're merging
+        if (pimpl_->debug_logging) {
+            std::string first_str = pimpl_->inv_vocab.count(max_pair->first.first) ? 
+                pimpl_->inv_vocab.at(max_pair->first.first) : "<?>";
+            std::string second_str = pimpl_->inv_vocab.count(max_pair->first.second) ? 
+                pimpl_->inv_vocab.at(max_pair->first.second) : "<?>";
+            std::cout << "Merging: '" << first_str << "' + '" << second_str << "' → count: " 
                       << max_pair->second << std::endl;
         }
         
@@ -716,12 +592,59 @@ void BPETokenizer::Impl::get_pair_counts(
     pair_counts.reserve(word_counts.size() * 10);
     
     for (const auto& [word, count] : word_counts) {
+        // Tokenize the word using the current vocabulary
         auto tokens = word_to_token_ids(word);
+        
+        // Count pairs in the tokenized representation
         for (size_t i = 0; i < tokens.size() - 1; i++) {
             auto pair = std::make_pair(tokens[i], tokens[i+1]);
             pair_counts[pair] += count;
         }
     }
+}
+
+std::vector<TokenID> BPETokenizer::Impl::word_to_token_ids(const std::string& word) const {
+    std::vector<TokenID> tokens;
+    
+    if (normalization_enabled) {
+        // Use Unicode-aware splitting
+        std::vector<std::string> characters;
+        if (cache_enabled) {
+            characters = unicode_cache.get_split(word);
+        } else {
+            characters = unicode::unicode_split(word);
+        }
+        
+        for (const auto& character : characters) {
+            if (auto it = vocab.find(character); it != vocab.end()) {
+                tokens.push_back(it->second);
+            } else if (byte_fallback_enabled) {
+                // Fall back to byte encoding for unknown characters
+                for (unsigned char c : character) {
+                    std::string byte_str(1, static_cast<char>(c));
+                    if (auto byte_it = vocab.find(byte_str); byte_it != vocab.end()) {
+                        tokens.push_back(byte_it->second);
+                    } else {
+                        tokens.push_back(unknown_token_id);
+                    }
+                }
+            } else {
+                tokens.push_back(unknown_token_id);
+            }
+        }
+    } else {
+        // Non-Unicode mode: treat as ASCII
+        for (char c : word) {
+            std::string token(1, c);
+            if (auto it = vocab.find(token); it != vocab.end()) {
+                tokens.push_back(it->second);
+            } else {
+                tokens.push_back(unknown_token_id);
+            }
+        }
+    }
+    
+    return tokens;
 }
 
 size_t BPETokenizer::vocab_size() const {
@@ -731,6 +654,7 @@ size_t BPETokenizer::vocab_size() const {
 std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
     pimpl_->log_encode_start(text);
     
+    // Validate UTF-8 before processing
     if (!is_valid_utf8_impl(text.data(), text.size())) {
         if (pimpl_->byte_fallback_enabled) {
             return pimpl_->handle_invalid_utf8(text);
@@ -739,58 +663,71 @@ std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
         }
     }
     
-    // First, convert the entire text to initial tokens
-    std::vector<TokenID> tokens;
+    // Normalize the text first
     std::string normalized = pimpl_->normalization_enabled ? 
         pimpl_->unicode_cache.get_normalized(text) : text;
     
-    // Split into characters or bytes
-    std::vector<std::string> characters;
-    if (pimpl_->normalization_enabled) {
-        characters = pimpl_->unicode_cache.get_split(normalized);
-    } else {
-        for (char c : normalized) {
-            characters.push_back(std::string(1, c));
-        }
-    }
+    // Split into words
+    auto words = pimpl_->split_text(normalized);
+    pimpl_->log_word_split(words);
     
-    // Convert characters to token IDs
-    for (const auto& character : characters) {
-        if (auto it = pimpl_->vocab.find(character); it != pimpl_->vocab.end()) {
-            tokens.push_back(it->second);
-        } else if (pimpl_->byte_fallback_enabled) {
-            // Byte fallback for unknown characters
-            for (unsigned char byte : character) {
-                std::string byte_str(1, static_cast<char>(byte));
-                if (auto byte_it = pimpl_->vocab.find(byte_str); byte_it != pimpl_->vocab.end()) {
-                    tokens.push_back(byte_it->second);
-                } else {
-                    tokens.push_back(pimpl_->unknown_token_id);
+    std::vector<TokenID> tokens;
+    
+    for (const auto& word : words) {
+        // Convert word to initial tokens (characters)
+        auto word_tokens = pimpl_->word_to_token_ids(word);
+        pimpl_->log_word_tokens(word, word_tokens);
+        
+        // Apply BPE merges
+        bool changed;
+        do {
+            changed = false;
+            for (size_t i = 0; i < word_tokens.size() - 1; i++) {
+                auto pair = std::make_pair(word_tokens[i], word_tokens[i+1]);
+                if (auto it = pimpl_->merges.find(pair); it != pimpl_->merges.end()) {
+                    // Replace the pair with the merged token
+                    word_tokens[i] = it->second;
+                    word_tokens.erase(word_tokens.begin() + i + 1);
+                    changed = true;
+                    pimpl_->log_merge_result(word_tokens);
+                    // Restart from the beginning to catch new pairs
+                    i = 0;
                 }
             }
-        } else {
-            tokens.push_back(pimpl_->unknown_token_id);
+        } while (changed);
+        
+        tokens.insert(tokens.end(), word_tokens.begin(), word_tokens.end());
+        
+        // Add space between words (except after the last word)
+        if (&word != &words.back() && pimpl_->vocab.find(" ") != pimpl_->vocab.end()) {
+            tokens.push_back(pimpl_->vocab.at(" "));
         }
     }
-    
-    // Apply BPE merges
-    bool changed;
-    do {
-        changed = false;
-        for (size_t i = 0; i < tokens.size() - 1; i++) {
-            auto pair = std::make_pair(tokens[i], tokens[i+1]);
-            if (auto it = pimpl_->merges.find(pair); it != pimpl_->merges.end()) {
-                tokens[i] = it->second;
-                tokens.erase(tokens.begin() + i + 1);
-                changed = true;
-                // Need to check the new pair with previous token
-                if (i > 0) i--;
-            }
-        }
-    } while (changed);
     
     pimpl_->log_final_tokens(tokens);
     return tokens;
+}
+
+// Add debug logging to the decode method
+std::string BPETokenizer::decode(const std::vector<TokenID>& tokens) const {
+    pimpl_->log_decode_start(tokens);
+    
+    std::string text;
+    text.reserve(tokens.size() * 3); // Estimate average token length
+    
+    for (TokenID token_id : tokens) {
+        std::string token_text;
+        if (pimpl_->inv_vocab.find(token_id) != pimpl_->inv_vocab.end()) {
+            token_text = pimpl_->inv_vocab.at(token_id);
+        } else {
+            token_text = pimpl_->unknown_token;
+        }
+        pimpl_->log_token_decoding(token_id, token_text);
+        text += token_text;
+    }
+    
+    pimpl_->log_final_decoding(text);
+    return text;
 }
 
 bool BPETokenizer::save(const std::string& filename) const {
