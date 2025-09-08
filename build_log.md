@@ -15,3 +15,7 @@ Spent several days chasing down some funky little errors with the tokizer while 
 
 ### 9/4/2025 - Conversation and ConversationTurn structures implemented
 Put in the foundational structures for getting conversations going on this framework. Also straitened out some lingering issues with the Training class.
+
+### 9/7/2025 - Using Efficient Token Sequence-Based Approach
+Hashing the tokens rather than string manipulation is a completely faster approach and I don't even feel the need to use inline assembly. 1000% more
+efficient. Added a vectorhash struct to effeiciently manipulate them as well.
