@@ -19,6 +19,8 @@ Requires:
 	sudo apt install libblas3
 7. The Parallel Hashmap Library (https://github.com/greg7mdp/parallel-hashmap)
 	sudo apt-get install libparallel-hashmap-dev
+8. Added Cereal C++ serialization library (https://uscilab.github.io/cereal/),
+    one less thing I need to maintain. CMake will automatically download this for you. 
 
 ### What’s here:
  A 100% C++ 17/STL implementation of a Byte Pair Encoding (Tokenization) AI Engine with speed at the foremost of the designer's minds, fully internationalized. Future plans include hooks for expansion and additional functionality with Python, other languages.
