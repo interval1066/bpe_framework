@@ -1,6 +1,8 @@
 #include "lm/tokenizer/bpe_tokenizer.hpp"
+#include "lm/tokenizer/unicode_utils.hpp"  // Add this include for normalization
 #include <iostream>
 #include <vector>
+#include <iomanip>  // Add this for std::hex and std::setw
 
 int main() {
     lm::BPETokenizer tokenizer;
@@ -40,13 +42,61 @@ int main() {
             std::string decoded = tokenizer.decode(tokens);
             
             std::cout << "\nOriginal: " << test_text << std::endl;
+            
+            // Add hex dump of original text
+            std::cout << "Original (hex): ";
+            for (unsigned char c : test_text) {
+                std::cout << std::hex << std::setw(2) << std::setfill('0') 
+                          << static_cast<int>(c) << " ";
+            }
+            std::cout << std::dec << std::endl;
+            
             std::cout << "Tokens: ";
             for (auto token : tokens) {
                 std::cout << token << " ";
             }
             std::cout << std::endl;
+            
             std::cout << "Decoded: " << decoded << std::endl;
+            
+            // Add hex dump of decoded text
+            std::cout << "Decoded (hex): ";
+            for (unsigned char c : decoded) {
+                std::cout << std::hex << std::setw(2) << std::setfill('0') 
+                          << static_cast<int>(c) << " ";
+            }
+            std::cout << std::dec << std::endl;
+            
             std::cout << "Match: " << (test_text == decoded ? "YES" : "NO") << std::endl;
+            
+            // Add normalization comparison
+            std::string normalized_original = lm::unicode::normalize(test_text);
+            std::string normalized_decoded = lm::unicode::normalize(decoded);
+            
+            std::cout << "Normalized match: " 
+                      << (normalized_original == normalized_decoded ? "YES" : "NO") 
+                      << std::endl;
+            
+            // If they don't match, show the normalized versions
+            if (normalized_original != normalized_decoded) {
+                std::cout << "Normalized original: " << normalized_original << std::endl;
+                std::cout << "Normalized decoded: " << normalized_decoded << std::endl;
+                
+                // Hex dumps of normalized versions
+                std::cout << "Normalized original (hex): ";
+                for (unsigned char c : normalized_original) {
+                    std::cout << std::hex << std::setw(2) << std::setfill('0') 
+                              << static_cast<int>(c) << " ";
+                }
+                std::cout << std::dec << std::endl;
+                
+                std::cout << "Normalized decoded (hex): ";
+                for (unsigned char c : normalized_decoded) {
+                    std::cout << std::hex << std::setw(2) << std::setfill('0') 
+                              << static_cast<int>(c) << " ";
+                }
+                std::cout << std::dec << std::endl;
+            }
         }
         
         // Save and load test
@@ -65,7 +115,14 @@ int main() {
             std::cout << "Loaded tokenizer test:" << std::endl;
             std::cout << "Original: " << test_text << std::endl;
             std::cout << "Decoded: " << decoded << std::endl;
-            std::cout << "Match: " << (test_text == decoded ? "YES" : "NO") << std::endl;
+            
+            // Add normalization check for loaded tokenizer test
+            std::string normalized_original = lm::unicode::normalize(test_text);
+            std::string normalized_decoded = lm::unicode::normalize(decoded);
+            
+            std::cout << "Normalized match: " 
+                      << (normalized_original == normalized_decoded ? "YES" : "NO") 
+                      << std::endl;
         }
         
     } catch (const std::exception& e) {

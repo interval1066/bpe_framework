@@ -770,22 +770,19 @@ std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
         
         tokens.insert(tokens.end(), word_tokens.begin(), word_tokens.end());
         
-        // Add space between words (except after the last word)
-        if (&word != &words.back() && pimpl_->vocab.find(" ") != pimpl_->vocab.end()) {
-            tokens.push_back(pimpl_->vocab.at(" "));
-        }
+        // DON'T add space between words - the original text already has spaces if needed
+        // This is the key change - remove the space insertion logic
     }
     
     pimpl_->log_final_tokens(tokens);
     return tokens;
 }
 
-// Add debug logging to the decode method
 std::string BPETokenizer::decode(const std::vector<TokenID>& tokens) const {
     pimpl_->log_decode_start(tokens);
     
     std::string text;
-    text.reserve(tokens.size() * 3); // Estimate average token length
+    text.reserve(tokens.size() * 3);
     
     for (TokenID token_id : tokens) {
         std::string token_text;
@@ -794,7 +791,10 @@ std::string BPETokenizer::decode(const std::vector<TokenID>& tokens) const {
         } else {
             token_text = pimpl_->unknown_token;
         }
+        
         pimpl_->log_token_decoding(token_id, token_text);
+        
+        // Directly append the token text without adding spaces
         text += token_text;
     }
     
