@@ -86,8 +86,10 @@ target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
 add_library(lm_tokenizer STATIC
     src/tokenizer/bpe_tokenizer.cpp
     src/tokenizer/unicode_utils.cpp
+    src/models/transformer_model.cpp
+    src/models/conversation_model.cpp
 )
-target_link_libraries(lm_tokenizer PUBLIC lm_core ICU::uc ICU::i18n)
+target_link_libraries(lm_tokenizer PUBLIC lm_core ICU::uc ICU::i18n ${EIGEN3_LIBRARIES})
 
 # Optimizers library
 add_library(lm_optimizers STATIC

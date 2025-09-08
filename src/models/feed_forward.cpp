@@ -105,7 +105,7 @@ Tensor FeedForward::forward(const Tensor& input) const {
 
 Tensor FeedForward::gelu(const Tensor& input) const {
     // GELU activation function: x * 0.5 * (1.0 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
-    const float sqrt_2_over_pi = std::sqrt(2.0f / M_PI);
+    const float sqrt_2_over_pi = std::sqrt(2.0f / static_cast<float>(M_PI));
     Tensor result(input.shape());
     
     for (size_t i = 0; i < input.size(); ++i) {
@@ -118,18 +118,18 @@ Tensor FeedForward::gelu(const Tensor& input) const {
 }
 
 Tensor FeedForward::apply_dropout(const Tensor& input, float dropout_rate) const {
-    if (dropout_rate <= 0.0) return input;
+    if (dropout_rate <= 0.0f) return input;
     
     Tensor output = input;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::bernoulli_distribution dist(1.0 - dropout_rate);
+    std::bernoulli_distribution dist(1.0f - dropout_rate);
     
     for (size_t i = 0; i < output.size(); ++i) {
         if (!dist(gen)) {
-            output(i) = 0.0;
+            output(i) = 0.0f;
         } else {
-            output(i) /= (1.0 - dropout_rate);
+            output(i) /= (1.0f - dropout_rate);
         }
     }
     
@@ -137,3 +137,4 @@ Tensor FeedForward::apply_dropout(const Tensor& input, float dropout_rate) const
 }
 
 } // namespace lm
+
