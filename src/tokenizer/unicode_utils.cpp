@@ -86,27 +86,31 @@ std::string from_code_points(const std::vector<CodePoint>& code_points) {
     return result;
 }
 
+// Remove the "unicode::" qualification - we're already in the lm::unicode namespace
 std::vector<std::string> unicode_split(const std::string& text) {
-    std::vector<std::string> words;
-    std::string current_word;
-    auto code_points = to_code_points(text);
-    
-    for (const auto& cp : code_points) {
-        if (is_whitespace(cp.value)) {
-            if (!current_word.empty()) {
-                words.push_back(current_word);
-                current_word.clear();
-            }
-        } else {
-            current_word += cp.utf8;
+    std::vector<std::string> characters;
+    int i = 0;
+    while (i < text.length()) {
+        int char_len = 1;
+        // Check for UTF-8 multi-byte characters
+        if ((text[i] & 0x80) == 0) {
+            // ASCII character
+            char_len = 1;
+        } else if ((text[i] & 0xE0) == 0xC0) {
+            // 2-byte UTF-8 character
+            char_len = 2;
+        } else if ((text[i] & 0xF0) == 0xE0) {
+            // 3-byte UTF-8 character
+            char_len = 3;
+        } else if ((text[i] & 0xF8) == 0xF0) {
+            // 4-byte UTF-8 character
+            char_len = 4;
         }
+        
+        characters.push_back(text.substr(i, char_len));
+        i += char_len;
     }
-    
-    if (!current_word.empty()) {
-        words.push_back(current_word);
-    }
-    
-    return words;
+    return characters;
 }
 
 std::vector<std::string> split_on_character_boundaries(const std::string& text) {
@@ -121,3 +125,4 @@ std::vector<std::string> split_on_character_boundaries(const std::string& text) 
 }
 
 } // namespace lm::unicode
+

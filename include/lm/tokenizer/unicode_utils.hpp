@@ -39,21 +39,4 @@ std::vector<std::string> unicode_split(const std::string& text);
 std::vector<std::string> split_on_character_boundaries(const std::string& text);
 
 } // namespace lm::unicode
-/*```
 
-This header provides a comprehensive set of Unicode utilities for the BPE tokenizer, including:
-
-1. **Code point representation** with both numeric value and UTF-8 string
-2. **Character classification** functions (whitespace, punctuation, control)
-3. **Text normalization** using Unicode NFC form
-4. **UTF-8 encoding/decoding** utilities
-5. **Unicode-aware text splitting** for proper tokenization
-
-These utilities enable the tokenizer to properly handle:
-- Multi-byte UTF-8 sequences
-- Unicode whitespace characters
-- Text normalization for consistent processing
-- Proper character boundary detection
-- Support for various writing systems (Latin, CJK, Arabic, etc.)
-
-The implementation in the corresponding `.cpp` file uses the ICU library for robust Unicode handling.*/

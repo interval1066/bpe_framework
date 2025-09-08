@@ -43,6 +43,11 @@ public:
     // UTF-8 validation method
     //bool is_valid_utf8_asm(const char* str, size_t length);
 
+    // Debug methods
+    void enable_debug_logging(bool enable);
+    void dump_vocabulary() const;
+    void dump_merges() const;
+
 private:
     class Impl;
     std::unique_ptr<Impl> pimpl_;

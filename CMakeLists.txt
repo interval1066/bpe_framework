@@ -180,6 +180,12 @@ target_link_libraries(test_conversation
     lm_core
 )
 
+add_executable(test_logger src/test_logger.cpp)
+target_link_libraries(test_logger
+    lm_tokenizer
+    lm_core
+)
+
 # Update the print configuration summary to include the new test
 message(STATUS "Conversation test: test_conversation")
 
