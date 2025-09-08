@@ -19,6 +19,16 @@
 
 namespace lm {
 
+struct VectorHash {
+    size_t operator()(const std::vector<TokenID>& vec) const {
+        size_t seed = vec.size();
+        for (const auto& token : vec) {
+            seed ^= token + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+    }
+};
+
 // Custom hash function for pair<TokenID, TokenID>
 struct PairHash {
     size_t operator()(const std::pair<TokenID, TokenID>& p) const {
@@ -164,7 +174,11 @@ struct BPETokenizer::Impl {
                         std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash>& pair_counts) const;
     void perform_merge(const std::pair<TokenID, TokenID>& pair, TokenID new_token_id,
                       std::unordered_map<std::string, int>& word_counts);
-    
+    void get_pair_counts_from_sequences(const std::vector<std::pair<std::vector<TokenID>, int>>& tokenized_corpus,
+                                       std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash>& pair_counts) const;
+    void perform_merge_on_sequences(const std::pair<TokenID, TokenID>& pair, TokenID new_token_id,
+                                   std::vector<std::pair<std::vector<TokenID>, int>>& tokenized_corpus);
+
     // Handle invalid UTF-8
     std::vector<TokenID> handle_invalid_utf8(const std::string& text) const;
     
@@ -195,6 +209,20 @@ struct BPETokenizer::Impl {
 void BPETokenizer::Impl::log_encode_start(const std::string& text) const {
     if (!debug_logging) return;
     std::cout << "[ENCODE] Starting encoding of text: '" << text << "'" << std::endl;
+}
+
+void BPETokenizer::Impl::get_pair_counts_from_sequences(
+    const std::vector<std::pair<std::vector<TokenID>, int>>& tokenized_corpus,
+    std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash>& pair_counts) const {
+    
+    pair_counts.clear();
+    
+    for (const auto& [sequence, count] : tokenized_corpus) {
+        for (size_t i = 0; i < sequence.size() - 1; i++) {
+            auto pair = std::make_pair(sequence[i], sequence[i+1]);
+            pair_counts[pair] += count;
+        }
+    }
 }
 
 void BPETokenizer::Impl::log_word_split(const std::vector<std::string>& words) const {
@@ -377,6 +405,39 @@ void BPETokenizer::Impl::initialize_vocab() {
     unknown_token_id = unk_token_id;
 }
 
+void BPETokenizer::Impl::perform_merge_on_sequences(
+    const std::pair<TokenID, TokenID>& pair, 
+    TokenID new_token_id,
+    std::vector<std::pair<std::vector<TokenID>, int>>& tokenized_corpus) {
+    
+    // Create new token
+    std::string new_token = this->inv_vocab.at(pair.first) + this->inv_vocab.at(pair.second);
+    
+    // Add to vocabulary
+    this->vocab[new_token] = new_token_id;
+    this->inv_vocab[new_token_id] = new_token;
+    this->merges[pair] = new_token_id;
+    
+    // Apply merge to all sequences
+    for (auto& [sequence, count] : tokenized_corpus) {
+        std::vector<TokenID> new_sequence;
+        new_sequence.reserve(sequence.size());
+        
+        for (size_t i = 0; i < sequence.size(); i++) {
+            if (i < sequence.size() - 1 && 
+                sequence[i] == pair.first && 
+                sequence[i+1] == pair.second) {
+                new_sequence.push_back(new_token_id);
+                i++; // Skip the next token
+            } else {
+                new_sequence.push_back(sequence[i]);
+            }
+        }
+        
+        sequence = std::move(new_sequence);
+    }
+}
+
 std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text) const {
     if (normalization_enabled) {
         if (cache_enabled) {
@@ -508,18 +569,30 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
         }
     }
     
-    // Split text into words
-    std::vector<std::string> words;
-    words.reserve(corpus.size() * 10); // Estimate average words per sentence
+    // Tokenize the entire corpus into token sequences with frequencies
+    std::vector<std::pair<std::vector<TokenID>, int>> tokenized_corpus;
+    std::unordered_map<std::vector<TokenID>, int, VectorHash> sequence_counts;
     
+    // First, split text into words and tokenize each word
     for (const auto& text : corpus) {
-        auto text_words = pimpl_->split_text(text);
-        words.insert(words.end(), text_words.begin(), text_words.end());
+        auto words = pimpl_->split_text(text);
+        for (const auto& word : words) {
+            // Convert word to initial token sequence (characters)
+            auto tokens = pimpl_->word_to_token_ids(word);
+            
+            // Count frequency of this token sequence
+            sequence_counts[tokens]++;
+        }
     }
     
-    // Count word frequencies using strings
-    std::unordered_map<std::string, int> word_counts;
-    pimpl_->count_word_frequencies(words, word_counts);
+    // Convert to vector for easier processing
+    tokenized_corpus.reserve(sequence_counts.size());
+    for (const auto& [sequence, count] : sequence_counts) {
+        tokenized_corpus.emplace_back(sequence, count);
+    }
+    
+    // Clear the temporary map to save memory
+    sequence_counts.clear();
     
     // BPE training algorithm with safety limit
     int iteration = 0;
@@ -530,9 +603,9 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     pair_counts.reserve(1000000); // Reserve space for 1M pairs
     
     while (pimpl_->vocab.size() < vocab_size && iteration < max_iterations) {
-        // Count pairs
+        // Count pairs in token sequences
         pair_counts.clear();
-        pimpl_->get_pair_counts(word_counts, pair_counts);
+        pimpl_->get_pair_counts_from_sequences(tokenized_corpus, pair_counts);
         
         if (pair_counts.empty()) {
             std::cout << "No more pairs to merge. Stopping early." << std::endl;
@@ -551,12 +624,13 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
                 pimpl_->inv_vocab.at(max_pair->first.first) : "<?>";
             std::string second_str = pimpl_->inv_vocab.count(max_pair->first.second) ? 
                 pimpl_->inv_vocab.at(max_pair->first.second) : "<?>";
-            std::cout << "Merging: '" << first_str << "' + '" << second_str << "' → count: " 
-                      << max_pair->second << std::endl;
+            std::cout << "Iteration " << iteration 
+                      << ": Merging '" << first_str << "' + '" << second_str 
+                      << "' → count: " << max_pair->second << std::endl;
         }
         
-        // Perform merge
-        pimpl_->perform_merge(max_pair->first, pimpl_->next_token_id, word_counts);
+        // Perform merge on token sequences
+        pimpl_->perform_merge_on_sequences(max_pair->first, pimpl_->next_token_id, tokenized_corpus);
         pimpl_->next_token_id++;
         iteration++;
         
@@ -565,9 +639,7 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
             size_t current_memory = get_peak_memory_usage();
             std::cout << "Memory after " << iteration << " iterations: " 
                       << (current_memory - start_memory) / (1024 * 1024) << "MB\n";
-            
-            // Clean up string pool to save memory
-            pimpl_->string_pool.clear();
+            std::cout << "Vocabulary size: " << pimpl_->vocab.size() << std::endl;
         }
     }
     
