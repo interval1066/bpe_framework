@@ -1,10 +1,12 @@
-// conversation_model.hpp
+// Enhanced conversation_model.hpp
 #pragma once
 
 #include "transformer_model.hpp"
 #include "bpe_tokenizer.hpp"
+#include "context_manager.hpp"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace lm {
 
@@ -20,27 +22,32 @@ public:
     // Train the model
     void train(const std::vector<std::string>& conversations);
     
-    // Generate a response
-    std::string generate_response(const std::string& input, 
-                                 const std::vector<std::string>& conversation_history = {});
+    // Generate a response with context management
+    std::string generate_response(const std::string& user_input);
+    
+    // Context management
+    void clear_context();
+    void set_system_prompt(const std::string& prompt);
+    size_t get_context_token_count() const;
     
     // Save and load
     bool save_model(const std::string& path);
     bool load_model(const std::string& path);
     
     // Set tokenizer
-    void set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer) { tokenizer_ = tokenizer; }
+    void set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer) { 
+        tokenizer_ = tokenizer; 
+        context_manager_ = std::make_unique<ContextManager>(2048, 20);
+    }
 
 private:
     std::shared_ptr<BPETokenizer> tokenizer_;
     std::unique_ptr<TransformerModel> transformer_;
+    std::unique_ptr<ContextManager> context_manager_;
+    std::string system_prompt_;
     
     // Format conversation for training
     std::string format_conversation(const std::vector<std::string>& turns);
-    
-    // Format input for inference
-    std::string format_input(const std::string& input, 
-                            const std::vector<std::string>& conversation_history);
 };
 
 } // namespace lm

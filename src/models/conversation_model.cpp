@@ -1,4 +1,4 @@
-// conversation_model.cpp
+// Enhanced conversation_model.cpp
 #include "conversation_model.hpp"
 #include <algorithm>
 #include <sstream>
@@ -28,13 +28,18 @@ void ConversationModel::train(const std::vector<std::string>& conversations) {
     }
 }
 
-std::string ConversationModel::generate_response(const std::string& input, 
-                                               const std::vector<std::string>& conversation_history) {
-    // Format the input
-    std::string formatted_input = format_input(input, conversation_history);
+std::string ConversationModel::generate_response(const std::string& user_input) {
+    // Add user message to context
+    context_manager_->add_user_message(user_input);
     
-    // Tokenize
-    auto tokens = tokenizer_->encode(formatted_input);
+    // Get the full context
+    std::string context = context_manager_->get_context();
+    
+    // Add assistant role tag to prompt the model
+    context += "<|assistant|>";
+    
+    // Tokenize context
+    auto tokens = tokenizer_->encode(context);
     
     // Generate continuation
     auto generated_tokens = transformer_->generate(tokens, 100, 0.8);
@@ -42,18 +47,37 @@ std::string ConversationModel::generate_response(const std::string& input,
     // Decode
     std::string response = tokenizer_->decode(generated_tokens);
     
-    // Extract only the new response (remove the input)
-    if (response.find(formatted_input) == 0) {
-        response = response.substr(formatted_input.length());
+    // Remove the context part to get just the new response
+    if (response.find(context) == 0) {
+        response = response.substr(context.length());
     }
     
-    // Trim any special tokens
-    size_t pos = response.find("<|endoftext|>");
-    if (pos != std::string::npos) {
-        response = response.substr(0, pos);
+    // Remove any trailing endoftext tokens
+    size_t end_pos = response.find("<|endoftext|>");
+    if (end_pos != std::string::npos) {
+        response = response.substr(0, end_pos);
     }
+    
+    // Add assistant response to context
+    context_manager_->add_assistant_message(response);
     
     return response;
+}
+
+void ConversationModel::clear_context() {
+    context_manager_->clear();
+    if (!system_prompt_.empty()) {
+        context_manager_->add_system_message(system_prompt_);
+    }
+}
+
+void ConversationModel::set_system_prompt(const std::string& prompt) {
+    system_prompt_ = prompt;
+    clear_context(); // Reset context with new system prompt
+}
+
+size_t ConversationModel::get_context_token_count() const {
+    return context_manager_->get_token_count();
 }
 
 std::string ConversationModel::format_conversation(const std::vector<std::string>& turns) {
@@ -68,21 +92,6 @@ std::string ConversationModel::format_conversation(const std::vector<std::string
     return ss.str();
 }
 
-std::string ConversationModel::format_input(const std::string& input, 
-                                          const std::vector<std::string>& conversation_history) {
-    std::stringstream ss;
-    
-    // Add conversation history
-    for (const auto& turn : conversation_history) {
-        ss << turn;
-    }
-    
-    // Add current input
-    ss << "<|user|>" << input << "<|endoftext|><|assistant|>";
-    
-    return ss.str();
-}
-
 bool ConversationModel::save_model(const std::string& path) {
     return transformer_->save(path);
 }
@@ -92,3 +101,4 @@ bool ConversationModel::load_model(const std::string& path) {
 }
 
 } // namespace lm
+

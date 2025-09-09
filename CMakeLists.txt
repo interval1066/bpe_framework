@@ -38,6 +38,8 @@ include_directories(include/lm/training)
 include_directories(include/lm/optimizers)
 include_directories(include/lm/core)
 include_directories(include/lm/tokenizer)
+include_directories(include/lm/generation)
+include_directories(include/lm/runtime)
 
 # Find required packages
 find_package(Eigen3 REQUIRED)
@@ -86,8 +88,6 @@ target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
 add_library(lm_tokenizer STATIC
     src/tokenizer/bpe_tokenizer.cpp
     src/tokenizer/unicode_utils.cpp
-    src/models/transformer_model.cpp
-    src/models/conversation_model.cpp
 )
 target_link_libraries(lm_tokenizer PUBLIC lm_core ICU::uc ICU::i18n ${EIGEN3_LIBRARIES})
 
@@ -97,15 +97,12 @@ add_library(lm_optimizers STATIC
 )
 target_link_libraries(lm_optimizers PUBLIC lm_core)
 
-# Models library - add Transformer implementations
+# Models library - keep only TransformerModel implementation
 add_library(lm_models STATIC
-    src/models/transformer.cpp
-    src/models/transformer_block.cpp
-    src/models/attention.cpp
-    src/models/feed_forward.cpp
-    src/models/layer_norm.cpp
+    src/models/transformer_model.cpp
+    src/models/conversation_model.cpp
 )
-target_link_libraries(lm_models PUBLIC lm_core lm_optimizers)
+target_link_libraries(lm_models PUBLIC lm_core lm_optimizers lm_tokenizer)
 
 # Generation library (samplers)
 add_library(lm_generation STATIC
@@ -119,12 +116,34 @@ add_library(lm_training STATIC
 )
 target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers lm_generation)
 
+# Context management library
+add_library(lm_context STATIC
+    src/context_manager.cpp
+)
+target_link_libraries(lm_context PUBLIC lm_core lm_tokenizer)
+
 # Conversation management library
 add_library(lm_conversation STATIC
     src/conversation_manager.cpp
 )
-target_link_libraries(lm_conversation PUBLIC lm_core)
+target_link_libraries(lm_conversation PUBLIC lm_core lm_context)
 
+# Runtime library
+add_library(lm_runtime STATIC
+    src/runtime/init.cpp
+    src/runtime/shutdown.cpp
+    src/runtime/state_utils.cpp
+)
+target_link_libraries(lm_runtime PUBLIC lm_core)
+
+# Alpha components
+add_library(lm_alpha STATIC
+    src/alpha/config_io.cpp
+    src/alpha/repl.cpp
+)
+target_link_libraries(lm_alpha PUBLIC lm_core lm_runtime lm_conversation lm_models)
+
+# Test executables
 add_executable(performance_test src/performance_test.cpp)
 target_link_libraries(performance_test
     lm_training
@@ -151,6 +170,7 @@ target_link_libraries(serialization_demo
     lm_optimizers
     lm_tokenizer
     lm_conversation
+    lm_context
     lm_core
 )
 
@@ -179,17 +199,33 @@ target_link_libraries(sampler_test
 add_executable(test_conversation src/test_conversation.cpp)
 target_link_libraries(test_conversation
     lm_conversation
+    lm_context
     lm_core
 )
 
 add_executable(test_logger src/test_logger.cpp)
 target_link_libraries(test_logger
     lm_tokenizer
+    lm_models
     lm_core
 )
 
-# Update the print configuration summary to include the new test
-message(STATUS "Conversation test: test_conversation")
+add_executable(test_transformer src/test_transformer.cpp)
+target_link_libraries(test_transformer
+    lm_models
+    lm_tokenizer
+    lm_core
+)
+
+add_executable(starter_convo src/starter_convo.cpp)
+target_link_libraries(starter_convo
+    lm_alpha
+    lm_conversation
+    lm_context
+    lm_models
+    lm_tokenizer
+    lm_core
+)
 
 # Enable testing if needed
 #enable_testing()
@@ -201,3 +237,4 @@ message(STATUS "ICU found: ${ICU_FOUND}")
 message(STATUS "Cereal include: ${CEREAL_INCLUDE_DIR}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Profiling enabled: ${ENABLE_PROFILING}")
+
