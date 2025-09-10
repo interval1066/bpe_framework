@@ -31,23 +31,6 @@ class Tensor {
 public:
     Tensor() : data_(Eigen::MatrixXf(0, 0)), shape_({0}), requires_grad_(false) {}
     
-    Tensor sqrt() const {
-        Tensor result(data_.array().sqrt(), shape_);
-    
-        if (requires_grad_) {
-            result.requires_grad(true);
-            result.backward_fn_ = [this, result]() {
-                if (this->requires_grad_) {
-                    // Gradient of sqrt: 0.5 / sqrt(input)
-                    Eigen::ArrayXf grad_sqrt = 0.5f / (this->data_.array().sqrt() + 1e-12f);
-                    this->grad_.array() += result.grad_.array() * grad_sqrt;
-                }
-            };
-        }
-    
-        return result;
-    }
-    
     Tensor(const std::vector<size_t>& shape, bool requires_grad = false) : requires_grad_(requires_grad) {
         shape_ = shape;
         size_t total_size = 1;
@@ -64,7 +47,6 @@ public:
                 grad_ = Eigen::MatrixXf::Zero(shape[0], shape[1]);
             }
         } else {
-            // For higher dimensions, we'll flatten and handle with care
             data_ = Eigen::VectorXf::Zero(total_size);
             if (requires_grad) {
                 grad_ = Eigen::VectorXf::Zero(total_size);
@@ -159,7 +141,43 @@ public:
             throw std::invalid_argument("Tensor shapes must match for addition");
         }
         
-        Tensor result(data_ + other.data_, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_ || other.requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* a = data_.data();
+        const float* b = other.data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 va = _mm256_loadu_ps(a + i);
+            __m256 vb = _mm256_loadu_ps(b + i);
+            __m256 vresult = _mm256_add_ps(va, vb);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] + b[i];
+        }
+        #elif defined(__SSE__)
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 va = _mm_loadu_ps(a + i);
+            __m128 vb = _mm_loadu_ps(b + i);
+            __m128 vresult = _mm_add_ps(va, vb);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] + b[i];
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = a[i] + b[i];
+        }
+        #endif
         
         if (requires_grad_ || other.requires_grad_) {
             result.requires_grad(true);
@@ -181,7 +199,43 @@ public:
             throw std::invalid_argument("Tensor shapes must match for subtraction");
         }
         
-        Tensor result(data_ - other.data_, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_ || other.requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* a = data_.data();
+        const float* b = other.data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 va = _mm256_loadu_ps(a + i);
+            __m256 vb = _mm256_loadu_ps(b + i);
+            __m256 vresult = _mm256_sub_ps(va, vb);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] - b[i];
+        }
+        #elif defined(__SSE__)
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 va = _mm_loadu_ps(a + i);
+            __m128 vb = _mm_loadu_ps(b + i);
+            __m128 vresult = _mm_sub_ps(va, vb);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] - b[i];
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = a[i] - b[i];
+        }
+        #endif
         
         if (requires_grad_ || other.requires_grad_) {
             result.requires_grad(true);
@@ -203,7 +257,43 @@ public:
             throw std::invalid_argument("Tensor shapes must match for element-wise multiplication");
         }
         
-        Tensor result(data_.cwiseProduct(other.data_), shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_ || other.requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* a = data_.data();
+        const float* b = other.data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 va = _mm256_loadu_ps(a + i);
+            __m256 vb = _mm256_loadu_ps(b + i);
+            __m256 vresult = _mm256_mul_ps(va, vb);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] * b[i];
+        }
+        #elif defined(__SSE__)
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 va = _mm_loadu_ps(a + i);
+            __m128 vb = _mm_loadu_ps(b + i);
+            __m128 vresult = _mm_mul_ps(va, vb);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] * b[i];
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = a[i] * b[i];
+        }
+        #endif
         
         if (requires_grad_ || other.requires_grad_) {
             result.requires_grad(true);
@@ -225,7 +315,43 @@ public:
             throw std::invalid_argument("Tensor shapes must match for element-wise division");
         }
         
-        Tensor result(data_.cwiseQuotient(other.data_), shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_ || other.requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* a = data_.data();
+        const float* b = other.data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 va = _mm256_loadu_ps(a + i);
+            __m256 vb = _mm256_loadu_ps(b + i);
+            __m256 vresult = _mm256_div_ps(va, vb);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] / b[i];
+        }
+        #elif defined(__SSE__)
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 va = _mm_loadu_ps(a + i);
+            __m128 vb = _mm_loadu_ps(b + i);
+            __m128 vresult = _mm_div_ps(va, vb);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = a[i] / b[i];
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = a[i] / b[i];
+        }
+        #endif
         
         if (requires_grad_ || other.requires_grad_) {
             result.requires_grad(true);
@@ -243,7 +369,42 @@ public:
     }
     
     Tensor operator+(float scalar) const {
-        Tensor result(data_.array() + scalar, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vscalar = _mm256_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 v = _mm256_loadu_ps(src + i);
+            __m256 vresult = _mm256_add_ps(v, vscalar);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] + scalar;
+        }
+        #elif defined(__SSE__)
+        __m128 vscalar = _mm_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 v = _mm_loadu_ps(src + i);
+            __m128 vresult = _mm_add_ps(v, vscalar);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] + scalar;
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = src[i] + scalar;
+        }
+        #endif
         
         if (requires_grad_) {
             result.requires_grad(true);
@@ -258,7 +419,42 @@ public:
     }
     
     Tensor operator-(float scalar) const {
-        Tensor result(data_.array() - scalar, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vscalar = _mm256_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 v = _mm256_loadu_ps(src + i);
+            __m256 vresult = _mm256_sub_ps(v, vscalar);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] - scalar;
+        }
+        #elif defined(__SSE__)
+        __m128 vscalar = _mm_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 v = _mm_loadu_ps(src + i);
+            __m128 vresult = _mm_sub_ps(v, vscalar);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] - scalar;
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = src[i] - scalar;
+        }
+        #endif
         
         if (requires_grad_) {
             result.requires_grad(true);
@@ -273,7 +469,42 @@ public:
     }
     
     Tensor operator*(float scalar) const {
-        Tensor result(data_ * scalar, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vscalar = _mm256_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 v = _mm256_loadu_ps(src + i);
+            __m256 vresult = _mm256_mul_ps(v, vscalar);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] * scalar;
+        }
+        #elif defined(__SSE__)
+        __m128 vscalar = _mm_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 v = _mm_loadu_ps(src + i);
+            __m128 vresult = _mm_mul_ps(v, vscalar);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] * scalar;
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = src[i] * scalar;
+        }
+        #endif
         
         if (requires_grad_) {
             result.requires_grad(true);
@@ -288,7 +519,42 @@ public:
     }
     
     Tensor operator/(float scalar) const {
-        Tensor result(data_ / scalar, shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vscalar = _mm256_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 v = _mm256_loadu_ps(src + i);
+            __m256 vresult = _mm256_div_ps(v, vscalar);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] / scalar;
+        }
+        #elif defined(__SSE__)
+        __m128 vscalar = _mm_set1_ps(scalar);
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 v = _mm_loadu_ps(src + i);
+            __m128 vresult = _mm_div_ps(v, vscalar);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] / scalar;
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = src[i] / scalar;
+        }
+        #endif
         
         if (requires_grad_) {
             result.requires_grad(true);
@@ -353,8 +619,57 @@ public:
         Tensor result;
         
         if (axis == -1 || ndim() == 1) {
-            // Use Eigen's optimized sum
-            result = Tensor(Eigen::MatrixXf::Constant(1, 1, data_.sum()));
+            // Use SIMD for sum if possible
+            float sum_val = 0.0f;
+            size_t size = data_.size();
+            const float* src = data_.data();
+            
+            #if defined(__AVX__)
+            __m256 vsum = _mm256_setzero_ps();
+            size_t i = 0;
+            for (; i + 7 < size; i += 8) {
+                __m256 v = _mm256_loadu_ps(src + i);
+                vsum = _mm256_add_ps(vsum, v);
+            }
+            // Horizontal sum of 8 floats
+            __m128 vlow = _mm256_castps256_ps128(vsum);
+            __m128 vhigh = _mm256_extractf128_ps(vsum, 1);
+            vlow = _mm_add_ps(vlow, vhigh);
+            __m128 shuf = _mm_shuffle_ps(vlow, vlow, _MM_SHUFFLE(2, 3, 0, 1));
+            __m128 sums = _mm_add_ps(vlow, shuf);
+            shuf = _mm_movehl_ps(shuf, sums);
+            sums = _mm_add_ss(sums, shuf);
+            sum_val = _mm_cvtss_f32(sums);
+            
+            // Add remaining elements
+            for (; i < size; ++i) {
+                sum_val += src[i];
+            }
+            #elif defined(__SSE__)
+            __m128 vsum = _mm_setzero_ps();
+            size_t i = 0;
+            for (; i + 3 < size; i += 4) {
+                __m128 v = _mm_loadu_ps(src + i);
+                vsum = _mm_add_ps(vsum, v);
+            }
+            // Horizontal sum of 4 floats
+            __m128 shuf = _mm_shuffle_ps(vsum, vsum, _MM_SHUFFLE(2, 3, 0, 1));
+            __m128 sums = _mm_add_ps(vsum, shuf);
+            shuf = _mm_movehl_ps(shuf, sums);
+            sums = _mm_add_ss(sums, shuf);
+            sum_val = _mm_cvtss_f32(sums);
+            
+            // Add remaining elements
+            for (; i < size; ++i) {
+                sum_val += src[i];
+            }
+            #else
+            for (size_t i = 0; i < size; ++i) {
+                sum_val += src[i];
+            }
+            #endif
+            
+            result = Tensor(Eigen::MatrixXf::Constant(1, 1, sum_val));
         } else if (axis == 0) {
             result = Tensor(data_.colwise().sum(), {shape_[1]});
         } else {
@@ -389,32 +704,13 @@ public:
         
         if (axis == -1 || ndim() == 1) {
             divisor = data_.size();
-            result = Tensor(Eigen::MatrixXf::Constant(1, 1, data_.mean()));
+            result = sum(axis) / divisor;
         } else if (axis == 0) {
             divisor = data_.rows();
-            result = Tensor(data_.colwise().mean(), {shape_[1]});
+            result = sum(axis) / divisor;
         } else {
             divisor = data_.cols();
-            result = Tensor(data_.rowwise().mean(), {shape_[0]});
-        }
-        
-        if (requires_grad_) {
-            result.requires_grad(true);
-            result.backward_fn_ = [this, axis, divisor, result]() {
-                if (this->requires_grad_) {
-                    if (axis == -1 || ndim() == 1) {
-                        this->grad_.array() += result.grad_(0, 0) / divisor;
-                    } else if (axis == 0) {
-                        for (int i = 0; i < this->grad_.rows(); ++i) {
-                            this->grad_.row(i) += result.grad_.transpose() / divisor;
-                        }
-                    } else {
-                        for (int j = 0; j < this->grad_.cols(); ++j) {
-                            this->grad_.col(j) += result.grad_ / divisor;
-                        }
-                    }
-                }
-            };
+            result = sum(axis) / divisor;
         }
         
         return result;
@@ -422,16 +718,93 @@ public:
     
     // Optimized activation functions
     Tensor relu() const {
-        // Use Eigen's optimized cwiseMax
-        Tensor result(data_.cwiseMax(0.0f), shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
         
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 zero = _mm256_setzero_ps();
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 v = _mm256_loadu_ps(src + i);
+            __m256 mask = _mm256_cmp_ps(v, zero, _CMP_GT_OS);
+            __m256 vresult = _mm256_and_ps(v, mask);
+            _mm256_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] > 0 ? src[i] : 0;
+        }
+        #elif defined(__SSE__)
+        __m128 zero = _mm_setzero_ps();
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 v = _mm_loadu_ps(src + i);
+            __m128 mask = _mm_cmpgt_ps(v, zero);
+            __m128 vresult = _mm_and_ps(v, mask);
+            _mm_storeu_ps(dst + i, vresult);
+        }
+        for (; i < size; ++i) {
+            dst[i] = src[i] > 0 ? src[i] : 0;
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = src[i] > 0 ? src[i] : 0;
+        }
+        #endif
+
         if (requires_grad_) {
             result.requires_grad(true);
             result.backward_fn_ = [this, result]() {
                 if (this->requires_grad_) {
-                    // Gradient is 1 where input > 0, 0 otherwise
-                    Eigen::MatrixXf mask = (this->data_.array() > 0.0f).cast<float>();
-                    this->grad_ += result.grad_.cwiseProduct(mask);
+                    size_t total_size = this->data_.size();
+                    float* grad_ptr = this->grad_.data();
+                    const float* data_ptr = this->data_.data();
+                    const float* result_grad_ptr = result.grad_.data();
+
+                    #if defined(__AVX__)
+                    __m256 zero = _mm256_setzero_ps();
+                    size_t i = 0;
+                    for (; i + 7 < total_size; i += 8) {
+                        __m256 data_val = _mm256_loadu_ps(data_ptr + i);
+                        __m256 mask = _mm256_cmp_ps(data_val, zero, _CMP_GT_OS);
+                        __m256 grad_val = _mm256_loadu_ps(result_grad_ptr + i);
+                        __m256 add_grad = _mm256_and_ps(grad_val, mask);
+                        __m256 current_grad = _mm256_loadu_ps(grad_ptr + i);
+                        _mm256_storeu_ps(grad_ptr + i, _mm256_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        if (data_ptr[i] > 0) {
+                            grad_ptr[i] += result_grad_ptr[i];
+                        }
+                    }
+                    #elif defined(__SSE__)
+                    __m128 zero = _mm_setzero_ps();
+                    size_t i = 0;
+                    for (; i + 3 < total_size; i += 4) {
+                        __m128 data_val = _mm_loadu_ps(data_ptr + i);
+                        __m128 mask = _mm_cmpgt_ps(data_val, zero);
+                        __m128 grad_val = _mm_loadu_ps(result_grad_ptr + i);
+                        __m128 add_grad = _mm_and_ps(grad_val, mask);
+                        __m128 current_grad = _mm_loadu_ps(grad_ptr + i);
+                        _mm_storeu_ps(grad_ptr + i, _mm_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        if (data_ptr[i] > 0) {
+                            grad_ptr[i] += result_grad_ptr[i];
+                        }
+                    }
+                    #else
+                    for (size_t i = 0; i < total_size; ++i) {
+                        if (data_ptr[i] > 0) {
+                            grad_ptr[i] += result_grad_ptr[i];
+                        }
+                    }
+                    #endif
                 }
             };
         }
@@ -443,30 +816,209 @@ public:
     Tensor gelu() const {
         // Approximation of GELU: x * 0.5 * (1.0 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
         const float sqrt_2_over_pi = std::sqrt(2.0f / M_PI);
-        Eigen::ArrayXf x_array = data_.array();
         
-        // Use Eigen's optimized operations
-        Eigen::ArrayXf result_array = 0.5f * x_array * 
-            (1.0f + (sqrt_2_over_pi * (x_array + 0.044715f * x_array.pow(3))).tanh());
-    
-        Tensor result(Eigen::MatrixXf(result_array), shape_);
-    
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vsqrt_2_over_pi = _mm256_set1_ps(sqrt_2_over_pi);
+        __m256 vcoef = _mm256_set1_ps(0.044715f);
+        __m256 vhalf = _mm256_set1_ps(0.5f);
+        __m256 vone = _mm256_set1_ps(1.0f);
+        
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 x = _mm256_loadu_ps(src + i);
+            __m256 x3 = _mm256_mul_ps(x, _mm256_mul_ps(x, x));
+            __m256 inner = _mm256_mul_ps(vsqrt_2_over_pi, 
+                                        _mm256_add_ps(x, _mm256_mul_ps(vcoef, x3)));
+            __m256 tanh_inner = tanh_avx(inner);
+            __m256 result_val = _mm256_mul_ps(x, 
+                                            _mm256_mul_ps(vhalf, 
+                                                        _mm256_add_ps(vone, tanh_inner)));
+            _mm256_storeu_ps(dst + i, result_val);
+        }
+        for (; i < size; ++i) {
+            float x = src[i];
+            float x3 = x * x * x;
+            float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+            float tanh_inner = std::tanh(inner);
+            dst[i] = 0.5f * x * (1.0f + tanh_inner);
+        }
+        #elif defined(__SSE__)
+        __m128 vsqrt_2_over_pi = _mm_set1_ps(sqrt_2_over_pi);
+        __m128 vcoef = _mm_set1_ps(0.044715f);
+        __m128 vhalf = _mm_set1_ps(0.5f);
+        __m128 vone = _mm_set1_ps(1.0f);
+        
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 x = _mm_loadu_ps(src + i);
+            __m128 x3 = _mm_mul_ps(x, _mm_mul_ps(x, x));
+            __m128 inner = _mm_mul_ps(vsqrt_2_over_pi, 
+                                    _mm_add_ps(x, _mm_mul_ps(vcoef, x3)));
+            __m128 tanh_inner = tanh_sse(inner);
+            __m128 result_val = _mm_mul_ps(x, 
+                                        _mm_mul_ps(vhalf, 
+                                                    _mm_add_ps(vone, tanh_inner)));
+            _mm_storeu_ps(dst + i, result_val);
+        }
+        for (; i < size; ++i) {
+            float x = src[i];
+            float x3 = x * x * x;
+            float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+            float tanh_inner = std::tanh(inner);
+            dst[i] = 0.5f * x * (1.0f + tanh_inner);
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            float x = src[i];
+            float x3 = x * x * x;
+            float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+            float tanh_inner = std::tanh(inner);
+            dst[i] = 0.5f * x * (1.0f + tanh_inner);
+        }
+        #endif
+
         if (requires_grad_) {
             result.requires_grad(true);
             result.backward_fn_ = [this, sqrt_2_over_pi, result]() {
                 if (this->requires_grad_) {
-                    // Gradient of GELU approximation
-                    Eigen::ArrayXf x_array = this->data_.array();
-                    Eigen::ArrayXf x_cubed = x_array.pow(3);
-                    Eigen::ArrayXf inner = sqrt_2_over_pi * (x_array + 0.044715f * x_cubed);
-                    Eigen::ArrayXf tanh_inner = inner.tanh();
-                    Eigen::ArrayXf sech_squared = 1.0f - tanh_inner.square();
-                
-                    Eigen::ArrayXf grad = 0.5f * tanh_inner + 
-                        0.5f * x_array * sech_squared * sqrt_2_over_pi * (1.0f + 0.134145f * x_array.square()) +
-                        0.5f * (1.0f + tanh_inner);
-                
-                    this->grad_.array() += result.grad_.array() * grad;
+                    size_t total_size = this->data_.size();
+                    float* grad_ptr = this->grad_.data();
+                    const float* data_ptr = this->data_.data();
+                    const float* result_grad_ptr = result.grad_.data();
+
+                    #if defined(__AVX__)
+                    __m256 vsqrt_2_over_pi = _mm256_set1_ps(sqrt_2_over_pi);
+                    __m256 vcoef = _mm256_set1_ps(0.044715f);
+                    __m256 vhalf = _mm256_set1_ps(0.5f);
+                    __m256 vone = _mm256_set1_ps(1.0f);
+                    __m256 v134145 = _mm256_set1_ps(0.134145f); // 3 * 0.044715
+                    
+                    size_t i = 0;
+                    for (; i + 7 < total_size; i += 8) {
+                        __m256 x = _mm256_loadu_ps(data_ptr + i);
+                        __m256 x2 = _mm256_mul_ps(x, x);
+                        __m256 x3 = _mm256_mul_ps(x, x2);
+                        
+                        __m256 inner = _mm256_mul_ps(vsqrt_2_over_pi, 
+                                                    _mm256_add_ps(x, _mm256_mul_ps(vcoef, x3)));
+                        __m256 tanh_inner = tanh_avx(inner);
+                        __m256 sech_squared = _mm256_sub_ps(vone, _mm256_mul_ps(tanh_inner, tanh_inner));
+                        
+                        __m256 derivative = _mm256_add_ps(
+                            _mm256_mul_ps(vhalf, tanh_inner),
+                            _mm256_add_ps(
+                                _mm256_mul_ps(
+                                    _mm256_mul_ps(
+                                        _mm256_mul_ps(x, sech_squared),
+                                        vsqrt_2_over_pi
+                                    ),
+                                    _mm256_add_ps(
+                                        vone,
+                                        _mm256_mul_ps(v134145, x2)
+                                    )
+                                ),
+                                _mm256_mul_ps(vhalf, _mm256_add_ps(vone, tanh_inner))
+                            )
+                        );
+                        
+                        __m256 grad_val = _mm256_loadu_ps(result_grad_ptr + i);
+                        __m256 add_grad = _mm256_mul_ps(grad_val, derivative);
+                        __m256 current_grad = _mm256_loadu_ps(grad_ptr + i);
+                        _mm256_storeu_ps(grad_ptr + i, _mm256_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        float x = data_ptr[i];
+                        float x2 = x * x;
+                        float x3 = x * x2;
+                        float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+                        float tanh_inner = std::tanh(inner);
+                        float sech_squared = 1.0f - tanh_inner * tanh_inner;
+                        
+                        float derivative = 0.5f * tanh_inner + 
+                            0.5f * x * sech_squared * sqrt_2_over_pi * (1.0f + 0.134145f * x2) +
+                            0.5f * (1.0f + tanh_inner);
+                        
+                        grad_ptr[i] += result_grad_ptr[i] * derivative;
+                    }
+                    #elif defined(__SSE__)
+                    __m128 vsqrt_2_over_pi = _mm_set1_ps(sqrt_2_over_pi);
+                    __m128 vcoef = _mm_set1_ps(0.044715f);
+                    __m128 vhalf = _mm_set1_ps(0.5f);
+                    __m128 vone = _mm_set1_ps(1.0f);
+                    __m128 v134145 = _mm_set1_ps(0.134145f);
+                    
+                    size_t i = 0;
+                    for (; i + 3 < total_size; i += 4) {
+                        __m128 x = _mm_loadu_ps(data_ptr + i);
+                        __m128 x2 = _mm_mul_ps(x, x);
+                        __m128 x3 = _mm_mul_ps(x, x2);
+                        
+                        __m128 inner = _mm_mul_ps(vsqrt_2_over_pi, 
+                                                _mm_add_ps(x, _mm_mul_ps(vcoef, x3)));
+                        __m128 tanh_inner = tanh_sse(inner);
+                        __m128 sech_squared = _mm_sub_ps(vone, _mm_mul_ps(tanh_inner, tanh_inner));
+                        
+                        __m128 derivative = _mm_add_ps(
+                            _mm_mul_ps(vhalf, tanh_inner),
+                            _mm_add_ps(
+                                _mm_mul_ps(
+                                    _mm_mul_ps(
+                                        _mm_mul_ps(x, sech_squared),
+                                        vsqrt_2_over_pi
+                                    ),
+                                    _mm_add_ps(
+                                        vone,
+                                        _mm_mul_ps(v134145, x2)
+                                    )
+                                ),
+                                _mm_mul_ps(vhalf, _mm_add_ps(vone, tanh_inner))
+                            )
+                        );
+                        
+                        __m128 grad_val = _mm_loadu_ps(result_grad_ptr + i);
+                        __m128 add_grad = _mm_mul_ps(grad_val, derivative);
+                        __m128 current_grad = _mm_loadu_ps(grad_ptr + i);
+                        _mm_storeu_ps(grad_ptr + i, _mm_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        float x = data_ptr[i];
+                        float x2 = x * x;
+                        float x3 = x * x2;
+                        float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+                        float tanh_inner = std::tanh(inner);
+                        float sech_squared = 1.0f - tanh_inner * tanh_inner;
+                        
+                        float derivative = 0.5f * tanh_inner + 
+                            0.5f * x * sech_squared * sqrt_2_over_pi * (1.0f + 0.134145f * x2) +
+                            0.5f * (1.0f + tanh_inner);
+                        
+                        grad_ptr[i] += result_grad_ptr[i] * derivative;
+                    }
+                    #else
+                    for (size_t i = 0; i < total_size; ++i) {
+                        float x = data_ptr[i];
+                        float x2 = x * x;
+                        float x3 = x * x2;
+                        float inner = sqrt_2_over_pi * (x + 0.044715f * x3);
+                        float tanh_inner = std::tanh(inner);
+                        float sech_squared = 1.0f - tanh_inner * tanh_inner;
+                        
+                        float derivative = 0.5f * tanh_inner + 
+                            0.5f * x * sech_squared * sqrt_2_over_pi * (1.0f + 0.134145f * x2) +
+                            0.5f * (1.0f + tanh_inner);
+                        
+                        grad_ptr[i] += result_grad_ptr[i] * derivative;
+                    }
+                    #endif
                 }
             };
         }
@@ -537,25 +1089,192 @@ public:
     
     // Optimized sigmoid implementation
     Tensor sigmoid() const {
-        // Use Eigen's optimized operations
-        Eigen::ArrayXf x_array = data_.array();
-        Eigen::ArrayXf result_array = 1.0f / (1.0f + (-x_array).exp());
-    
-        Tensor result(Eigen::MatrixXf(result_array), shape_);
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        __m256 vone = _mm256_set1_ps(1.0f);
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 x = _mm256_loadu_ps(src + i);
+            __m256 neg_x = _mm256_sub_ps(_mm256_setzero_ps(), x);
+            __m256 exp_neg_x = exp_avx(neg_x);
+            __m256 denom = _mm256_add_ps(vone, exp_neg_x);
+            __m256 result_val = _mm256_div_ps(vone, denom);
+            _mm256_storeu_ps(dst + i, result_val);
+        }
+        for (; i < size; ++i) {
+            dst[i] = 1.0f / (1.0f + std::exp(-src[i]));
+        }
+        #elif defined(__SSE__)
+        __m128 vone = _mm_set1_ps(1.0f);
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 x = _mm_loadu_ps(src + i);
+            __m128 neg_x = _mm_sub_ps(_mm_setzero_ps(), x);
+            __m128 exp_neg_x = exp_sse(neg_x);
+            __m128 denom = _mm_add_ps(vone, exp_neg_x);
+            __m128 result_val = _mm_div_ps(vone, denom);
+            _mm_storeu_ps(dst + i, result_val);
+        }
+        for (; i < size; ++i) {
+            dst[i] = 1.0f / (1.0f + std::exp(-src[i]));
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = 1.0f / (1.0f + std::exp(-src[i]));
+        }
+        #endif
     
         if (requires_grad_) {
             result.requires_grad(true);
             result.backward_fn_ = [this, result]() {
                 if (this->requires_grad_) {
-                    // Gradient of sigmoid: sigmoid(x) * (1 - sigmoid(x))
-                    Eigen::ArrayXf sigmoid_grad = result.data().array() * (1.0f - result.data().array());
-                    this->grad_.array() += result.grad_.array() * sigmoid_grad;
+                    size_t total_size = this->data_.size();
+                    float* grad_ptr = this->grad_.data();
+                    const float* result_data_ptr = result.data_.data();
+                    const float* result_grad_ptr = result.grad_.data();
+
+                    #if defined(__AVX__)
+                    size_t i = 0;
+                    for (; i + 7 < total_size; i += 8) {
+                        __m256 sigmoid_val = _mm256_loadu_ps(result_data_ptr + i);
+                        __m256 one_minus_sigmoid = _mm256_sub_ps(_mm256_set1_ps(1.0f), sigmoid_val);
+                        __m256 sigmoid_grad = _mm256_mul_ps(sigmoid_val, one_minus_sigmoid);
+                        __m256 grad_val = _mm256_loadu_ps(result_grad_ptr + i);
+                        __m256 add_grad = _mm256_mul_ps(grad_val, sigmoid_grad);
+                        __m256 current_grad = _mm256_loadu_ps(grad_ptr + i);
+                        _mm256_storeu_ps(grad_ptr + i, _mm256_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        float sigmoid_val = result_data_ptr[i];
+                        float sigmoid_grad = sigmoid_val * (1.0f - sigmoid_val);
+                        grad_ptr[i] += result_grad_ptr[i] * sigmoid_grad;
+                    }
+                    #elif defined(__SSE__)
+                    size_t i = 0;
+                    for (; i + 3 < total_size; i += 4) {
+                        __m128 sigmoid_val = _mm_loadu_ps(result_data_ptr + i);
+                        __m128 one_minus_sigmoid = _mm_sub_ps(_mm_set1_ps(1.0f), sigmoid_val);
+                        __m128 sigmoid_grad = _mm_mul_ps(sigmoid_val, one_minus_sigmoid);
+                        __m128 grad_val = _mm_loadu_ps(result_grad_ptr + i);
+                        __m128 add_grad = _mm_mul_ps(grad_val, sigmoid_grad);
+                        __m128 current_grad = _mm_loadu_ps(grad_ptr + i);
+                        _mm_storeu_ps(grad_ptr + i, _mm_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        float sigmoid_val = result_data_ptr[i];
+                        float sigmoid_grad = sigmoid_val * (1.0f - sigmoid_val);
+                        grad_ptr[i] += result_grad_ptr[i] * sigmoid_grad;
+                    }
+                    #else
+                    for (size_t i = 0; i < total_size; ++i) {
+                        float sigmoid_val = result_data_ptr[i];
+                        float sigmoid_grad = sigmoid_val * (1.0f - sigmoid_val);
+                        grad_ptr[i] += result_grad_ptr[i] * sigmoid_grad;
+                    }
+                    #endif
                 }
             };
         }
     
         return result;
-    }    
+    }
+    
+    Tensor sqrt() const {
+        Tensor result;
+        result.shape_ = shape_;
+        result.requires_grad_ = requires_grad_;
+        result.data_.resize(data_.rows(), data_.cols());
+        
+        size_t size = data_.size();
+        const float* src = data_.data();
+        float* dst = result.data_.data();
+
+        #if defined(__AVX__)
+        size_t i = 0;
+        for (; i + 7 < size; i += 8) {
+            __m256 x = _mm256_loadu_ps(src + i);
+            __m256 sqrt_x = _mm256_sqrt_ps(x);
+            _mm256_storeu_ps(dst + i, sqrt_x);
+        }
+        for (; i < size; ++i) {
+            dst[i] = std::sqrt(src[i]);
+        }
+        #elif defined(__SSE__)
+        size_t i = 0;
+        for (; i + 3 < size; i += 4) {
+            __m128 x = _mm_loadu_ps(src + i);
+            __m128 sqrt_x = _mm_sqrt_ps(x);
+            _mm_storeu_ps(dst + i, sqrt_x);
+        }
+        for (; i < size; ++i) {
+            dst[i] = std::sqrt(src[i]);
+        }
+        #else
+        for (size_t i = 0; i < size; ++i) {
+            dst[i] = std::sqrt(src[i]);
+        }
+        #endif
+
+        if (requires_grad_) {
+            result.requires_grad(true);
+            result.backward_fn_ = [this, result]() {
+                if (this->requires_grad_) {
+                    size_t total_size = this->data_.size();
+                    float* grad_ptr = this->grad_.data();
+                    const float* data_ptr = this->data_.data();
+                    const float* result_grad_ptr = result.grad_.data();
+
+                    #if defined(__AVX__)
+                    __m256 half = _mm256_set1_ps(0.5f);
+                    __m256 eps = _mm256_set1_ps(1e-12f);
+                    size_t i = 0;
+                    for (; i + 7 < total_size; i += 8) {
+                        __m256 data_val = _mm256_loadu_ps(data_ptr + i);
+                        __m256 sqrt_val = _mm256_sqrt_ps(data_val);
+                        __m256 inv_sqrt = _mm256_div_ps(half, _mm256_add_ps(sqrt_val, eps));
+                        __m256 grad_val = _mm256_loadu_ps(result_grad_ptr + i);
+                        __m256 add_grad = _mm256_mul_ps(grad_val, inv_sqrt);
+                        __m256 current_grad = _mm256_loadu_ps(grad_ptr + i);
+                        _mm256_storeu_ps(grad_ptr + i, _mm256_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        grad_ptr[i] += result_grad_ptr[i] * (0.5f / (std::sqrt(data_ptr[i]) + 1e-12f));
+                    }
+                    #elif defined(__SSE__)
+                    __m128 half = _mm_set1_ps(0.5f);
+                    __m128 eps = _mm_set1_ps(1e-12f);
+                    size_t i = 0;
+                    for (; i + 3 < total_size; i += 4) {
+                        __m128 data_val = _mm_loadu_ps(data_ptr + i);
+                        __m128 sqrt_val = _mm_sqrt_ps(data_val);
+                        __m128 inv_sqrt = _mm_div_ps(half, _mm_add_ps(sqrt_val, eps));
+                        __m128 grad_val = _mm_loadu_ps(result_grad_ptr + i);
+                        __m128 add_grad = _mm_mul_ps(grad_val, inv_sqrt);
+                        __m128 current_grad = _mm_loadu_ps(grad_ptr + i);
+                        _mm_storeu_ps(grad_ptr + i, _mm_add_ps(current_grad, add_grad));
+                    }
+                    for (; i < total_size; ++i) {
+                        grad_ptr[i] += result_grad_ptr[i] * (0.5f / (std::sqrt(data_ptr[i]) + 1e-12f));
+                    }
+                    #else
+                    for (size_t i = 0; i < total_size; ++i) {
+                        grad_ptr[i] += result_grad_ptr[i] * (0.5f / (std::sqrt(data_ptr[i]) + 1e-12f));
+                    }
+                    #endif
+                }
+            };
+        }
+    
+        return result;
+    }
     
     // Backward propagation
     void backward() {
@@ -787,6 +1506,103 @@ private:
     std::vector<size_t> shape_;
     bool requires_grad_;
     std::function<void()> backward_fn_;
+    
+    // Helper functions for SIMD operations
+    #if defined(__AVX__)
+    static __m256 exp_avx(__m256 x) {
+        // Implementation of exp using AVX intrinsics
+        // This is an approximation
+        __m256 a = _mm256_set1_ps(12102203.0f); // 2^23 / ln(2)
+        __m256 b = _mm256_set1_ps(1065353216.0f); // 2^23
+        __m256 c = _mm256_set1_ps(0.5f);
+        __m256 d = _mm256_set1_ps(1.0f);
+        __m256 e = _mm256_set1_ps(1.0f);
+        __m256 f = _mm256_set1_ps(0.99992522f);
+        __m256 g = _mm256_set1_ps(0.69583354f);
+        __m256 h = _mm256_set1_ps(0.22606716f);
+        __m256 i = _mm256_set1_ps(0.078024523f);
+        
+        __m256 mask = _mm256_cmp_ps(x, _mm256_set1_ps(-88.0f), _CMP_GT_OS);
+        x = _mm256_min_ps(x, _mm256_set1_ps(88.0f));
+        
+        __m256 z = _mm256_mul_ps(x, a);
+        z = _mm256_add_ps(z, b);
+        __m256 n = _mm256_floor_ps(z);
+        z = _mm256_sub_ps(z, n);
+        __m256 r = _mm256_sub_ps(x, _mm256_mul_ps(n, _mm256_set1_ps(1.1920929e-7f)));
+        
+        __m256 r2 = _mm256_mul_ps(r, r);
+        __m256 result = _mm256_add_ps(_mm256_mul_ps(i, r), h);
+        result = _mm256_add_ps(_mm256_mul_ps(result, r), g);
+        result = _mm256_add_ps(_mm256_mul_ps(result, r), f);
+        result = _mm256_add_ps(_mm256_mul_ps(result, r), e);
+        result = _mm256_add_ps(_mm256_mul_ps(result, r), d);
+        
+        n = _mm256_add_ps(n, _mm256_set1_ps(127.0f));
+        n = _mm256_castsi256_ps(_mm256_slli_epi32(_mm256_castps_si256(n), 23));
+        
+        result = _mm256_mul_ps(result, n);
+        return _mm256_and_ps(result, mask);
+    }
+    
+    static __m256 tanh_avx(__m256 x) {
+        // Implementation of tanh using AVX intrinsics
+        // This is an approximation
+        __m256 x2 = _mm256_mul_ps(x, x);
+        __m256 a = _mm256_mul_ps(x2, _mm256_set1_ps(0.00992762224f));
+        a = _mm256_add_ps(a, _mm256_set1_ps(0.0559197695f));
+        a = _mm256_mul_ps(a, x2);
+        a = _mm256_add_ps(a, _mm256_set1_ps(0.173565726f));
+        a = _mm256_mul_ps(a, x2);
+        a = _mm256_add_ps(a, _mm256_set1_ps(0.239708459f));
+        a = _mm256_mul_ps(a, x2);
+        a = _mm256_add_ps(a, _mm256_set1_ps(0.666657572f));
+        a = _mm256_mul_ps(a, x);
+        return a;
+    }
+    #endif
+    
+#if defined(__SSE__)
+static __m128 exp_sse(__m128 x) {
+    // Alternative implementation using SSE2 intrinsics
+    // This is a simpler approximation that doesn't require SSE4.1
+    __m128 a = _mm_set1_ps(12102203.0f);
+    __m128 b = _mm_set1_ps(1065353216.0f);
+    __m128 c = _mm_set1_ps(1.0f);
+    __m128 d = _mm_set1_ps(0.5f);
+    
+    // Handle large negative values
+    __m128 mask = _mm_cmpgt_ps(x, _mm_set1_ps(-88.0f));
+    x = _mm_min_ps(x, _mm_set1_ps(88.0f));
+    
+    // Approximation: exp(x) ≈ 1 + x + x^2/2 + x^3/6 + x^4/24
+    __m128 x2 = _mm_mul_ps(x, x);
+    __m128 x3 = _mm_mul_ps(x2, x);
+    __m128 x4 = _mm_mul_ps(x3, x);
+    
+    __m128 result = _mm_add_ps(c, x);
+    result = _mm_add_ps(result, _mm_mul_ps(x2, d));
+    result = _mm_add_ps(result, _mm_mul_ps(x3, _mm_set1_ps(0.1666667f)));
+    result = _mm_add_ps(result, _mm_mul_ps(x4, _mm_set1_ps(0.04166667f)));
+    
+    return _mm_and_ps(result, mask);
+}
+
+static __m128 tanh_sse(__m128 x) {
+    // Alternative tanh approximation using SSE2
+    __m128 x2 = _mm_mul_ps(x, x);
+    __m128 a = _mm_mul_ps(x2, _mm_set1_ps(0.00992762224f));
+    a = _mm_add_ps(a, _mm_set1_ps(0.0559197695f));
+    a = _mm_mul_ps(a, x2);
+    a = _mm_add_ps(a, _mm_set1_ps(0.173565726f));
+    a = _mm_mul_ps(a, x2);
+    a = _mm_add_ps(a, _mm_set1_ps(0.239708459f));
+    a = _mm_mul_ps(a, x2);
+    a = _mm_add_ps(a, _mm_set1_ps(0.666657572f));
+    a = _mm_mul_ps(a, x);
+    return a;
+}
+#endif
 };
 
 // Global operator for scalar multiplication (scalar * tensor)
@@ -795,4 +1611,3 @@ inline Tensor operator*(float scalar, const Tensor& tensor) {
 }
 
 } // namespace lm
-
