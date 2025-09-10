@@ -19,3 +19,5 @@ Put in the foundational structures for getting conversations going on this frame
 ### 9/7/2025 - Using Efficient Token Sequence-Based Approach
 Hashing the tokens rather than string manipulation is a completely faster approach and I don't even feel the need to use inline assembly. 1000% more
 efficient. Added a vectorhash struct to effeiciently manipulate them as well.
+
+### 9/9/2025 – Changed my mind about assembly with the Tensor class, removed the now redundant Transformer & LayerNorm classes as they are no longer needed with the  for more flexible TransformerModel class.
