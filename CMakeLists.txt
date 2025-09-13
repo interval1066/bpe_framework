@@ -104,6 +104,15 @@ add_library(lm_models STATIC
 )
 target_link_libraries(lm_models PUBLIC lm_core lm_optimizers lm_tokenizer)
 
+#add_library(lm_core INTERFACE)
+#target_include_directories(lm_core INTERFACE ${CMAKE_SOURCE_DIR}/include)
+#target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
+
+# Add TensorPool as part of the core library
+target_sources(lm_core INTERFACE
+    ${CMAKE_SOURCE_DIR}/include/lm/core/tensor_pool.hpp
+)
+
 # Generation library (samplers)
 add_library(lm_generation STATIC
     src/generation/sampler.cpp
@@ -135,6 +144,12 @@ add_library(lm_runtime STATIC
     src/runtime/state_utils.cpp
 )
 target_link_libraries(lm_runtime PUBLIC lm_core)
+
+# Add Tensor and TensorPool as part of the core library
+target_sources(lm_core INTERFACE
+    ${CMAKE_SOURCE_DIR}/include/lm/core/tensor.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/core/tensor_pool.hpp
+)
 
 # Alpha components
 add_library(lm_alpha STATIC
@@ -224,6 +239,11 @@ target_link_libraries(starter_convo
     lm_context
     lm_models
     lm_tokenizer
+    lm_core
+)
+
+add_executable(test_tensor_pool src/test_tensor_pool.cpp)
+target_link_libraries(test_tensor_pool
     lm_core
 )
 
