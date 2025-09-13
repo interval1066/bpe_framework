@@ -119,12 +119,6 @@ add_library(lm_generation STATIC
 )
 target_link_libraries(lm_generation PUBLIC lm_core)
 
-# Training library
-add_library(lm_training STATIC
-    src/training/trainer.cpp
-)
-target_link_libraries(lm_training PUBLIC lm_models lm_tokenizer lm_optimizers lm_generation)
-
 # Context management library
 add_library(lm_context STATIC
     src/context_manager.cpp
@@ -242,6 +236,13 @@ target_link_libraries(starter_convo
     lm_core
 )
 
+add_library(lm_training STATIC
+    src/training/trainer.cpp
+    src/training/data_loader.cpp
+    src/training/losses.cpp
+)
+
+target_link_libraries(lm_training PUBLIC lm_models lm_optimizers lm_tokenizer)
 add_executable(test_tensor_pool src/test_tensor_pool.cpp)
 target_link_libraries(test_tensor_pool
     lm_core
