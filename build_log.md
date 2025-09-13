@@ -23,3 +23,5 @@ efficient. Added a vectorhash struct to effeiciently manipulate them as well.
 ### 9/9/2025 – Changed my mind about assembly with the Tensor class, removed the now redundant Transformer & LayerNorm classes as they are no longer needed with the for more flexible TransformerModel class.
 
 ### 9/10/2025 – Moved the Todos and explanatory papers into their own folder.
+
+### 9/13/2025 – Started on inference engine. Almost as taxing as the Tensor class.
