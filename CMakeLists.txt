@@ -136,7 +136,7 @@ target_sources(lm_generation INTERFACE
 
 # Context management library
 add_library(lm_context STATIC
-    src/context_manager.cpp
+    tests/context_manager.cpp
 )
 target_link_libraries(lm_context PUBLIC lm_core lm_tokenizer)
 
@@ -173,7 +173,7 @@ add_library(lm_alpha STATIC
 target_link_libraries(lm_alpha PUBLIC lm_core lm_runtime lm_conversation lm_models)
 
 # Test executables
-add_executable(performance_test src/performance_test.cpp)
+add_executable(performance_test tests/performance_test.cpp)
 target_link_libraries(performance_test
     lm_training
     lm_models
@@ -182,14 +182,14 @@ target_link_libraries(performance_test
     lm_core
 )
 
-add_executable(test_data_loader src/test_data_loader.cpp)
+add_executable(test_data_loader tests/test_data_loader.cpp)
 target_link_libraries(test_data_loader
     lm_training
     lm_tokenizer
     lm_core
 )
 
-add_executable(chat_demo src/chat_demo.cpp)
+add_executable(chat_demo tests/chat_demo.cpp)
 target_link_libraries(chat_demo
     lm_inference
     lm_conversation
@@ -199,7 +199,7 @@ target_link_libraries(chat_demo
     lm_core
 )
 
-add_executable(test_generation src/test_generation.cpp)
+add_executable(test_generation tests/test_generation.cpp)
 target_link_libraries(test_generation
     lm_training
     lm_models
@@ -209,7 +209,7 @@ target_link_libraries(test_generation
     lm_core
 )
 
-add_executable(serialization_demo src/serialization_demo.cpp)
+add_executable(serialization_demo tests/serialization_demo.cpp)
 target_link_libraries(serialization_demo
     lm_training
     lm_models
@@ -239,19 +239,20 @@ target_link_libraries(test_generation
     lm_generation  # Ensure this is included
     lm_core
 )
-add_executable(test_bpe src/test_bpe.cpp)
+
+add_executable(test_bpe tests/test_bpe.cpp)
 target_link_libraries(test_bpe
     lm_tokenizer
     lm_core
 )
 
-add_executable(test_unicode_bpe src/test_unicode_bpe.cpp)
+add_executable(test_unicode_bpe tests/test_unicode_bpe.cpp)
 target_link_libraries(test_unicode_bpe
     lm_tokenizer
     lm_core
 )
 
-add_executable(sampler_test src/sampler_test.cpp)
+add_executable(sampler_test tests/sampler_test.cpp)
 target_link_libraries(sampler_test
     lm_training
     lm_models
@@ -261,7 +262,7 @@ target_link_libraries(sampler_test
     lm_core
 )
 
-add_executable(test_conversation src/test_conversation.cpp)
+add_executable(test_conversation tests/test_conversation.cpp)
 target_link_libraries(test_conversation
     lm_conversation
     lm_models
@@ -270,21 +271,21 @@ target_link_libraries(test_conversation
     lm_core
 )
 
-add_executable(test_logger src/test_logger.cpp)
+add_executable(test_logger tests/test_logger.cpp)
 target_link_libraries(test_logger
     lm_tokenizer
     lm_models
     lm_core
 )
 
-add_executable(test_transformer src/test_transformer.cpp)
+add_executable(test_transformer tests/test_transformer.cpp)
 target_link_libraries(test_transformer
     lm_models
     lm_tokenizer
     lm_core
 )
 
-add_executable(starter_convo src/starter_convo.cpp)
+add_executable(starter_convo tests/starter_convo.cpp)
 target_link_libraries(starter_convo
     lm_alpha
     lm_conversation
@@ -301,7 +302,7 @@ add_library(lm_training STATIC
 )
 
 target_link_libraries(lm_training PUBLIC lm_models lm_optimizers lm_tokenizer)
-add_executable(test_tensor_pool src/test_tensor_pool.cpp)
+add_executable(test_tensor_pool tests/test_tensor_pool.cpp)
 target_link_libraries(test_tensor_pool
     lm_core
 )
