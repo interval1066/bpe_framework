@@ -1,10 +1,13 @@
+// src/serialization_demo.cpp
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include "lm/optimizers/adam.hpp"
-#include "lm/conversation_manager.hpp"
+#include "lm/conversation/conversation_manager.hpp"
 #include "lm/core/tensor.hpp"
+#include "lm/generation/greedy_sampler.hpp"
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <memory>
 
 using namespace lm;
 
@@ -12,8 +15,8 @@ int main() {
     std::cout << "=== BPE Framework Serialization Demo ===\n\n";
     
     try {
-        // Initialize tokenizer
-        BPETokenizer tokenizer;
+        // Create tokenizer directly as a shared_ptr
+        auto tokenizer_ptr = std::make_shared<BPETokenizer>();
         
         // Create a small test corpus
         std::vector<std::string> corpus = {
@@ -23,36 +26,37 @@ int main() {
         };
         
         std::cout << "Training tokenizer on " << corpus.size() << " sentences...\n";
-        tokenizer.train(corpus, 100); // Small vocabulary for testing
+        tokenizer_ptr->train(corpus, 100); // Small vocabulary for testing
+        
+        // Create a dummy model for the conversation manager
+        auto dummy_model = std::make_shared<TransformerModel>(1000, 512, 6, 8, 2048, 0.1f);
+        auto dummy_sampler = std::make_unique<GreedySampler>();
         
         // Test conversation manager
         std::cout << "Testing conversation manager...\n";
-        ConversationManager conv_manager;
+        ConversationManager conv_manager(dummy_model, tokenizer_ptr, std::move(dummy_sampler));
         
-        // Create a conversation and add some messages
-        std::string conv_id = conv_manager.create_conversation("Test Conversation");
-        conv_manager.add_message(conv_id, "user", "Hello, how are you?");
-        conv_manager.add_message(conv_id, "assistant", "I'm doing well, thank you!");
-        conv_manager.add_message(conv_id, "user", "What's the weather like today?");
+        // Add some messages to the conversation
+        conv_manager.add_to_history("Hello, how are you?", true);
+        conv_manager.add_to_history("I'm doing well, thank you!", false);
+        conv_manager.add_to_history("What's the weather like today?", true);
         
         // Save conversation
         std::cout << "Saving conversation...\n";
-        conv_manager.save_conversations("test_conversations.bin");
+        conv_manager.save_conversation("test_conversation.txt");
         
         // Load conversation into a new manager
         std::cout << "Loading conversation...\n";
-        ConversationManager loaded_conv_manager;
-        loaded_conv_manager.load_conversations("test_conversations.bin");
+        auto dummy_model2 = std::make_shared<TransformerModel>(1000, 512, 6, 8, 2048, 0.1f);
+        auto dummy_sampler2 = std::make_unique<GreedySampler>();
+        ConversationManager loaded_conv_manager(dummy_model2, tokenizer_ptr, std::move(dummy_sampler2));
+        loaded_conv_manager.load_conversation("test_conversation.txt");
         
         // Verify the loaded conversation
-        auto loaded_conv = loaded_conv_manager.get_conversation(conv_id);
-        if (loaded_conv) {
-            std::cout << "Loaded conversation has " << loaded_conv->turns.size() << " turns\n";
-            for (size_t i = 0; i < loaded_conv->turns.size(); i++) {
-                const auto& turn = loaded_conv->turns[i];
-                std::cout << "Turn " << i << ": " << speaker_type_to_string(turn.speaker) 
-                          << ": " << turn.text << "\n";
-            }
+        auto history = loaded_conv_manager.get_history();
+        std::cout << "Loaded conversation has " << history.size() << " turns\n";
+        for (size_t i = 0; i < history.size(); i++) {
+            std::cout << "Turn " << i << ": " << history[i] << "\n";
         }
         
         // Test optimizer state serialization
@@ -101,13 +105,14 @@ int main() {
         std::cout << "Original tensor:\n" << test_tensor.data() << "\n";
         std::cout << "Loaded tensor:\n" << loaded_tensor.data() << "\n";
         
-        // Test tokenizer serialization (if implemented)
+        // Test tokenizer serialization
         std::cout << "Testing tokenizer serialization...\n";
-        tokenizer.save("test_tokenizer.bin");
+        tokenizer_ptr->save("test_tokenizer.bin");
         
-        BPETokenizer loaded_tokenizer;
-        loaded_tokenizer.load("test_tokenizer.bin");
-        std::cout << "Tokenizer vocabulary size after loading: " << loaded_tokenizer.vocab_size() << "\n";
+        // Create a new tokenizer and load the saved state
+        auto loaded_tokenizer_ptr = std::make_shared<BPETokenizer>();
+        loaded_tokenizer_ptr->load("test_tokenizer.bin");
+        std::cout << "Tokenizer vocabulary size after loading: " << loaded_tokenizer_ptr->vocab_size() << "\n";
         
         std::cout << "\n=== Serialization Demo Completed Successfully ===\n";
         

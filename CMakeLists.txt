@@ -116,8 +116,23 @@ target_sources(lm_core INTERFACE
 # Generation library (samplers)
 add_library(lm_generation STATIC
     src/generation/sampler.cpp
+    src/generation/greedy_sampler.cpp
+    src/generation/temperature_sampler.cpp
+    src/generation/topk_sampler.cpp
+    src/generation/topp_sampler.cpp
+    src/generation/random_sampler.cpp  # Add this line
 )
 target_link_libraries(lm_generation PUBLIC lm_core)
+
+# Add header files to the generation library
+target_sources(lm_generation INTERFACE
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/sampler.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/greedy_sampler.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/temperature_sampler.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/topk_sampler.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/topp_sampler.hpp
+    ${CMAKE_SOURCE_DIR}/include/lm/generation/random_sampler.hpp  # Add this line
+)
 
 # Context management library
 add_library(lm_context STATIC
@@ -127,9 +142,14 @@ target_link_libraries(lm_context PUBLIC lm_core lm_tokenizer)
 
 # Conversation management library
 add_library(lm_conversation STATIC
-    src/conversation_manager.cpp
+    src/conversation/conversation_manager.cpp
 )
 target_link_libraries(lm_conversation PUBLIC lm_core lm_context)
+
+add_library(lm_inference STATIC
+    src/inference/inference_engine.cpp
+)
+target_link_libraries(lm_inference PUBLIC lm_conversation lm_models lm_tokenizer lm_generation)
 
 # Runtime library
 add_library(lm_runtime STATIC
@@ -162,6 +182,23 @@ target_link_libraries(performance_test
     lm_core
 )
 
+add_executable(test_data_loader src/test_data_loader.cpp)
+target_link_libraries(test_data_loader
+    lm_training
+    lm_tokenizer
+    lm_core
+)
+
+add_executable(chat_demo src/chat_demo.cpp)
+target_link_libraries(chat_demo
+    lm_inference
+    lm_conversation
+    lm_models
+    lm_tokenizer
+    lm_generation
+    lm_core
+)
+
 add_executable(test_generation src/test_generation.cpp)
 target_link_libraries(test_generation
     lm_training
@@ -181,8 +218,27 @@ target_link_libraries(serialization_demo
     lm_conversation
     lm_context
     lm_core
+    lm_generation  # Add this line
 )
 
+# Update other executables that might use samplers
+target_link_libraries(chat_demo
+    lm_inference
+    lm_conversation
+    lm_models
+    lm_tokenizer
+    lm_generation  # Ensure this is included
+    lm_core
+)
+
+target_link_libraries(test_generation
+    lm_training
+    lm_models
+    lm_optimizers
+    lm_tokenizer
+    lm_generation  # Ensure this is included
+    lm_core
+)
 add_executable(test_bpe src/test_bpe.cpp)
 target_link_libraries(test_bpe
     lm_tokenizer
@@ -208,7 +264,9 @@ target_link_libraries(sampler_test
 add_executable(test_conversation src/test_conversation.cpp)
 target_link_libraries(test_conversation
     lm_conversation
-    lm_context
+    lm_models
+    lm_tokenizer
+    lm_generation
     lm_core
 )
 

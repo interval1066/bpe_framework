@@ -1,4 +1,8 @@
 #include "lm/generation/sampler.hpp"
+#include "lm/generation/greedy_sampler.hpp"
+#include "lm/generation/random_sampler.hpp"
+#include "lm/generation/topk_sampler.hpp"
+#include "lm/generation/topp_sampler.hpp"
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include <iostream>
 #include <cassert>
