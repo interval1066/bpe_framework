@@ -25,3 +25,5 @@ efficient. Added a vectorhash struct to effeiciently manipulate them as well.
 ### 9/10/2025 – Moved the Todos and explanatory papers into their own folder.
 
 ### 9/13/2025 – Started on inference engine. Almost as taxing as the Tensor class.
+
+### 9/14/2025 – Moved the tests to their own folder, they’re getting to be to many to simply leave in the src dir.
