@@ -1,7 +1,9 @@
 // Enhanced conversation_model.cpp
-#include "conversation_model.hpp"
+#include "lm/models/conversation_model.hpp"
 #include <algorithm>
 #include <sstream>
+#include <iostream>
+#include <stdexcept>
 
 namespace lm {
 
@@ -13,22 +15,60 @@ ConversationModel::ConversationModel(size_t vocab_size, size_t d_model,
 }
 
 void ConversationModel::train(const std::vector<std::string>& conversations) {
+    // Validate tokenizer is set
+    if (!tokenizer_) {
+        throw std::runtime_error("Tokenizer not set before training");
+    }
+    
+    size_t max_seq_length = 0;
+    std::vector<std::vector<TokenID>> all_tokens;
+    
+    // First pass: tokenize all conversations and find max length
     for (const auto& conversation : conversations) {
-        // Tokenize the conversation
         auto tokens = tokenizer_->encode(conversation);
+        if (tokens.size() < 2) continue;
         
+        max_seq_length = std::max(max_seq_length, tokens.size());
+        all_tokens.push_back(tokens);
+    }
+    
+    // Second pass: pad sequences and train
+    for (const auto& tokens : all_tokens) {
         if (tokens.size() < 2) continue;
         
         // Create input and target sequences
+        // Input: all tokens except the last one
         std::vector<TokenID> input_tokens(tokens.begin(), tokens.end() - 1);
+        // Target: all tokens except the first one (shifted by one)
         std::vector<TokenID> target_tokens(tokens.begin() + 1, tokens.end());
         
+        // Pad both sequences to the same length (max_seq_length - 1)
+        if (input_tokens.size() < max_seq_length - 1) {
+            input_tokens.resize(max_seq_length - 1, pad_token_id_);
+        }
+        
+        if (target_tokens.size() < max_seq_length - 1) {
+            target_tokens.resize(max_seq_length - 1, pad_token_id_);
+        }
+        
         // Training step
-        transformer_->train_step(input_tokens, target_tokens);
+        try {
+            transformer_->train_step(input_tokens, target_tokens);
+        } catch (const std::exception& e) {
+            std::cerr << "Error during training step: " << e.what() << std::endl;
+            std::cerr << "Input size: " << input_tokens.size() 
+                      << ", Target size: " << target_tokens.size() << std::endl;
+            throw;
+        }
     }
 }
 
 std::string ConversationModel::generate_response(const std::string& user_input) {
+    // Validate tokenizer is set
+    if (!tokenizer_) {
+        throw std::runtime_error("Tokenizer not set before generation");
+    }
+    
     // Add user message to context
     context_manager_->add_user_message(user_input);
     
@@ -40,6 +80,11 @@ std::string ConversationModel::generate_response(const std::string& user_input) 
     
     // Tokenize context
     auto tokens = tokenizer_->encode(context);
+    
+    // Ensure we have tokens to generate from
+    if (tokens.empty()) {
+        return "I'm not sure how to respond to that.";
+    }
     
     // Generate continuation
     auto generated_tokens = transformer_->generate(tokens, 100, 0.8);

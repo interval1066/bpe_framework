@@ -4,6 +4,8 @@
 #include <iostream>
 #include <chrono>
 #include <iomanip>
+#include <vector>
+#include <memory>
 
 // Helper function to get current timestamp
 std::string get_current_timestamp() {
@@ -18,101 +20,111 @@ std::string get_current_timestamp() {
 int main() {
     std::cout << "[" << get_current_timestamp() << "] Starting conversation model initialization..." << std::endl;
     
-    // Initialize tokenizer
-    std::cout << "[" << get_current_timestamp() << "] Creating BPE tokenizer..." << std::endl;
-    auto tokenizer = std::make_shared<lm::BPETokenizer>();
-    
-    // Train or load tokenizer
-    std::cout << "[" << get_current_timestamp() << "] Preparing training data for tokenizer..." << std::endl;
-    std::vector<std::string> training_data = {
-        "Hello, how are you?",
-        "I'm doing well, thank you!",
-        "What can I help you with today?",
-        "The weather is nice today.",
-        "I enjoy programming in C++.",
-        "Machine learning is fascinating.",
-        "Natural language processing enables computers to understand human language.",
-        "This is a test of the tokenizer system.",
-        "Reinforcement learning uses rewards to train agents.",
-        "Deep learning models have many layers."
-    };
-    
-    std::cout << "[" << get_current_timestamp() << "] Training tokenizer with " << training_data.size() << " examples..." << std::endl;
-    tokenizer->train(training_data, 1000);  // Reduced vocab size for demo
-    std::cout << "[" << get_current_timestamp() << "] Tokenizer training completed. Vocabulary size: " << tokenizer->vocab_size() << std::endl;
-    
-    // Initialize conversation model
-    std::cout << "[" << get_current_timestamp() << "] Initializing conversation model..." << std::endl;
-    lm::ConversationModel model(tokenizer->vocab_size());
-    model.set_tokenizer(tokenizer);
-    
-    // Train the model
-    std::cout << "[" << get_current_timestamp() << "] Preparing conversation training data..." << std::endl;
-    std::vector<std::string> conversations = {
-        "<|user|>Hello<|endoftext|><|assistant|>Hi there! How can I help you?<|endoftext|>",
-        "<|user|>What's the weather like?<|endoftext|><|assistant|>I'm not sure, I don't have access to real-time weather data.<|endoftext|>",
-        "<|user|>What can you do?<|endoftext|><|assistant|>I can chat with you about various topics and answer questions based on my training.<|endoftext|>",
-        "<|user|>Tell me a joke<|endoftext|><|assistant|>Why don't scientists trust atoms? Because they make up everything!<|endoftext|>",
-        "<|user|>How does machine learning work?<|endoftext|><|assistant|>Machine learning uses algorithms to learn patterns from data without being explicitly programmed for each task.<|endoftext|>"
-    };
-    
-    std::cout << "[" << get_current_timestamp() << "] Training conversation model with " << conversations.size() << " examples..." << std::endl;
-    model.train(conversations);
-    std::cout << "[" << get_current_timestamp() << "] Model training completed." << std::endl;
-    
-    // Test with some sample inputs
-    std::cout << "[" << get_current_timestamp() << "] Testing model with sample inputs..." << std::endl;
-    std::vector<std::string> test_inputs = {
-        "Hello, how are you?",
-        "What can you do?",
-        "Tell me about machine learning"
-    };
-    
-    for (const auto& input : test_inputs) {
-        std::cout << "[" << get_current_timestamp() << "] Input: " << input << std::endl;
-        std::string response = model.generate_response(input);
-        std::cout << "[" << get_current_timestamp() << "] Response: " << response << std::endl;
-        std::cout << "[" << get_current_timestamp() << "] ---" << std::endl;
-    }
-    
-    // Interactive conversation loop
-    std::cout << "[" << get_current_timestamp() << "] Starting interactive conversation mode..." << std::endl;
-    std::cout << "[" << get_current_timestamp() << "] Type 'quit' to exit, 'clear' to reset conversation context" << std::endl;
-    
-    std::string user_input;
-    while (true) {
-        std::cout << "[" << get_current_timestamp() << "] User: ";
-        std::getline(std::cin, user_input);
+    try {
+        // Initialize tokenizer
+        std::cout << "[" << get_current_timestamp() << "] Creating BPE tokenizer..." << std::endl;
+        auto tokenizer = std::make_shared<lm::BPETokenizer>();
         
-        if (user_input == "quit" || user_input == "exit") {
-            break;
+        // Train or load tokenizer
+        std::cout << "[" << get_current_timestamp() << "] Preparing training data for tokenizer..." << std::endl;
+        std::vector<std::string> training_data = {
+            "Hello, how are you?",
+            "I'm doing well, thank you!",
+            "What can I help you with today?",
+            "The weather is nice today.",
+            "I enjoy programming in C++.",
+            "Machine learning is fascinating.",
+            "Natural language processing enables computers to understand human language.",
+            "This is a test of the tokenizer system.",
+            "Reinforcement learning uses rewards to train agents.",
+            "Deep learning models have many layers."
+        };
+        
+        std::cout << "[" << get_current_timestamp() << "] Training tokenizer with " << training_data.size() << " examples..." << std::endl;
+        tokenizer->train(training_data, 1000);
+        std::cout << "[" << get_current_timestamp() << "] Tokenizer training completed. Vocabulary size: " << tokenizer->vocab_size() << std::endl;
+        
+        // Initialize conversation model with explicit parameters
+        std::cout << "[" << get_current_timestamp() << "] Initializing conversation model..." << std::endl;
+        lm::ConversationModel model(
+            tokenizer->vocab_size(), // vocab_size
+            512,                     // d_model
+            6,                       // n_layers
+            8,                       // n_heads
+            2048,                    // d_ff
+            0.1f                     // dropout
+        );
+        model.set_tokenizer(tokenizer);
+        
+        // Test the tokenizer with a simple input
+        std::cout << "[" << get_current_timestamp() << "] Testing tokenizer..." << std::endl;
+        std::string test_text = "Hello";
+        std::vector<lm::TokenID> test_tokens = tokenizer->encode(test_text);
+        std::string decoded_text = tokenizer->decode(test_tokens);
+        
+        std::cout << "[" << get_current_timestamp() << "] Tokenizer test:" << std::endl;
+        std::cout << "  Input: '" << test_text << "'" << std::endl;
+        std::cout << "  Tokens: ";
+        for (lm::TokenID id : test_tokens) {
+            std::cout << id << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "  Decoded: '" << decoded_text << "'" << std::endl;
+        
+        // Check if the token IDs are within the vocabulary size
+        for (lm::TokenID id : test_tokens) {
+            if (id >= tokenizer->vocab_size()) {
+                std::cerr << "[" << get_current_timestamp() << "] ERROR: Token ID " << id 
+                          << " is out of range (vocab size: " << tokenizer->vocab_size() << ")!" << std::endl;
+                return 1;
+            }
         }
         
-        if (user_input == "clear") {
-            // Assuming there's a method to clear context
-            // model.clear_context();
-            std::cout << "[" << get_current_timestamp() << "] Conversation context cleared." << std::endl;
-            continue;
+        if (test_text != decoded_text) {
+            std::cerr << "[" << get_current_timestamp() << "] ERROR: Tokenizer round-trip failed!" << std::endl;
+            return 1;
         }
         
-        if (user_input.empty()) {
-            continue;
-        }
+        // Train the model with simplified data
+        std::cout << "[" << get_current_timestamp() << "] Preparing conversation training data..." << std::endl;
+        
+        // Use a single, very simple example to isolate the issue
+        std::vector<std::string> simple_example = {
+            "H"  // Single character
+        };
+        
+        std::cout << "[" << get_current_timestamp() << "] Training conversation model with " << simple_example.size() << " examples..." << std::endl;
         
         try {
-            std::string response = model.generate_response(user_input);
-            std::cout << "[" << get_current_timestamp() << "] AI: " << response << std::endl;
+            model.train(simple_example);
+            std::cout << "[" << get_current_timestamp() << "] Model training completed." << std::endl;
         } catch (const std::exception& e) {
-            std::cerr << "[" << get_current_timestamp() << "] Error generating response: " << e.what() << std::endl;
+            std::cerr << "[" << get_current_timestamp() << "] Error during training: " << e.what() << std::endl;
+            
+            // Try to get more information about the error
+            std::cerr << "[" << get_current_timestamp() << "] Tokenizer vocab size: " << tokenizer->vocab_size() << std::endl;
+            std::cerr << "[" << get_current_timestamp() << "] Model vocab size: " << model.vocab_size() << std::endl;
+            
+            return 1;
         }
+        
+        // Test with a simple input
+        std::cout << "[" << get_current_timestamp() << "] Testing model with sample input..." << std::endl;
+        std::string test_input = "Hello";
+        
+        std::cout << "[" << get_current_timestamp() << "] Input: " << test_input << std::endl;
+        std::string response = model.generate_response(test_input);
+        std::cout << "[" << get_current_timestamp() << "] Response: " << response << std::endl;
+        
+        std::cout << "[" << get_current_timestamp() << "] Conversation demo completed." << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "[" << get_current_timestamp() << "] Error: " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "[" << get_current_timestamp() << "] Unknown error occurred." << std::endl;
+        return 1;
     }
     
-    // Save the model
-    std::cout << "[" << get_current_timestamp() << "] Saving model to 'conversation_model.bin'..." << std::endl;
-    model.save_model("conversation_model.bin");
-    std::cout << "[" << get_current_timestamp() << "] Model saved successfully." << std::endl;
-    
-    std::cout << "[" << get_current_timestamp() << "] Conversation demo completed." << std::endl;
     return 0;
 }
-

@@ -1,7 +1,7 @@
 // Enhanced conversation_model.hpp
 #pragma once
 
-#include "transformer_model.hpp"
+#include "lm/models/transformer_model.hpp"
 #include "bpe_tokenizer.hpp"
 #include "context_manager.hpp"
 #include <string>
@@ -40,12 +40,17 @@ public:
         context_manager_ = std::make_unique<ContextManager>(2048, 20);
     }
 
+    inline size_t vocab_size() const {
+        return transformer_->vocab_size();
+    }
+
 private:
     std::shared_ptr<BPETokenizer> tokenizer_;
     std::unique_ptr<TransformerModel> transformer_;
     std::unique_ptr<ContextManager> context_manager_;
     std::string system_prompt_;
-    
+    TokenID pad_token_id_;
+
     // Format conversation for training
     std::string format_conversation(const std::vector<std::string>& turns);
 };

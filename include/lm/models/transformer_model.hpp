@@ -42,9 +42,13 @@ public:
     TransformerModel();
     TransformerModel(size_t vocab_size, size_t d_model, size_t n_layers, 
                    size_t n_heads, size_t d_ff, float dropout);
-       ~TransformerModel();
- 
-private:
+    ~TransformerModel();
+
+    inline size_t vocab_size() const {
+        return vocab_size_;
+    }
+
+ private:
     // Private constructor
     // Implementation details
     struct Impl;

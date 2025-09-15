@@ -106,7 +106,10 @@ struct TransformerModel::Impl {
     // Embedding layers
     Eigen::MatrixXf token_embedding;
     Eigen::MatrixXf position_embedding;
-    
+
+    // Add dimension validation flag
+    bool enable_dimension_checks = true;
+
     // Transformer blocks
     struct TransformerBlock {
         // Self-attention
@@ -126,6 +129,143 @@ struct TransformerModel::Impl {
         Eigen::MatrixXf w_ff1_grad, w_ff2_grad;
         Eigen::VectorXf ff_gamma_grad, ff_beta_grad;
     };
+
+    void print_dimensions(const char* name, const Eigen::MatrixXf& matrix) const {
+        std::cout << name << " dimensions: (" << matrix.rows() 
+                  << ", " << matrix.cols() << ")" << std::endl;
+    }
+
+    std::vector<float> forward(const std::vector<TokenID>& input_tokens, bool is_training = true) {
+        size_t seq_len = input_tokens.size();
+        
+        // Validate input dimensions
+        if (enable_dimension_checks && seq_len == 0) {
+            throw std::runtime_error("Input sequence cannot be empty");
+        }
+        
+        // Clear previous cache if training
+        if (is_training) {
+            forward_caches.resize(n_layers);
+        }
+        
+        // Create token embeddings
+        embeddings.resize(seq_len, d_model);
+        for (size_t i = 0; i < seq_len; i++) {
+            embeddings.row(i) = token_embedding.row(input_tokens[i]);
+        }
+        
+        // Add position embeddings
+        for (size_t i = 0; i < seq_len; i++) {
+            if (i < 10000) { // Limit to precomputed positions
+                embeddings.row(i) += position_embedding.row(i);
+            }
+        }
+        
+        // Apply transformer blocks
+        Eigen::MatrixXf x = embeddings;
+        if (enable_dimension_checks) {
+            check_dimensions("after embeddings", x, seq_len, d_model);
+        }
+        
+        for (size_t layer = 0; layer < n_layers; layer++) {
+            auto& block = blocks[layer];
+            auto& cache = forward_caches[layer];
+            
+            if (is_training) {
+                cache.pre_attention_norm = x;
+            }
+
+            // Self-attention
+            Eigen::MatrixXf attn_output = self_attention(x, block.w_q, block.w_k, 
+                                                        block.w_v, block.w_o, is_training);
+            
+            if (enable_dimension_checks) {
+                check_dimensions("after attention", attn_output, seq_len, d_model);
+            }
+            
+            if (is_training) {
+                cache.attention_output = attn_output;
+            }
+            
+            // Residual connection and layer norm
+            x = x + attn_output;
+            if (enable_dimension_checks) {
+                check_dimensions("after residual", x, seq_len, d_model);
+            }
+            
+            if (is_training) {
+                cache.layer_norm_input = x;
+            }
+            
+            for (size_t i = 0; i < seq_len; i++) {
+                x.row(i) = layer_norm(x.row(i).transpose(), block.attn_gamma, 
+                                     block.attn_beta).transpose();
+            }
+            
+            if (is_training) {
+                cache.pre_ff_norm = x;
+            }
+            
+            // Feed-forward
+            Eigen::MatrixXf ff_output = feed_forward(x, block.w_ff1, block.w_ff2, is_training);
+            
+            if (enable_dimension_checks) {
+                check_dimensions("after feedforward", ff_output, seq_len, d_model);
+            }
+            
+            if (is_training) {
+                cache.gelu_output = ff_output;
+            }
+            
+            // Residual connection and layer norm
+            x = x + ff_output;
+            if (enable_dimension_checks) {
+                check_dimensions("after second residual", x, seq_len, d_model);
+            }
+            
+            for (size_t i = 0; i < seq_len; i++) {
+                x.row(i) = layer_norm(x.row(i).transpose(), block.ff_gamma, 
+                                     block.ff_beta).transpose();
+            }
+            
+            if (enable_dimension_checks) {
+                check_dimensions("after layer norm", x, seq_len, d_model);
+            }
+        }
+        
+        // Final layer norm
+        for (size_t i = 0; i < seq_len; i++) {
+            x.row(i) = layer_norm(x.row(i).transpose(), final_gamma, final_beta).transpose();
+        }
+        
+        if (enable_dimension_checks) {
+            check_dimensions("after final norm", x, seq_len, d_model);
+        }
+        
+        // Language model head
+        final_output = x * lm_head;
+        
+        if (enable_dimension_checks) {
+            check_dimensions("after lm_head", final_output, seq_len, vocab_size);
+        }
+        
+        // Convert to vector
+        std::vector<float> result(final_output.data(), final_output.data() + final_output.size());
+        return result;
+    }
+    
+    void check_dimensions(const char* location, const Eigen::MatrixXf& matrix, 
+                         size_t expected_rows, size_t expected_cols) const {
+        if (matrix.rows() != expected_rows || matrix.cols() != expected_cols) {
+            std::string error_msg = std::string("Dimension mismatch at ") + location + 
+                ": expected (" + std::to_string(expected_rows) + ", " + 
+                std::to_string(expected_cols) + "), got (" +
+                std::to_string(matrix.rows()) + ", " + 
+                std::to_string(matrix.cols()) + ")";
+            std::cerr << error_msg << std::endl;
+            throw std::runtime_error(error_msg);
+        }
+    }
     
     std::vector<TransformerBlock> blocks;
     
@@ -230,11 +370,25 @@ struct TransformerModel::Impl {
                                   const Eigen::MatrixXf& w_o,
                                   bool is_training = true) {
         size_t seq_len = x.rows();
+
+        if (enable_dimension_checks) {
+            check_dimensions("x in self_attention", x, seq_len, d_model);
+            check_dimensions("w_q", w_q, d_model, d_model);
+            check_dimensions("w_k", w_k, d_model, d_model);
+            check_dimensions("w_v", w_v, d_model, d_model);
+            check_dimensions("w_o", w_o, d_model, d_model);
+        }
         
         // Compute queries, keys, values
         Eigen::MatrixXf q = x * w_q;
         Eigen::MatrixXf k = x * w_k;
         Eigen::MatrixXf v = x * w_v;
+
+        if (enable_dimension_checks) {
+            check_dimensions("q", q, seq_len, d_model);
+            check_dimensions("k", k, seq_len, d_model);
+            check_dimensions("v", v, seq_len, d_model);
+        }
         
         // Scale and compute attention scores
         Eigen::MatrixXf scores = q * k.transpose() / std::sqrt(d_model);
@@ -264,6 +418,10 @@ struct TransformerModel::Impl {
         
         // Apply attention to values
         Eigen::MatrixXf output = attention * v;
+
+        if (enable_dimension_checks) {
+            check_dimensions("attention * v", output, seq_len, d_model);
+        }
         
         // Apply output projection
         output = output * w_o;
@@ -275,6 +433,13 @@ struct TransformerModel::Impl {
                             const Eigen::MatrixXf& w1,
                             const Eigen::MatrixXf& w2,
                             bool is_training = true) {
+        size_t seq_len = x.rows();
+        
+        if (enable_dimension_checks) {
+            check_dimensions("x in feed_forward", x, seq_len, d_model);
+            check_dimensions("w1", w1, d_model, d_ff);
+            check_dimensions("w2", w2, d_ff, d_model);
+        }
         // First linear layer + GELU activation
         Eigen::MatrixXf h = x * w1;
     
@@ -299,93 +464,21 @@ struct TransformerModel::Impl {
     
         return output;
     }
-
-    std::vector<float> forward(const std::vector<TokenID>& input_tokens, bool is_training = true) {
-        size_t seq_len = input_tokens.size();
-        
-        // Clear previous cache if training
-        if (is_training) {
-            forward_caches.resize(n_layers);
-        }
-        
-        // Create token embeddings
-        embeddings.resize(seq_len, d_model);
-        for (size_t i = 0; i < seq_len; i++) {
-            embeddings.row(i) = token_embedding.row(input_tokens[i]);
-        }
-        
-        // Add position embeddings
-        for (size_t i = 0; i < seq_len; i++) {
-            if (i < 10000) { // Limit to precomputed positions
-                embeddings.row(i) += position_embedding.row(i);
-            }
-        }
-        
-        // Apply transformer blocks
-        Eigen::MatrixXf x = embeddings;
-        for (size_t layer = 0; layer < n_layers; layer++) {
-            auto& block = blocks[layer];
-            auto& cache = forward_caches[layer];
-            
-            if (is_training) {
-                cache.pre_attention_norm = x;
-            }
-            
-            // Self-attention
-            Eigen::MatrixXf attn_output = self_attention(x, block.w_q, block.w_k, 
-                                                        block.w_v, block.w_o, is_training);
-            
-            if (is_training) {
-                cache.attention_output = attn_output;
-            }
-            
-            // Residual connection and layer norm
-            x = x + attn_output;
-            if (is_training) {
-                cache.layer_norm_input = x;
-            }
-            
-            for (size_t i = 0; i < seq_len; i++) {
-                x.row(i) = layer_norm(x.row(i).transpose(), block.attn_gamma, 
-                                     block.attn_beta).transpose();
-            }
-            
-            if (is_training) {
-                cache.pre_ff_norm = x;
-            }
-            
-            // Feed-forward
-            Eigen::MatrixXf ff_output = feed_forward(x, block.w_ff1, block.w_ff2, is_training);
-            
-            if (is_training) {
-                cache.gelu_output = ff_output;
-            }
-            
-            // Residual connection and layer norm
-            x = x + ff_output;
-            for (size_t i = 0; i < seq_len; i++) {
-                x.row(i) = layer_norm(x.row(i).transpose(), block.ff_gamma, 
-                                     block.ff_beta).transpose();
-            }
-        }
-        
-        // Final layer norm
-        for (size_t i = 0; i < seq_len; i++) {
-            x.row(i) = layer_norm(x.row(i).transpose(), final_gamma, final_beta).transpose();
-        }
-        
-        // Language model head
-        final_output = x * lm_head;
-        
-        // Convert to vector
-        std::vector<float> result(final_output.data(), final_output.data() + final_output.size());
-        return result;
-    }
     
     void backward(const Eigen::MatrixXf& grad_output) {
         size_t seq_len = grad_output.rows();
         size_t vocab_size = grad_output.cols();
-        
+
+        if (enable_dimension_checks && 
+            (final_output.rows() != seq_len || final_output.cols() != vocab_size)) {
+            std::string error_msg = "Dimension mismatch in backward pass: " +
+                std::string("final_output(") + std::to_string(final_output.rows()) + 
+                ", " + std::to_string(final_output.cols()) + ") " +
+                "grad_output(" + std::to_string(seq_len) + ", " + 
+                std::to_string(vocab_size) + ")";
+            throw std::runtime_error(error_msg);
+        }
+
         // Gradient through final layer norm and LM head
         Eigen::MatrixXf grad_final = grad_output * lm_head.transpose();
         
@@ -564,6 +657,14 @@ void TransformerModel::backward(const std::vector<float>& grad_output) {
     size_t seq_len = pimpl_->final_output.rows();
     size_t vocab_size = pimpl_->final_output.cols();
     
+    // Validate gradient dimensions
+    if (grad_output.size() != seq_len * vocab_size) {
+        std::string error_msg = "Gradient dimension mismatch: " +
+            std::string("expected ") + std::to_string(seq_len * vocab_size) +
+            " elements, got " + std::to_string(grad_output.size());
+        throw std::runtime_error(error_msg);
+    }
+    
     // Convert vector gradient to matrix
     Eigen::Map<const Eigen::MatrixXf> grad_output_map(grad_output.data(), seq_len, vocab_size);
     pimpl_->backward(grad_output_map);
@@ -572,8 +673,20 @@ void TransformerModel::backward(const std::vector<float>& grad_output) {
 void TransformerModel::train_step(const std::vector<TokenID>& input_tokens, 
                                 const std::vector<TokenID>& target_tokens,
                                 float learning_rate) {
+    // Add validation
+    if (input_tokens.size() != target_tokens.size()) {
+        std::string error_msg = "Input and target sequences must have the same length. " +
+            std::string("Input: ") + std::to_string(input_tokens.size()) + ", " +
+            "Target: " + std::to_string(target_tokens.size());
+        throw std::runtime_error(error_msg);
+    }
+    
+    if (input_tokens.empty()) {
+        throw std::runtime_error("Input sequence cannot be empty");
+    }
+    
     // Forward pass
-    auto logits = pimpl_->forward(input_tokens, true); // true for training mode
+    auto logits = pimpl_->forward(input_tokens, true);
     
     // Calculate loss and gradient
     float loss = calculate_loss(logits, target_tokens);
