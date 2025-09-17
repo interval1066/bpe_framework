@@ -577,7 +577,6 @@ struct TransformerModel::Impl {
         final_gamma -= learning_rate * final_gamma_grad;
         final_beta -= learning_rate * final_beta_grad;
         
-        // Update transformer blocks
         for (auto& block : blocks) {
             block.w_q -= learning_rate * block.w_q_grad;
             block.w_k -= learning_rate * block.w_k_grad;
@@ -673,6 +672,7 @@ void TransformerModel::backward(const std::vector<float>& grad_output) {
 void TransformerModel::train_step(const std::vector<TokenID>& input_tokens, 
                                 const std::vector<TokenID>& target_tokens,
                                 float learning_rate) {
+    pimpl_->update_parameters(learning_rate);
     // Add validation
     if (input_tokens.size() != target_tokens.size()) {
         std::string error_msg = "Input and target sequences must have the same length. " +

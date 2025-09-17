@@ -1,4 +1,3 @@
-// Enhanced conversation_model.hpp
 #pragma once
 
 #include "lm/models/transformer_model.hpp"
@@ -44,16 +43,23 @@ public:
         return transformer_->vocab_size();
     }
 
+    void set_verbose(bool verbose) { verbose_ = verbose; }
+    void set_max_response_length(size_t length) { max_response_length_ = length; }
+    void set_temperature(float temperature) { temperature_ = temperature; }
+
 private:
     std::shared_ptr<BPETokenizer> tokenizer_;
     std::unique_ptr<TransformerModel> transformer_;
     std::unique_ptr<ContextManager> context_manager_;
+
     std::string system_prompt_;
     TokenID pad_token_id_;
+    bool verbose_ = false;
+    size_t max_response_length_ = 20;
 
+    float temperature_ = 0.8f;    
     // Format conversation for training
     std::string format_conversation(const std::vector<std::string>& turns);
 };
 
 } // namespace lm
-

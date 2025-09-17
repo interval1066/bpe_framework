@@ -24,11 +24,12 @@ public:
     // Public interface
     std::vector<float> forward(const std::vector<TokenID>& input_tokens);
     void backward(const std::vector<float>& grad_output);
-    void train_step(const std::vector<TokenID>& input_tokens, 
-                  const std::vector<TokenID>& target_tokens,
-                  float learning_rate = 0.001f);
     float calculate_loss(const std::vector<float>& logits, 
                        const std::vector<TokenID>& targets);
+    void train_step(const std::vector<TokenID>& input_tokens, 
+                    const std::vector<TokenID>& target_tokens,
+                    float learning_rate = 0.01f); // Remove the extra }; here
+
     std::vector<TokenID> generate(const std::vector<TokenID>& context, 
                                 size_t max_length, float temperature);
     std::vector<Tensor*> parameters();
@@ -48,7 +49,7 @@ public:
         return vocab_size_;
     }
 
- private:
+private:
     // Private constructor
     // Implementation details
     struct Impl;
@@ -64,4 +65,3 @@ public:
 };
 
 } // namespace lm
-

@@ -30,6 +30,14 @@ void ConversationModel::train(const std::vector<std::string>& conversations) {
         
         max_seq_length = std::max(max_seq_length, tokens.size());
         all_tokens.push_back(tokens);
+        
+        if (verbose_) {
+            std::cout << "Tokenized: '" << conversation << "' -> ";
+            for (auto token : tokens) {
+                std::cout << token << " ";
+            }
+            std::cout << std::endl;
+        }
     }
     
     // Second pass: pad sequences and train
@@ -51,9 +59,21 @@ void ConversationModel::train(const std::vector<std::string>& conversations) {
             target_tokens.resize(max_seq_length - 1, pad_token_id_);
         }
         
+        if (verbose_) {
+            std::cout << "Training on: ";
+            for (auto token : input_tokens) {
+                std::cout << token << " ";
+            }
+            std::cout << " -> ";
+            for (auto token : target_tokens) {
+                std::cout << token << " ";
+            }
+            std::cout << std::endl;
+        }
+        
         // Training step
         try {
-            transformer_->train_step(input_tokens, target_tokens);
+            transformer_->train_step(input_tokens, target_tokens, 0.01f); // Added learning rate
         } catch (const std::exception& e) {
             std::cerr << "Error during training step: " << e.what() << std::endl;
             std::cerr << "Input size: " << input_tokens.size() 
@@ -63,50 +83,20 @@ void ConversationModel::train(const std::vector<std::string>& conversations) {
     }
 }
 
-std::string ConversationModel::generate_response(const std::string& user_input) {
-    // Validate tokenizer is set
+std::string ConversationModel::generate_response(const std::string& input) {
     if (!tokenizer_) {
-        throw std::runtime_error("Tokenizer not set before generation");
+        throw std::runtime_error("Tokenizer not set");
     }
     
-    // Add user message to context
-    context_manager_->add_user_message(user_input);
+    // Encode input
+    auto input_tokens = tokenizer_->encode(input);
     
-    // Get the full context
-    std::string context = context_manager_->get_context();
+    // Generate response with temperature parameter
+    float temperature = 0.8f; // Default temperature value
+    auto response_tokens = transformer_->generate(input_tokens, max_response_length_, temperature);
     
-    // Add assistant role tag to prompt the model
-    context += "<|assistant|>";
-    
-    // Tokenize context
-    auto tokens = tokenizer_->encode(context);
-    
-    // Ensure we have tokens to generate from
-    if (tokens.empty()) {
-        return "I'm not sure how to respond to that.";
-    }
-    
-    // Generate continuation
-    auto generated_tokens = transformer_->generate(tokens, 100, 0.8);
-    
-    // Decode
-    std::string response = tokenizer_->decode(generated_tokens);
-    
-    // Remove the context part to get just the new response
-    if (response.find(context) == 0) {
-        response = response.substr(context.length());
-    }
-    
-    // Remove any trailing endoftext tokens
-    size_t end_pos = response.find("<|endoftext|>");
-    if (end_pos != std::string::npos) {
-        response = response.substr(0, end_pos);
-    }
-    
-    // Add assistant response to context
-    context_manager_->add_assistant_message(response);
-    
-    return response;
+    // Decode response
+    return tokenizer_->decode(response_tokens);
 }
 
 void ConversationModel::clear_context() {
