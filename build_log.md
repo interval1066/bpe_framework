@@ -29,3 +29,5 @@ efficient. Added a vectorhash struct to effeiciently manipulate them as well.
 ### 9/14/2025 – Moved the tests to their own folder, they’re getting to be to many to simply leave in the src dir.
 
 ### 9/16/2025 – Incremental tokenizer/inference improvements, just little dabs here and there.
+
+### 9/17/2025 – Epochal (cyclic) training implemented and seems to be working well. Speed still fairly limited given development is on a linux. Next step is a Window port to I can take advantage of my GPU. I debated several options, including a rebuild of my host pc and install a dual-boot situation, but I really like my rig as it is, so its a windows version of “Monster Baby” (new working title) so as to be able to take advantage of my laptop’s on-board AMD GPU. Run the “starter_convo” to see the training in action.
