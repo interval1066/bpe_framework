@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <random>
 #include <sstream>
+#include <fstream>
+#include <string>
 
 // Helper function to get current timestamp
 std::string get_current_timestamp() {
@@ -21,77 +23,52 @@ std::string get_current_timestamp() {
     return ss.str();
 }
 
-// Function to create comprehensive training dataset
-lm::TrainingDataset create_training_dataset() {
+// Function to load training data from a text file
+lm::TrainingDataset load_training_dataset(const std::string& filename) {
     lm::TrainingDataset dataset;
+    std::ifstream file(filename);
     
-    // Basic greetings
-    dataset.add_example("Hello", "Hi there! How can I help you?");
-    dataset.add_example("Hi", "Hello! What can I do for you?");
-    dataset.add_example("Hey", "Hey! How can I assist you today?");
-    dataset.add_example("Good morning", "Good morning! How are you today?");
-    dataset.add_example("Good afternoon", "Good afternoon! How can I help you?");
-    dataset.add_example("Good evening", "Good evening! What can I do for you?");
+    if (!file.is_open()) {
+        std::cerr << "[" << get_current_timestamp() << "] ERROR: Could not open training data file: " << filename << std::endl;
+        return dataset;
+    }
     
-    // Questions about the AI
-    dataset.add_example("What's your name?", "I'm an AI assistant created to help with conversations.");
-    dataset.add_example("Who are you?", "I'm a conversational AI designed to chat with humans.");
-    dataset.add_example("What can you do?", "I can chat, answer questions, and learn from our conversations.");
-    dataset.add_example("Are you a robot?", "I'm an AI program, so in a way, yes! But I'm designed to be helpful and friendly.");
-    dataset.add_example("Who created you?", "I was created by a developer interested in conversational AI.");
+    std::string line;
+    std::vector<std::string> current_conversation;
     
-    // Common questions
-    dataset.add_example("How are you?", "I'm functioning well, thank you for asking! How are you?");
-    dataset.add_example("What's the weather like?", "I don't have access to real-time weather data, but I can chat about weather in general!");
-    dataset.add_example("Tell me a joke", "Why don't scientists trust atoms? Because they make up everything!");
-    dataset.add_example("What time is it?", "I don't have access to the current time, but I can help with other questions!");
-    dataset.add_example("How old are you?", "I was just created, so I'm very new to the world!");
+    while (std::getline(file, line)) {
+        // Skip empty lines and comments
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+        
+        // Check if this line starts a new conversation
+        if (line.find("CONVERSATION:") == 0) {
+            if (!current_conversation.empty()) {
+                dataset.add_conversation(current_conversation);
+                current_conversation.clear();
+            }
+            continue;
+        }
+        
+        // Check if this is a single example (input and response separated by tab)
+        size_t tab_pos = line.find('\t');
+        if (tab_pos != std::string::npos) {
+            std::string input = line.substr(0, tab_pos);
+            std::string target = line.substr(tab_pos + 1);
+            dataset.add_example(input, target);
+        } else {
+            // Add line to current conversation
+            current_conversation.push_back(line);
+        }
+    }
     
-    // Jokes and fun responses
-    dataset.add_example("Tell me another joke", "Why did the scarecrow win an award? Because he was outstanding in his field!");
-    dataset.add_example("More jokes", "What do you call a fake noodle? An impasta!");
-    dataset.add_example("That's funny", "I'm glad you liked it! Do you want to hear another one?");
-    dataset.add_example("No thanks", "No problem! What would you like to talk about instead?");
-    dataset.add_example("Yes please", "Great! What did the ocean say to the beach? Nothing, it just waved!");
+    // Add the last conversation if exists
+    if (!current_conversation.empty()) {
+        dataset.add_conversation(current_conversation);
+    }
     
-    // Conversation continuations
-    dataset.add_example("I'm good", "That's great to hear! How can I help you today?");
-    dataset.add_example("I'm fine", "I'm glad to hear that! What would you like to talk about?");
-    dataset.add_example("Not so good", "I'm sorry to hear that. Is there anything I can do to help?");
-    dataset.add_example("What should we talk about?", "We could talk about technology, science, jokes, or anything you're interested in!");
-    dataset.add_example("I don't know", "That's okay! We can just chat. How was your day?");
-    
-    // Multi-turn conversations
-    std::vector<std::string> conversation1 = {
-        "Hello",
-        "Hi there! How can I help you?",
-        "What's your name?",
-        "I'm an AI assistant. What's yours?",
-        "My name is Alex",
-        "Nice to meet you, Alex! How can I help you today?"
-    };
-    dataset.add_conversation(conversation1);
-    
-    std::vector<std::string> conversation2 = {
-        "Tell me a joke",
-        "Why did the scarecrow win an award? Because he was outstanding in his field!",
-        "That's pretty good",
-        "Thanks! I have more if you'd like to hear them.",
-        "Maybe later",
-        "Sure thing! Just let me know when you're ready for more jokes."
-    };
-    dataset.add_conversation(conversation2);
-    
-    std::vector<std::string> conversation3 = {
-        "How are you today?",
-        "I'm doing well, thank you for asking! How about you?",
-        "I'm good too",
-        "That's great to hear! Is there anything I can help you with?",
-        "Just wanted to chat",
-        "I'd love to chat! What would you like to talk about?"
-    };
-    dataset.add_conversation(conversation3);
-    
+    file.close();
     return dataset;
 }
 
@@ -103,9 +80,23 @@ int main() {
         std::cout << "[" << get_current_timestamp() << "] Creating BPE tokenizer..." << std::endl;
         auto tokenizer = std::make_shared<lm::BPETokenizer>();
         
+        // Load training data from file
+        std::cout << "[" << get_current_timestamp() << "] Loading training data from file..." << std::endl;
+        auto training_dataset = load_training_dataset("training_data.txt");
+        
+        if (training_dataset.size() == 0) {
+            std::cerr << "[" << get_current_timestamp() << "] ERROR: No training data loaded!" << std::endl;
+            return 1;
+        }
+        
+        std::cout << "[" << get_current_timestamp() << "] Loaded " << training_dataset.size() << " training examples." << std::endl;
+        
         // Create comprehensive tokenizer training data
         std::cout << "[" << get_current_timestamp() << "] Preparing training data for tokenizer..." << std::endl;
-        std::vector<std::string> tokenizer_training_data = {
+        std::vector<std::string> tokenizer_training_data;
+        
+        // Add general text data for tokenizer
+        std::vector<std::string> general_texts = {
             "Hello, how are you?",
             "I'm doing well, thank you!",
             "What can I help you with today?",
@@ -128,9 +119,12 @@ int main() {
             "Language models can generate human-like text."
         };
         
+        for (const auto& text : general_texts) {
+            tokenizer_training_data.push_back(text);
+        }
+        
         // Add data from our conversation dataset
-        auto conversation_dataset = create_training_dataset();
-        for (const auto& example : conversation_dataset.examples()) {
+        for (const auto& example : training_dataset.examples()) {
             tokenizer_training_data.push_back(example.input);
             tokenizer_training_data.push_back(example.target);
         }
@@ -174,10 +168,6 @@ int main() {
             std::cerr << "[" << get_current_timestamp() << "] ERROR: Tokenizer round-trip failed!" << std::endl;
             return 1;
         }
-        
-        // Create training dataset
-        std::cout << "[" << get_current_timestamp() << "] Preparing conversation training data..." << std::endl;
-        auto training_dataset = create_training_dataset();
         
         std::cout << "[" << get_current_timestamp() << "] Training conversation model with " 
                   << training_dataset.size() << " examples..." << std::endl;

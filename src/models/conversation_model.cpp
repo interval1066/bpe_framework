@@ -1,5 +1,6 @@
 #include "lm/models/conversation_model.hpp"
 #include "lm/data/training_data.hpp"
+#include "lm/context_manager.hpp"
 #include <fstream>
 #include <chrono>
 #include <iomanip>
@@ -33,7 +34,10 @@ ConversationModel::ConversationModel(size_t vocab_size,
 }
 
 // Train method implementation
-void ConversationModel::train(const TrainingDataset& dataset, size_t num_epochs, float learning_rate) {
+void ConversationModel::train(const TrainingDataset& dataset, 
+                             size_t num_epochs, 
+                             float learning_rate,
+                             const std::string& resume_checkpoint) {
     // Validate tokenizer is set
     if (!tokenizer_) {
         throw std::runtime_error("Tokenizer not set before training");
@@ -333,6 +337,14 @@ size_t ConversationModel::get_context_token_count() const {
         return context_manager_->get_token_count();
     }
     return 0;
+}
+
+void ConversationModel::set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer) { 
+    tokenizer_ = tokenizer; 
+    // Initialize context manager with appropriate limits
+    context_manager_ = std::make_unique<ContextManager>(2048, 20);
+    // Set the tokenizer in the context manager
+    context_manager_->set_tokenizer(tokenizer);
 }
 
 } // namespace lm

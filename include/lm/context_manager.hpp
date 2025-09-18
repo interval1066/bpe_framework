@@ -1,10 +1,11 @@
-// context_manager.hpp
+// include/lm/context_manager.hpp
 #pragma once
 
 #include <vector>
 #include <string>
 #include <deque>
-#include "token_types.hpp"
+#include <memory>
+#include "lm/tokenizer/bpe_tokenizer.hpp"
 
 namespace lm {
 
@@ -13,6 +14,7 @@ public:
     ContextManager(size_t max_context_tokens = 2048, 
                   size_t max_turns = 20);
     
+    void set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer);
     void add_user_message(const std::string& message);
     void add_assistant_message(const std::string& message);
     void add_system_message(const std::string& message);
@@ -37,6 +39,7 @@ private:
     size_t max_context_tokens;
     size_t max_turns;
     size_t current_token_count;
+    std::shared_ptr<BPETokenizer> tokenizer_;
     
     void add_message(const std::string& role, const std::string& content);
 };

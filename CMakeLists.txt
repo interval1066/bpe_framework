@@ -44,6 +44,7 @@ include_directories(include/lm/runtime)
 # Find required packages
 find_package(Eigen3 REQUIRED)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
+find_package(Threads REQUIRED)
 
 # Cereal serialization library (header-only)
 # We'll manually download it to avoid Boost dependency issues
@@ -97,10 +98,10 @@ add_library(lm_optimizers STATIC
 )
 target_link_libraries(lm_optimizers PUBLIC lm_core)
 
-# Models library - keep only TransformerModel implementation
 add_library(lm_models STATIC
     src/models/transformer_model.cpp
     src/models/conversation_model.cpp
+    src/context/context_manager.cpp  # Add this line
 )
 target_link_libraries(lm_models PUBLIC lm_core lm_optimizers lm_tokenizer)
 
@@ -136,7 +137,7 @@ target_sources(lm_generation INTERFACE
 
 # Context management library
 add_library(lm_context STATIC
-    tests/context_manager.cpp
+    src/context/context_manager.cpp
 )
 target_link_libraries(lm_context PUBLIC lm_core lm_tokenizer)
 
@@ -236,7 +237,7 @@ target_link_libraries(test_generation
     lm_models
     lm_optimizers
     lm_tokenizer
-    lm_generation  # Ensure this is included
+    lm_generation
     lm_core
 )
 
@@ -293,6 +294,20 @@ target_link_libraries(starter_convo
     lm_models
     lm_tokenizer
     lm_core
+)
+
+# Add the interactive learning conversation application
+add_executable(interactive_learning_convo tests/interactive_learning_convo.cpp)
+target_link_libraries(interactive_learning_convo
+    lm_alpha
+    lm_conversation
+    lm_context
+    lm_models
+    lm_tokenizer
+    lm_training
+    lm_generation
+    lm_core
+    Threads::Threads  # Add threading support
 )
 
 add_library(lm_training STATIC

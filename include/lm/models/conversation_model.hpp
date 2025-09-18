@@ -4,7 +4,7 @@
 #include "lm/models/transformer_model.hpp"
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include "lm/data/training_data.hpp"
-#include "lm/context_manager.hpp"
+#include "lm/context_manager.hpp"  // Add this include
 #include <string>
 #include <vector>
 #include <memory>
@@ -22,8 +22,11 @@ public:
                      float dropout = 0.1);
     
     // Train the model with a dataset
-    void train(const TrainingDataset& dataset, size_t num_epochs = 50, float learning_rate = 0.01f);
-    
+    void train(const TrainingDataset& dataset, 
+           size_t num_epochs = 50, 
+           float learning_rate = 0.01f,
+           const std::string& resume_checkpoint = "");
+
     // Generate a response
     std::string generate_response(const std::string& user_input);
     
@@ -37,10 +40,12 @@ public:
     bool load_checkpoint(const std::string& filename);
     
     // Set tokenizer
-    void set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer) { 
-        tokenizer_ = tokenizer; 
-        context_manager_ = std::make_unique<ContextManager>(2048, 20);
-    }
+    void set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer);
+    
+    // Utility functions
+    bool checkpoint_exists(const std::string& filename) const;
+    std::string find_latest_checkpoint() const;
+    void set_checkpoint_interval(size_t interval) { checkpoint_interval_ = interval; }
 
     inline size_t vocab_size() const {
         return transformer_->vocab_size();
@@ -58,6 +63,7 @@ private:
     TokenID pad_token_id_;
     bool verbose_ = false;
     size_t max_response_length_ = 20;
+    size_t checkpoint_interval_ = 10;
     
     // Training metadata
     size_t training_epochs_ = 0;
