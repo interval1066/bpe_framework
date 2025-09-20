@@ -10,7 +10,7 @@ Requires:
 	sudo apt install nlohmann-json3-dev
 2. Internationalzation library for Unicode by Frederick Roubert
  	(https://github.com/unicode-org/icu) sudo apt install libicu-dev
-3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenize)
+3. OpenNMT Tokenizer by Thuc Pham (https://github.com/OpenNMT/Tokenizer)
 	(Must be installed from source on Debian as far as I know)
 4. Eigen Library for Linear Math
    (https://github.com/PX4/eigen)
