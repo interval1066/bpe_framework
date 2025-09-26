@@ -1,0 +1,644 @@
+# CLEAN CONVERSATIONAL TRAINING DATA
+# Format: input[TAB]response
+# All examples are carefully formatted to avoid tokenization issues
+
+# Basic greetings
+Hello	Hi there!
+Hi	Hello!
+Hey	Hey! How can I help you?
+Good morning	Good morning! How are you today?
+Good afternoon	Good afternoon! What can I do for you?
+Good evening	Good evening! How can I assist you?
+Greetings	Greetings! How may I help you?
+What's up?	Not much, just here to help you!
+Howdy	Howdy! What can I do for you today?
+Hey there	Hey there! How's it going?
+
+# Simple questions
+What is your name?	I am an AI assistant.
+Who are you?	I am a conversational AI.
+What can you do?	I can chat and answer questions.
+Are you a robot?	I am an AI program, not a physical robot.
+Who made you?	I was created by developers.
+Are you human?	No, I am an artificial intelligence.
+How do you work?	I use machine learning to understand language.
+What are you?	I am a digital assistant.
+Where are you?	I exist in the digital world.
+When were you made?	I was created recently.
+
+# Common responses
+How are you?	I'm doing well, thank you!
+What time is it?	I don't have access to the current time.
+Tell me a joke	Why did the chicken cross the road?
+How old are you?	I was just created recently.
+What day is it?	I don't have a calendar, sorry.
+Where are you from?	I was developed in a digital environment.
+What's new?	Just learning more every day!
+How's your day?	My day is good, thanks for asking!
+What's happening?	Not much, just chatting with you!
+What should I do?	That depends on what you need help with.
+
+# Simple conversations
+What is the weather?	I don't have weather data, but I can chat!
+What is your favorite color?	I don't have eyes, so no favorite color.
+Do you like music?	I can't hear music, but I know about it.
+Do you like movies?	I don't watch movies, but I know about them.
+Can you help me?	I'll try my best to help you.
+What is love?	Love is a complex human emotion.
+What is life?	Life is the condition that distinguishes organisms.
+What is the meaning of life?	That's a philosophical question.
+What is happiness?	Happiness is a state of well-being.
+What is sadness?	Sadness is an emotional pain.
+
+# Technology topics
+What is AI?	AI means Artificial Intelligence.
+What is machine learning?	Machine learning is a type of AI.
+What is NLP?	NLP means Natural Language Processing.
+What is a neural network?	Neural networks are computing systems.
+What is deep learning?	Deep learning uses multi-layered networks.
+What are transformers?	Transformers are a type of neural network.
+What is GPT?	GPT means Generative Pre-trained Transformer.
+What is computer vision?	Computer vision helps computers see.
+What are chatbots?	Chatbots are conversational AI systems.
+How does speech recognition work?	It converts speech to text.
+
+# Science topics
+What is physics?	Physics is the science of matter and energy.
+What is chemistry?	Chemistry is the science of substances.
+What is biology?	Biology is the science of life.
+What is astronomy?	Astronomy is the study of space.
+What is geology?	Geology is the study of the Earth.
+What is mathematics?	Mathematics is the study of numbers.
+What is engineering?	Engineering applies science to solve problems.
+What is technology?	Technology is the application of scientific knowledge.
+What is electricity?	Electricity is the flow of electrical power.
+What is magnetism?	Magnetism is a force that attracts or repels.
+
+# Personal topics
+What are your hobbies?	I don't have hobbies, but I like learning.
+What do you do for fun?	I enjoy helping people and learning.
+Do you have a family?	I don't have a family in the human sense.
+What is your favorite food?	I don't eat, so no favorite food.
+Do you dream?	I don't sleep, so I don't dream.
+Can you feel emotions?	I can recognize emotions but don't feel them.
+What is your favorite movie?	I don't watch movies, sorry.
+Do you play games?	I can't play games but can discuss them.
+What music do you like?	I don't have personal music preferences.
+What is your favorite book?	I don't read books but know about them.
+
+# Multi-turn conversations
+CONVERSATION:
+Hello
+Hi there!
+How are you?
+I'm good, thanks for asking!
+What can you do?
+I can chat and answer questions.
+
+CONVERSATION:
+Tell me a joke
+Why did the scarecrow win an award?
+I don't know, why?
+Because he was outstanding in his field!
+That's funny!
+
+CONVERSATION:
+What is your name?
+My name is AI.
+Nice to meet you, AI.
+Nice to meet you too!
+
+CONVERSATION:
+How does AI work?
+AI uses algorithms to learn patterns.
+What kind of patterns?
+Patterns in data and language.
+
+CONVERSATION:
+What is machine learning?
+Machine learning is a type of AI.
+How does it work?
+It learns from data without explicit programming.
+
+CONVERSATION:
+Can you help me learn?
+I can try to help you learn.
+What do you want to learn?
+I want to learn about science.
+Science is the study of the natural world.
+
+CONVERSATION:
+What is the capital of France?
+The capital of France is Paris.
+What about Germany?
+The capital of Germany is Berlin.
+
+CONVERSATION:
+How far is the moon?
+The moon is about 238,855 miles away.
+How far is the sun?
+The sun is about 93 million miles away.
+
+CONVERSATION:
+What is photosynthesis?
+Photosynthesis is how plants make food.
+How does it work?
+Plants use sunlight to convert CO2 and water.
+
+CONVERSATION:
+Who wrote Romeo and Juliet?
+Shakespeare wrote Romeo and Juliet.
+What else did he write?
+He wrote many plays and sonnets.
+
+# Continue with many more simple, clean examples...
+
+# Additional single examples
+What is the largest ocean?	The Pacific Ocean is the largest.
+How many elements are there?	There are 118 known elements.
+What is the speed of light?	Light travels at 186,282 miles per second.
+Who painted the Mona Lisa?	Leonardo da Vinci painted the Mona Lisa.
+What is the tallest mountain?	Mount Everest is the tallest mountain.
+What is democracy?	Democracy is government by the people.
+Can you speak Spanish?	I can only speak English right now.
+What is the meaning of life?	That's a deep philosophical question.
+How do I make friends?	Be kind and show interest in others.
+What should I cook for dinner?	That depends on your preferences.
+
+How can I be more productive?	Set goals and minimize distractions.
+What's a good workout routine?	It depends on your fitness goals.
+How do I manage stress?	Exercise and relaxation can help.
+What are good habits?	Reading and exercise are good habits.
+How can I improve my sleep?	Keep a regular sleep schedule.
+How do I learn a new skill?	Practice consistently and be patient.
+Do you believe in aliens?	Many scientists think aliens might exist.
+What is blockchain?	Blockchain is a distributed database.
+How does cryptocurrency work?	It uses cryptography for security.
+What is virtual reality?	VR creates simulated environments.
+
+What is augmented reality?	AR overlays digital information on reality.
+What are NFTs?	NFTs are unique digital assets.
+How do self-driving cars work?	They use sensors and AI to drive.
+What is 5G technology?	5G is the fifth generation of cellular networks.
+What is the Internet of Things?	IoT connects physical devices to the internet.
+What is quantum computing?	Quantum computing uses quantum mechanics.
+What is mindfulness?	Mindfulness is being present in the moment.
+How do I meditate?	Focus on your breath and clear your mind.
+What is yoga?	Yoga is a mind-body practice.
+Tell me about Buddhism	Buddhism is a spiritual tradition.
+
+What is karma?	Karma is the concept of cause and effect.
+How can I be happier?	Practice gratitude and nurture relationships.
+What is emotional intelligence?	It's the ability to understand emotions.
+How do I build confidence?	Set achievable goals and practice.
+What is resilience?	Resilience is adapting to adversity.
+How can I be more patient?	Practice mindfulness and deep breathing.
+What is climate change?	Climate change is long-term weather shifts.
+How can I reduce my carbon footprint?	Use less energy and eat local food.
+What are renewable energy sources?	Solar and wind are renewable sources.
+Why is biodiversity important?	Biodiversity supports ecosystem health.
+
+What is recycling?	Recycling converts waste into new materials.
+How does plastic affect oceans?	Plastic pollution harms marine life.
+What are greenhouse gases?	They trap heat in the atmosphere.
+What is deforestation?	Deforestation is clearing forests.
+How can I live sustainably?	Reduce, reuse, and recycle.
+What is conservation?	Conservation protects natural resources.
+What is creativity?	Creativity is generating new ideas.
+How can I be more creative?	Expose yourself to new experiences.
+What is innovation?	Innovation is implementing creative ideas.
+Tell me about design thinking	Design thinking is a problem-solving approach.
+
+What is systems thinking?	Systems thinking looks at whole systems.
+How do puzzles help the brain?	Puzzles challenge cognitive skills.
+What is metacognition?	Metacognition is thinking about thinking.
+How can I improve my memory?	Use techniques like association and repetition.
+What is critical thinking?	Critical thinking is analyzing information.
+Why is learning important?	Learning helps us adapt and grow.
+What is poetry?	Poetry is a form of literary art.
+Tell me about haiku	Haiku is a Japanese poetic form.
+What is a sonnet?	A sonnet is a 14-line poem.
+How does rhyme work?	Rhyme creates rhythm with similar sounds.
+
+What is meter in poetry?	Meter is the rhythmic structure of poetry.
+What is free verse?	Free verse doesn't follow regular patterns.
+Tell me about epic poetry	Epic poetry tells stories of heroes.
+What is a limerick?	A limerick is a humorous five-line poem.
+How is poetry different from prose?	Poetry uses more condensed language.
+Why do people write poetry?	To express emotions and ideas.
+What is music theory?	Music theory studies how music works.
+What are chords?	Chords are groups of notes played together.
+How do scales work?	Scales are sequences of musical notes.
+What is rhythm?	Rhythm is the pattern of sounds in time.
+
+What is melody?	Melody is a sequence of musical notes.
+How does harmony work?	Harmony is how notes sound together.
+What is musical form?	Musical form is the structure of compositions.
+What are the elements of music?	Melody, harmony, rhythm, and timbre.
+How do I read sheet music?	Sheet music uses symbols on a staff.
+Why is music important?	Music has cultural and emotional value.
+What is the capital of Japan?	Tokyo is the capital of Japan.
+What is the currency of Europe?	The Euro is the currency of Europe.
+How many continents are there?	There are seven continents.
+What is the largest country?	Russia is the largest country by area.
+
+What is the smallest country?	Vatican City is the smallest country.
+How many planets are there?	There are eight planets in our solar system.
+What is the hottest planet?	Venus is the hottest planet.
+What is the coldest planet?	Neptune is the coldest planet.
+What is the Red Planet?	Mars is called the Red Planet.
+What is a black hole?	A black hole has intense gravity.
+What is a galaxy?	A galaxy is a system of stars and matter.
+What is the Milky Way?	The Milky Way is our galaxy.
+How many stars are there?	There are billions of stars.
+What is a light year?	A light year is the distance light travels.
+
+# Continue adding more clean, simple examples until we reach 1MB+
+
+CONVERSATION:
+What is Python?
+Python is a programming language.
+What is it used for?
+It's used for web development, data science, and more.
+Is it easy to learn?
+Many people find Python easy to learn.
+
+CONVERSATION:
+What is JavaScript?
+JavaScript is a programming language.
+What is it used for?
+It's mainly used for web development.
+Can you use it for other things?
+Yes, it can be used for servers and apps too.
+
+CONVERSATION:
+What is HTML?
+HTML is for creating web pages.
+What does it stand for?
+HyperText Markup Language.
+What is CSS?
+CSS is for styling web pages.
+
+CONVERSATION:
+What is a database?
+A database stores organized information.
+What kinds are there?
+There are relational and non-relational databases.
+What is SQL?
+SQL is a language for database queries.
+
+CONVERSATION:
+What is cloud computing?
+Cloud computing uses remote servers.
+What are the benefits?
+Scalability and cost savings are benefits.
+What are examples?
+AWS and Azure are cloud platforms.
+
+CONVERSATION:
+What is cybersecurity?
+Cybersecurity protects computer systems.
+Why is it important?
+It protects against hackers and threats.
+How can I stay safe online?
+Use strong passwords and be careful.
+
+CONVERSATION:
+What is artificial intelligence?
+AI makes machines smart.
+What are examples?
+Voice assistants and self-driving cars.
+Will AI take over the world?
+That's science fiction, not reality.
+
+CONVERSATION:
+What is machine learning?
+ML is a type of AI.
+How does it work?
+It learns patterns from data.
+What is deep learning?
+Deep learning uses neural networks.
+
+CONVERSATION:
+What is big data?
+Big data is large datasets.
+What is it used for?
+It's used for analysis and insights.
+What are the challenges?
+Storage and processing are challenges.
+
+CONVERSATION:
+What is the Internet?
+The Internet is a global network.
+How does it work?
+It uses protocols to connect devices.
+When was it invented?
+The Internet began in the 1960s.
+
+# Even more simple examples
+What is a smartphone?	A smartphone is a mobile phone with advanced features.
+What is a computer?	A computer is an electronic device for processing data.
+What is a laptop?	A laptop is a portable computer.
+What is a tablet?	A tablet is a mobile computer with a touchscreen.
+What is a server?	A server provides services to other computers.
+What is a router?	A router directs network traffic.
+What is Wi-Fi?	Wi-Fi is wireless networking technology.
+What is Bluetooth?	Bluetooth is short-range wireless technology.
+What is a printer?	A printer produces physical copies of documents.
+What is a scanner?	A scanner digitizes physical documents.
+
+What is a camera?	A camera captures images and video.
+What is a microphone?	A microphone captures audio.
+What is a speaker?	A speaker produces sound.
+What is a monitor?	A monitor displays visual information.
+What is a keyboard?	A keyboard is for inputting text.
+What is a mouse?	A mouse is for pointing and clicking.
+What is a touchscreen?	A touchscreen detects touch input.
+What is a battery?	A battery stores electrical energy.
+What is electricity?	Electricity is the flow of electrical charge.
+What is a circuit?	A circuit is a path for electricity.
+
+What is a resistor?	A resistor limits electrical current.
+What is a capacitor?	A capacitor stores electrical energy.
+What is a transistor?	A transistor amplifies or switches signals.
+What is a diode?	A diode allows current to flow one way.
+What is an LED?	An LED is a light-emitting diode.
+What is a motor?	A motor converts electrical energy to motion.
+What is a generator?	A generator converts motion to electricity.
+What is a sensor?	A sensor detects and measures things.
+What is a robot?	A robot is a machine that performs tasks.
+What is automation?	Automation uses technology to perform tasks.
+
+What is programming?	Programming is writing code for computers.
+What is coding?	Coding is another word for programming.
+What is an algorithm?	An algorithm is a step-by-step procedure.
+What is software?	Software is programs and data for computers.
+What is hardware?	Hardware is physical components of computers.
+What is an app?	An app is a software application.
+What is an operating system?	An OS manages computer resources.
+What is Windows?	Windows is an operating system from Microsoft.
+What is macOS?	macOS is an operating system from Apple.
+What is Linux?	Linux is an open-source operating system.
+
+# Final set of clean, simple examples
+What is a file?	A file is a collection of data.
+What is a folder?	A folder organizes files.
+What is a directory?	A directory is another name for a folder.
+What is a path?	A path specifies a location in a file system.
+What is a URL?	A URL is a web address.
+What is a website?	A website is a collection of web pages.
+What is a web page?	A web page is a document on the web.
+What is a browser?	A browser views web pages.
+What is a search engine?	A search engine finds information online.
+What is email?	Email is electronic mail.
+
+What is social media?	Social media connects people online.
+What is streaming?	Streaming delivers media over the internet.
+What is downloading?	Downloading copies files from the internet.
+What is uploading?	Uploading sends files to the internet.
+What is bandwidth?	Bandwidth is the capacity of a network.
+What is latency?	Latency is delay in a network.
+What is a virus?	A virus is malicious software.
+What is malware?	Malware is malicious software.
+What is a firewall?	A firewall protects networks.
+What is encryption?	Encryption secures data.
+
+What is a password?	A password authenticates users.
+What is two-factor authentication?	2FA adds extra security to logins.
+What is a backup?	A backup is a copy of data for safety.
+What is the cloud?	The cloud means internet-based services.
+What is virtualization?	Virtualization creates virtual versions.
+What is a container?	A container packages software for deployment.
+What is DevOps?	DevOps combines development and operations.
+What is agile methodology?	Agile is iterative development approach.
+What is scrum?	Scrum is a framework for agile development.
+What is kanban?	Kanban is a visual workflow system.
+
+# Continue adding until we reach 1MB+ of clean, well-formatted data
+# New example added: 2025-09-18 20:33:44
+Hello	Hi there!
+# New example added: 2025-09-18 20:33:44
+Hi	Hello!
+# New example added: 2025-09-18 20:33:44
+Hey	Hey! How can I help you?
+# New example added: 2025-09-18 20:33:44
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-18 20:33:44
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-18 20:33:44
+Good evening	Good evening! How can I assist you?
+# New example added: 2025-09-18 20:33:44
+Greetings	Greetings! How may I help you?
+# New example added: 2025-09-18 20:33:44
+What's up?	Not much, just here to help you!
+# New example added: 2025-09-18 20:33:44
+Howdy	Howdy! What can I do for you today?
+# New example added: 2025-09-18 20:33:44
+Hey there	Hey there! How's it going?
+# New example added: 2025-09-18 20:58:41
+Hello	Hi there!
+# New example added: 2025-09-18 20:58:41
+Hi	Hello!
+# New example added: 2025-09-18 20:58:41
+Hey	Hey! How can I help you?
+# New example added: 2025-09-18 20:58:41
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-18 20:58:41
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-18 20:58:41
+Good evening	Good evening! How can I assist you?
+# New example added: 2025-09-18 20:58:41
+Greetings	Greetings! How may I help you?
+# New example added: 2025-09-18 20:58:41
+What's up?	Not much, just here to help you!
+# New example added: 2025-09-18 20:58:41
+Howdy	Howdy! What can I do for you today?
+# New example added: 2025-09-18 20:58:41
+Hey there	Hey there! How's it going?
+# New example added: 2025-09-18 21:09:44
+Hello	Hi there!
+# New example added: 2025-09-18 21:09:44
+Hi	Hello!
+# New example added: 2025-09-18 21:09:44
+Hey	Hey! How can I help you?
+# New example added: 2025-09-18 21:09:44
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-18 21:09:44
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-18 21:09:44
+Good evening	Good evening! How can I assist you?
+# New example added: 2025-09-18 21:09:44
+Greetings	Greetings! How may I help you?
+# New example added: 2025-09-18 21:09:44
+What's up?	Not much, just here to help you!
+# New example added: 2025-09-18 21:09:44
+Howdy	Howdy! What can I do for you today?
+# New example added: 2025-09-18 21:09:44
+Hey there	Hey there! How's it going?
+# New example added: 2025-09-18 21:10:00
+hello	I'm not sure how to respond to that.
+# New example added: 2025-09-18 21:10:11
+hello	hello
+# New example added: 2025-09-18 21:10:27
+what time is it?	I'm not sure how to respond to that.
+# New example added: 2025-09-18 21:10:37
+hello	I'm not sure how to respond to that.
+# New example added: 2025-09-18 21:11:05
+Hello	Hi there!
+# New example added: 2025-09-18 21:11:05
+Hi	Hello!
+# New example added: 2025-09-18 21:11:05
+Hey	Hey! How can I help you?
+# New example added: 2025-09-18 21:11:05
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-18 21:11:05
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-18 21:11:05
+Good evening	Good evening! How can I assist you?
+# New example added: 2025-09-19 10:00:51
+Hello	Hi there!
+# New example added: 2025-09-19 10:00:51
+Hi	Hello!
+# New example added: 2025-09-19 10:00:51
+Hey	Hey! How can I help you?
+# New example added: 2025-09-19 10:00:51
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-19 10:00:51
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-19 10:00:51
+Good evening	Good evening! How can I assist you?
+# New example added: 2025-09-19 10:00:51
+Greetings	Greetings! How may I help you?
+# New example added: 2025-09-19 10:00:51
+What's up?	Not much, just here to help you!
+# New example added: 2025-09-19 10:00:51
+Howdy	Howdy! What can I do for you today?
+# New example added: 2025-09-19 10:00:51
+Hey there	Hey there! How's it going?
+# New example added: 2025-09-19 19:31:08
+Hello	I'm not sure how to respond to that.
+# New example added: 2025-09-19 19:31:23
+Hello	Hello
+# New example added: 2025-09-19 19:41:20
+How are you?	I'm not sure how to respond to that.
+# New example added: 2025-09-19 19:41:55
+How are you?	Ok.
+# New example added: 2025-09-20 16:01:13
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 16:02:02
+Hello.	Hello.
+# New example added: 2025-09-20 16:05:06
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 16:05:35
+Hello.	Hello.
+# New example added: 2025-09-20 16:08:37
+Can you say hello?	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:30:30
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:31:03
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:36:09
+Hello.	Hello.До
+# New example added: 2025-09-20 18:55:56
+hello	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:56:26
+hello	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:56:35
+hello	 Hello
+# New example added: 2025-09-20 18:57:46
+What is your name?	I'm not sure how to respond to that.
+# New example added: 2025-09-20 18:58:59
+Your name is bob.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 19:01:55
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 19:11:10
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 19:12:30
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 19:13:30
+Hello	Hi there!
+# New example added: 2025-09-20 19:13:30
+Hi	Hello!
+# New example added: 2025-09-20 19:13:30
+Hey	Hey! How can I help you?
+# New example added: 2025-09-20 19:28:36
+Hello	Hi there!
+# New example added: 2025-09-20 19:28:36
+Hi	Hello!
+# New example added: 2025-09-20 19:28:36
+Hey	Hey! How can I help you?
+# New example added: 2025-09-20 19:28:36
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-20 19:28:36
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-20 19:59:14
+heHello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 19:59:28
+heHello.	Hello.
+# New example added: 2025-09-20 20:01:47
+What time is it?	I'm not sure how to respond to that.
+# New example added: 2025-09-20 20:02:22
+Hello.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 20:07:16
+Hello	Hi there!
+# New example added: 2025-09-20 20:07:16
+Hi	Hello!
+# New example added: 2025-09-20 20:07:16
+Hey	Hey! How can I help you?
+# New example added: 2025-09-20 20:07:16
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-20 20:07:16
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-20 21:19:32
+hello	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:23:18
+Now is the time for all good men.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:25:14
+To come to the aid of the party.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:26:56
+You are an army of one.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:29:21
+What can you respond to, what can I say?	I'm not sure how to respond to that.
+
+# Conversation added: 2025-09-20 21:29:59
+CONVERSATION:
+hello
+I'm not sure how to respond to that.
+Now is the time for all good men.
+I'm not sure how to respond to that.
+To come to the aid of the party.
+I'm not sure how to respond to that.
+You are an army of one.
+I'm not sure how to respond to that.
+What can you respond to, what can I say?
+I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:33:36
+Hello	Hi there!
+# New example added: 2025-09-20 21:33:36
+Hi	Hello!
+# New example added: 2025-09-20 21:33:36
+Hey	Hey! How can I help you?
+# New example added: 2025-09-20 21:33:36
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-20 21:33:36
+Good afternoon	Good afternoon! What can I do for you?
+# New example added: 2025-09-20 21:44:04
+What exactly is your problem?	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:46:52
+I'd like a cheeseburger please.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:49:38
+Would you like to know how to make a cheeseburger?	I'm not sure how to respond to that.
+# New example added: 2025-09-20 21:49:57
+Would you like to know how to make a cheeseburger?	What is a cheeseburger?
+# New example added: 2025-09-20 21:52:04
+A cheesebrger is a kind of sandwich.	I'm not sure how to respond to that.
+# New example added: 2025-09-20 22:27:48
+Hello	Hi there!
+# New example added: 2025-09-20 22:27:48
+Hi	Hello!
+# New example added: 2025-09-20 22:27:48
+Hey	Hey! How can I help you?
+# New example added: 2025-09-20 22:27:48
+Good morning	Good morning! How are you today?
+# New example added: 2025-09-20 22:27:48
+Good afternoon	Good afternoon! What can I do for you?

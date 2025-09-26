@@ -1,0 +1,1901 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="bpe_framework"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\share\;CMake Files\..\..\..\..\usr\share\eigen3\;CMake Files\..\..\..\..\usr\share\eigen3\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_tokenizer">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_tokenizer.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_tokenizer"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_tokenizer/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_tokenizer.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_tokenizer/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_optimizers">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_optimizers.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_optimizers"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_optimizers/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_optimizers.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_optimizers/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_models">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_models.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_models"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_models/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_models.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_models/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_generation">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_generation.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_generation"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_generation/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_generation.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_generation/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_context">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_context.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_context"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_context/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_context.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_context/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_conversation">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_conversation.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_conversation"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_conversation/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_conversation.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_conversation/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_inference">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_inference.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_inference"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_inference/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_inference.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_inference/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_runtime">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_runtime.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_runtime"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_runtime/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_runtime.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_runtime/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_alpha">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_alpha.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_alpha"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_alpha/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_alpha.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_alpha/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="performance_test">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/performance_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 performance_test"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="performance_test/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/performance_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 performance_test/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_data_loader">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_data_loader" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_data_loader"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_data_loader/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_data_loader" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_data_loader/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="chat_demo">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/chat_demo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 chat_demo"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="chat_demo/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/chat_demo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 chat_demo/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_generation">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_generation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_generation"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_generation/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_generation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_generation/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="serialization_demo">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/serialization_demo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 serialization_demo"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="serialization_demo/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/serialization_demo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 serialization_demo/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_bpe">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_bpe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_bpe"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_bpe/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_bpe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_bpe/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_unicode_bpe">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_unicode_bpe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_unicode_bpe"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_unicode_bpe/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_unicode_bpe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_unicode_bpe/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sampler_test">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/sampler_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 sampler_test"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sampler_test/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/sampler_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 sampler_test/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_conversation">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_conversation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_conversation"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_conversation/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_conversation" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_conversation/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_logger">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_logger" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_logger"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_logger/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_logger" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_logger/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_transformer">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_transformer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_transformer"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_transformer/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_transformer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_transformer/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="starter_convo">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/starter_convo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 starter_convo"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="starter_convo/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/starter_convo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 starter_convo/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="interactive_learning_convo">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/interactive_learning_convo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 interactive_learning_convo"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="interactive_learning_convo/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/interactive_learning_convo" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 interactive_learning_convo/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_training">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_training.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_training"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lm_training/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/liblm_training.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 lm_training/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_tensor_pool">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_tensor_pool" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_tensor_pool"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_tensor_pool/fast">
+				<Option output="/home/bwana/Desktop/bpe_framework/build/test_tensor_pool" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D__x86_64__"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/models"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/training"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/optimizers"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/core"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/tokenizer"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/generation"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/include/lm/runtime"/>
+					<Add directory="/home/bwana/Desktop/bpe_framework/third_party/cereal/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 test_tensor_pool/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/bwana/Desktop/bpe_framework/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/bwana/Desktop/bpe_framework/build/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/core/tensor.hpp">
+			<Option target="lm_tokenizer"/>
+			<Option target="lm_optimizers"/>
+			<Option target="lm_models"/>
+			<Option target="lm_generation"/>
+			<Option target="lm_context"/>
+			<Option target="lm_conversation"/>
+			<Option target="lm_inference"/>
+			<Option target="lm_runtime"/>
+			<Option target="lm_alpha"/>
+			<Option target="performance_test"/>
+			<Option target="test_data_loader"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="test_bpe"/>
+			<Option target="test_unicode_bpe"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="test_logger"/>
+			<Option target="test_transformer"/>
+			<Option target="starter_convo"/>
+			<Option target="interactive_learning_convo"/>
+			<Option target="lm_training"/>
+			<Option target="test_tensor_pool"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/core/tensor_pool.hpp">
+			<Option target="lm_tokenizer"/>
+			<Option target="lm_optimizers"/>
+			<Option target="lm_models"/>
+			<Option target="lm_generation"/>
+			<Option target="lm_context"/>
+			<Option target="lm_conversation"/>
+			<Option target="lm_inference"/>
+			<Option target="lm_runtime"/>
+			<Option target="lm_alpha"/>
+			<Option target="performance_test"/>
+			<Option target="test_data_loader"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="test_bpe"/>
+			<Option target="test_unicode_bpe"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="test_logger"/>
+			<Option target="test_transformer"/>
+			<Option target="starter_convo"/>
+			<Option target="interactive_learning_convo"/>
+			<Option target="lm_training"/>
+			<Option target="test_tensor_pool"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/greedy_sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/random_sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/temperature_sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/topk_sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/include/lm/generation/topp_sampler.hpp">
+			<Option target="lm_inference"/>
+			<Option target="chat_demo"/>
+			<Option target="test_generation"/>
+			<Option target="serialization_demo"/>
+			<Option target="sampler_test"/>
+			<Option target="test_conversation"/>
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/alpha/config_io.cpp">
+			<Option target="lm_alpha"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/alpha/repl.cpp">
+			<Option target="lm_alpha"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/context/context_manager.cpp">
+			<Option target="lm_models"/>
+			<Option target="lm_context"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/conversation/conversation_manager.cpp">
+			<Option target="lm_conversation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/greedy_sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/random_sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/temperature_sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/topk_sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/generation/topp_sampler.cpp">
+			<Option target="lm_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/inference/inference_engine.cpp">
+			<Option target="lm_inference"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/models/conversation_model.cpp">
+			<Option target="lm_models"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/models/transformer_model.cpp">
+			<Option target="lm_models"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/optimizers/adam.cpp">
+			<Option target="lm_optimizers"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/runtime/init.cpp">
+			<Option target="lm_runtime"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/runtime/shutdown.cpp">
+			<Option target="lm_runtime"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/runtime/state_utils.cpp">
+			<Option target="lm_runtime"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/tokenizer/bpe_tokenizer.cpp">
+			<Option target="lm_tokenizer"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/tokenizer/unicode_utils.cpp">
+			<Option target="lm_tokenizer"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/training/data_loader.cpp">
+			<Option target="lm_training"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/training/losses.cpp">
+			<Option target="lm_training"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/src/training/trainer.cpp">
+			<Option target="lm_training"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/chat_demo.cpp">
+			<Option target="chat_demo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/interactive_learning_convo.cpp">
+			<Option target="interactive_learning_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/performance_test.cpp">
+			<Option target="performance_test"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/sampler_test.cpp">
+			<Option target="sampler_test"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/serialization_demo.cpp">
+			<Option target="serialization_demo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/starter_convo.cpp">
+			<Option target="starter_convo"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_bpe.cpp">
+			<Option target="test_bpe"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_conversation.cpp">
+			<Option target="test_conversation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_data_loader.cpp">
+			<Option target="test_data_loader"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_generation.cpp">
+			<Option target="test_generation"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_logger.cpp">
+			<Option target="test_logger"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_tensor_pool.cpp">
+			<Option target="test_tensor_pool"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_transformer.cpp">
+			<Option target="test_transformer"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/tests/test_unicode_bpe.cpp">
+			<Option target="test_unicode_bpe"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/../../../../usr/share/eigen3/cmake/Eigen3Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/../../../../usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/home/bwana/Desktop/bpe_framework/../../../../usr/share/eigen3/cmake/Eigen3Targets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\eigen3\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
