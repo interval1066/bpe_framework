@@ -26,18 +26,22 @@ public:
     void backward(const std::vector<float>& grad_output);
     float calculate_loss(const std::vector<float>& logits, 
                        const std::vector<TokenID>& targets);
-    void train_step(const std::vector<TokenID>& input_tokens, 
+
+    float train_step(const std::vector<TokenID>& input_tokens, 
                     const std::vector<TokenID>& target_tokens,
-                    float learning_rate = 0.01f); // Remove the extra }; here
+                    float learning_rate = 0.01f,
+                    float max_grad_norm = 1.0f);  // 4 parameters total
 
     std::vector<TokenID> generate(const std::vector<TokenID>& context, 
                                 size_t max_length, float temperature);
     std::vector<Tensor*> parameters();
     void zero_grad();
+    float clip_gradients(float max_norm = 1.0f);
     void serialize(std::ostream& stream) const;
     void deserialize(std::istream& stream);
     bool save(const std::string& filename);
     bool load(const std::string& filename);
+    void clip_gradients_simple(float max_value);
 
     // Destructor
     TransformerModel();

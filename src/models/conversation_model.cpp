@@ -8,6 +8,8 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <limits>
+#include <algorithm>
+#include <cmath>
 
 namespace lm {
 
@@ -21,6 +23,44 @@ std::string ConversationModel::get_current_timestamp() const {
     return ss.str();
 }
 
+// Improved learning rate scheduler
+float ConversationModel::calculate_learning_rate(size_t epoch, size_t total_epochs, float base_lr) const {
+    // Warmup for first 10% of training
+    if (epoch < total_epochs * 0.1f) {
+        return base_lr * (float(epoch) / (total_epochs * 0.1f));
+    }
+    
+    // Cosine decay after warmup
+    float progress = float(epoch - total_epochs * 0.1f) / (total_epochs * 0.9f);
+    return base_lr * 0.5f * (1.0f + std::cos(progress * 3.14159265359f));
+}
+
+// Validate training example
+bool ConversationModel::validate_training_example(const std::vector<TokenID>& input, 
+                                                 const std::vector<TokenID>& target) const {
+    if (input.empty() || target.empty()) {
+        return false;
+    }
+    
+    if (input.size() > 100 || target.size() > 100) {
+        return false;
+    }
+    
+    // Check for invalid token IDs
+    for (TokenID id : input) {
+        if (id >= transformer_->vocab_size()) {
+            return false;
+        }
+    }
+    for (TokenID id : target) {
+        if (id >= transformer_->vocab_size()) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 // Constructor
 ConversationModel::ConversationModel(size_t vocab_size, 
                                    size_t d_model, 
@@ -30,15 +70,19 @@ ConversationModel::ConversationModel(size_t vocab_size,
                                    float dropout)
     : transformer_(std::make_unique<TransformerModel>(vocab_size, d_model, n_layers, n_heads, d_ff, dropout)),
       pad_token_id_(1) {
-    // Initialize with default values
+    // Initialize with conservative defaults
+    max_grad_norm_ = 1.0f;
+    lr_decay_ = 0.95f;
+    weight_decay_ = 0.01f;
 }
 
-// Train method implementation
 void ConversationModel::train(const TrainingDataset& dataset, 
                              size_t num_epochs, 
                              float learning_rate,
                              const std::string& resume_checkpoint) {
-    // Validate tokenizer is set
+    // CRITICAL: Use much smaller learning rate
+    learning_rate = 0.0001f; // 1e-4
+    
     if (!tokenizer_) {
         throw std::runtime_error("Tokenizer not set before training");
     }
@@ -50,6 +94,7 @@ void ConversationModel::train(const TrainingDataset& dataset,
     if (verbose_) {
         std::cout << "[" << training_timestamp_ << "] Starting training with " 
                   << total_examples << " examples for " << num_epochs << " epochs" << std::endl;
+        std::cout << "Using stable learning rate: " << learning_rate << std::endl;
     }
     
     if (total_examples == 0) {
@@ -57,48 +102,75 @@ void ConversationModel::train(const TrainingDataset& dataset,
         return;
     }
     
-    // Initialize best loss
     float best_loss = std::numeric_limits<float>::max();
+    size_t examples_skipped = 0;
+    size_t examples_processed = 0;
+    
+    // Use only same-length examples for stability
+    lm::TrainingDataset stable_dataset;
+    for (const auto& example : examples) {
+        auto input_tokens = tokenizer_->encode(example.input);
+        auto target_tokens = tokenizer_->encode(example.target);
+        
+        // Only use examples where input and target have same length
+        if (input_tokens.size() == target_tokens.size() && 
+            !input_tokens.empty() && 
+            input_tokens.size() <= 20) { // Limit sequence length
+            stable_dataset.add_example(example.input, example.target);
+        }
+    }
+    
+    if (stable_dataset.size() == 0) {
+        std::cerr << "No valid same-length training examples found!" << std::endl;
+        return;
+    }
+    
+    if (verbose_) {
+        std::cout << "Using " << stable_dataset.size() << " same-length examples for stable training" << std::endl;
+    }
+    
+    const auto& stable_examples = stable_dataset.examples();
     
     // Training loop
     for (size_t epoch = 0; epoch < num_epochs; epoch++) {
         float epoch_loss = 0.0f;
-        size_t examples_processed = 0;
+        examples_processed = 0;
         
         if (verbose_) {
             std::cout << "[" << get_current_timestamp() << "] Epoch " << (epoch + 1) 
                       << "/" << num_epochs << std::endl;
         }
         
-        // Process each example
-        for (const auto& example : examples) {
-            // Encode input and target
-            auto input_tokens = tokenizer_->encode(example.input);
-            auto target_tokens = tokenizer_->encode(example.target);
-            
-            if (input_tokens.size() < 1 || target_tokens.size() < 1) {
-                continue; // Skip empty sequences
-            }
-            
-            // Training step
+        for (const auto& example : stable_examples) {
             try {
-                // Execute training step (returns void)
-                transformer_->train_step(input_tokens, target_tokens, learning_rate);
+                // Single training step
+                float loss = transformer_->train_step(
+                    tokenizer_->encode(example.input),
+                    tokenizer_->encode(example.target),
+                    learning_rate
+                );
                 
-                // Calculate loss separately for monitoring
-                auto logits = transformer_->forward(input_tokens);
-                float loss = transformer_->calculate_loss(logits, target_tokens);
+                // Check for exploding loss
+                if (std::isnan(loss) || std::isinf(loss) || loss > 1e5f) {
+                    examples_skipped++;
+                    if (verbose_) {
+                        std::cout << "Skipping example due to high loss: " << loss << std::endl;
+                    }
+                    continue;
+                }
                 
                 epoch_loss += loss;
                 examples_processed++;
                 
-                if (verbose_ && examples_processed % 100 == 0) {
-                    std::cout << "Processed " << examples_processed << " examples, current loss: " << loss << std::endl;
+                if (verbose_ && examples_processed % 10 == 0) {
+                    std::cout << "Processed " << examples_processed << " examples, loss: " << loss << std::endl;
                 }
+                
             } catch (const std::exception& e) {
-                std::cerr << "Error during training step: " << e.what() << std::endl;
-                std::cerr << "Input: '" << example.input << "', Target: '" << example.target << "'" << std::endl;
-                // Continue with next example instead of stopping
+                examples_skipped++;
+                if (verbose_) {
+                    std::cerr << "Error training example: " << e.what() << std::endl;
+                }
             }
         }
         
@@ -107,7 +179,8 @@ void ConversationModel::train(const TrainingDataset& dataset,
             epoch_loss /= examples_processed;
             
             if (verbose_) {
-                std::cout << "Epoch " << (epoch + 1) << " average loss: " << epoch_loss << std::endl;
+                std::cout << "Epoch " << (epoch + 1) << " average loss: " << epoch_loss 
+                          << " (skipped " << examples_skipped << " examples)" << std::endl;
             }
             
             // Update best loss
@@ -118,25 +191,23 @@ void ConversationModel::train(const TrainingDataset& dataset,
                     std::cout << "New best loss: " << best_loss << std::endl;
                 }
                 
-                // Save best model checkpoint
+                // Save best model
                 save_checkpoint("best_model.checkpoint");
+            }
+            
+            // Stop if loss becomes unstable
+            if (epoch_loss > 1e4f) {
+                std::cerr << "Loss becoming unstable: " << epoch_loss << " - stopping early" << std::endl;
+                break;
             }
         }
         
         training_epochs_++;
+        examples_skipped = 0;
         
-        // Learning rate decay
-        learning_rate *= 0.95f;
-        
-        // Periodic checkpoint
-        if ((epoch + 1) % 10 == 0) {
-            std::string checkpoint_name = "checkpoint_epoch_" + std::to_string(epoch + 1) + ".bin";
-            save_checkpoint(checkpoint_name);
-            
-            if (verbose_) {
-                std::cout << "Saved checkpoint: " << checkpoint_name << std::endl;
-            }
-        }
+        // Gradually reduce learning rate
+        learning_rate *= 0.9f;
+        if (learning_rate < 1e-6f) learning_rate = 1e-6f;
     }
     
     // Final save
@@ -155,18 +226,34 @@ std::string ConversationModel::generate_response(const std::string& input) {
         throw std::runtime_error("Tokenizer not set");
     }
     
-    // Encode input
-    auto input_tokens = tokenizer_->encode(input);
-    
-    // Generate response with temperature parameter
-    float temperature = 0.8f; // Default temperature value
-    auto response_tokens = transformer_->generate(input_tokens, max_response_length_, temperature);
-    
-    // Decode response
-    return tokenizer_->decode(response_tokens);
+    try {
+        // Encode input
+        auto input_tokens = tokenizer_->encode(input);
+        
+        if (input_tokens.empty()) {
+            return "I'm not sure how to respond to that.";
+        }
+        
+        // Generate response with temperature parameter
+        float temperature = 0.8f; // Default temperature value
+        auto response_tokens = transformer_->generate(input_tokens, max_response_length_, temperature);
+        
+        // Decode response
+        std::string response = tokenizer_->decode(response_tokens);
+        
+        // Validate response
+        if (response.empty() || response.length() < 2) {
+            return "I'm not sure how to respond to that.";
+        }
+        
+        return response;
+    } catch (const std::exception& e) {
+        std::cerr << "Error generating response: " << e.what() << std::endl;
+        return "I'm experiencing technical difficulties. Please try again.";
+    }
 }
 
-// Save checkpoint method
+// IMPROVED Save checkpoint method
 bool ConversationModel::save_checkpoint(const std::string& filename) {
     std::ofstream ofs(filename, std::ios::binary);
     if (!ofs.is_open()) {
@@ -175,12 +262,10 @@ bool ConversationModel::save_checkpoint(const std::string& filename) {
     }
     
     try {
-        // Create a binary output archive
         cereal::BinaryOutputArchive archive(ofs);
         
         // Serialize the transformer model
         if (transformer_) {
-            // Use the transformer's serialize method
             std::stringstream model_stream;
             transformer_->serialize(model_stream);
             std::string model_data = model_stream.str();
@@ -190,22 +275,23 @@ bool ConversationModel::save_checkpoint(const std::string& filename) {
             archive(empty);
         }
         
-        // Serialize training metadata
+        // Serialize training metadata and configuration
         archive(
             training_epochs_,
             best_loss_,
             training_timestamp_,
             max_response_length_,
-            verbose_
+            verbose_,
+            max_grad_norm_,    // Save training configuration
+            lr_decay_,
+            weight_decay_
         );
         
         // Serialize tokenizer information if available
         if (tokenizer_) {
-            // Save tokenizer vocabulary size for verification
             size_t vocab_size = tokenizer_->vocab_size();
             archive(vocab_size);
             
-            // Save tokenizer state to a temporary file and read its data
             std::string temp_filename = "temp_tokenizer_checkpoint.bin";
             if (tokenizer_->save(temp_filename)) {
                 std::ifstream temp_file(temp_filename, std::ios::binary);
@@ -216,8 +302,6 @@ bool ConversationModel::save_checkpoint(const std::string& filename) {
                     );
                     temp_file.close();
                     archive(tokenizer_data);
-                    
-                    // Clean up the temporary file
                     std::remove(temp_filename.c_str());
                 } else {
                     std::string empty;
@@ -247,7 +331,7 @@ bool ConversationModel::save_checkpoint(const std::string& filename) {
     }
 }
 
-// Load checkpoint method
+// IMPROVED Load checkpoint method
 bool ConversationModel::load_checkpoint(const std::string& filename) {
     std::ifstream ifs(filename, std::ios::binary);
     if (!ifs.is_open()) {
@@ -256,7 +340,6 @@ bool ConversationModel::load_checkpoint(const std::string& filename) {
     }
     
     try {
-        // Create a binary input archive
         cereal::BinaryInputArchive archive(ifs);
         
         // Deserialize the transformer model
@@ -268,13 +351,16 @@ bool ConversationModel::load_checkpoint(const std::string& filename) {
             transformer_->deserialize(model_stream);
         }
         
-        // Deserialize training metadata
+        // Deserialize training metadata and configuration
         archive(
             training_epochs_,
             best_loss_,
             training_timestamp_,
             max_response_length_,
-            verbose_
+            verbose_,
+            max_grad_norm_,    // Load training configuration
+            lr_decay_,
+            weight_decay_
         );
         
         // Deserialize tokenizer information if available
@@ -296,11 +382,7 @@ bool ConversationModel::load_checkpoint(const std::string& filename) {
             if (temp_file.is_open()) {
                 temp_file.write(tokenizer_data.data(), tokenizer_data.size());
                 temp_file.close();
-                
-                // Load tokenizer from the temporary file
                 tokenizer_->load(temp_filename);
-                
-                // Clean up the temporary file
                 std::remove(temp_filename.c_str());
             } else {
                 std::cerr << "Warning: Failed to create temporary file for tokenizer loading" << std::endl;
@@ -321,7 +403,7 @@ bool ConversationModel::load_checkpoint(const std::string& filename) {
     }
 }
 
-// Other methods (context management, system prompt, etc.) would be implemented here
+// Other methods remain the same...
 void ConversationModel::clear_context() {
     if (context_manager_) {
         context_manager_->clear();
@@ -341,11 +423,8 @@ size_t ConversationModel::get_context_token_count() const {
 
 void ConversationModel::set_tokenizer(std::shared_ptr<BPETokenizer> tokenizer) { 
     tokenizer_ = tokenizer; 
-    // Initialize context manager with appropriate limits
     context_manager_ = std::make_unique<ContextManager>(2048, 20);
-    // Set the tokenizer in the context manager
     context_manager_->set_tokenizer(tokenizer);
 }
 
 } // namespace lm
-

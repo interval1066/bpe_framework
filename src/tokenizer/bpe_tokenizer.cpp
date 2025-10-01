@@ -11,6 +11,8 @@
 #include <memory>
 #include <unordered_map>
 #include <iomanip>
+#include <cmath>
+#include <regex>
 
 // Add CPU-specific optimizations
 #ifdef __SSE4_2__
@@ -164,6 +166,18 @@ struct BPETokenizer::Impl {
     TokenID pad_token_id = 0;
     TokenID unk_token_id = 0;
     
+    // Stability parameters
+    double min_frequency_ratio_ = 0.0001;
+    double learning_rate_ = 0.1;
+    double smoothing_factor_ = 1.0;
+    size_t min_sequence_length_ = 1;
+    size_t max_sequence_length_ = 10000;  // Increased for literary works
+    
+    // Literary text handling
+    bool preserve_paragraphs_ = true;
+    bool handle_contractions_ = true;
+    bool preserve_punctuation_ = true;
+    
     // Helper functions
     std::vector<std::string> split_text(const std::string& text) const;
     std::vector<TokenID> word_to_token_ids(const std::string& word) const;
@@ -193,6 +207,13 @@ struct BPETokenizer::Impl {
         }
     }
     
+    // New robust training methods for literary text
+    std::vector<std::string> preprocess_literary_text(const std::vector<std::string>& corpus) const;
+    bool validate_literary_example(const std::string& text) const;
+    double calculate_merge_score(int freq_old1, int freq_old2, int freq_new, double smoothing = 1.0) const;
+    void apply_stability_parameters(double stability_factor);
+    std::string normalize_literary_text(const std::string& text) const;
+    
     // Debug logging methods
     void log_encode_start(const std::string& text) const;
     void log_word_split(const std::vector<std::string>& words) const;
@@ -203,7 +224,191 @@ struct BPETokenizer::Impl {
     void log_decode_start(const std::vector<TokenID>& tokens) const;
     void log_token_decoding(TokenID token_id, const std::string& decoded) const;
     void log_final_decoding(const std::string& text) const;
+    
+    // Debug method for training
+    void debug_tokenization(const std::vector<std::string>& corpus) const;
 };
+
+// Enhanced preprocessing for literary text
+std::vector<std::string> BPETokenizer::Impl::preprocess_literary_text(const std::vector<std::string>& corpus) const {
+    std::vector<std::string> processed;
+    processed.reserve(corpus.size());
+    
+    for (const auto& text : corpus) {
+        // Skip empty lines but keep meaningful content
+        if (text.empty()) continue;
+        
+        // Apply literary text normalization
+        std::string cleaned = normalize_literary_text(text);
+        
+        if (!cleaned.empty()) {
+            processed.push_back(cleaned);
+        }
+    }
+    
+    return processed;
+}
+
+std::string BPETokenizer::Impl::normalize_literary_text(const std::string& text) const {
+    std::string result;
+    result.reserve(text.size());
+    
+    bool last_was_space = false;
+    bool in_quotes = false;
+    char last_char = 0;
+    
+    for (size_t i = 0; i < text.size(); i++) {
+        char c = text[i];
+        
+        // Handle quotes specially for literary text
+        if (c == '"' || c == '\'' || c == '`') {
+            if (!in_quotes) {
+                // Add space before opening quote if needed
+                if (!result.empty() && !std::isspace(result.back()) && result.back() != '(') {
+                    result.push_back(' ');
+                }
+            } else {
+                // Add space after closing quote if needed
+                if (i + 1 < text.size() && !std::isspace(text[i + 1])) {
+                    result.push_back(' ');
+                }
+            }
+            in_quotes = !in_quotes;
+            result.push_back(c);
+            last_was_space = false;
+            continue;
+        }
+        
+        // Handle various whitespace - normalize to single space
+        if (std::isspace(static_cast<unsigned char>(c))) {
+            // Preserve paragraph breaks for literary text
+            if (c == '\n' && preserve_paragraphs_) {
+                // Check if this might be a paragraph break (multiple newlines or at start of meaningful text)
+                if (i > 0 && text[i-1] == '\n') {
+                    // Multiple newlines - treat as paragraph break
+                    if (!result.empty() && result.back() != '\n') {
+                        result.push_back('\n');
+                        last_was_space = true;
+                    }
+                }
+            } else if (!last_was_space && !result.empty()) {
+                result.push_back(' ');
+                last_was_space = true;
+            }
+        }
+        // Handle punctuation - keep most punctuation but normalize spaces around it
+        else if (std::ispunct(static_cast<unsigned char>(c)) && preserve_punctuation_) {
+            // Don't add space before punctuation if it's at start or after space
+            if (!result.empty() && !std::isspace(result.back()) && 
+                result.back() != '(' && result.back() != '[' && result.back() != '{') {
+                result.push_back(c);
+                // Add space after punctuation if it's not followed by another punctuation or whitespace
+                if (i + 1 < text.size() && !std::ispunct(text[i + 1]) && !std::isspace(text[i + 1])) {
+                    result.push_back(' ');
+                    last_was_space = true;
+                } else {
+                    last_was_space = false;
+                }
+            } else {
+                result.push_back(c);
+                last_was_space = false;
+            }
+        }
+        // Handle printable characters
+        else if (std::isprint(static_cast<unsigned char>(c))) {
+            result.push_back(c);
+            last_was_space = false;
+        }
+        // Convert other non-printable to space
+        else {
+            if (!last_was_space && !result.empty()) {
+                result.push_back(' ');
+                last_was_space = true;
+            }
+        }
+        
+        last_char = c;
+    }
+    
+    // Trim trailing space
+    if (!result.empty() && result.back() == ' ') {
+        result.pop_back();
+    }
+    
+    return result;
+}
+
+bool BPETokenizer::Impl::validate_literary_example(const std::string& text) const {
+    // Very tolerant validation for literary text
+    if (text.length() < 1 || text.length() > max_sequence_length_) {
+        return false;
+    }
+    
+    // Count alphanumeric and punctuation characters
+    size_t meaningful_chars = 0;
+    for (char c : text) {
+        if (std::isalnum(static_cast<unsigned char>(c)) || 
+            (preserve_punctuation_ && std::ispunct(static_cast<unsigned char>(c)))) {
+            meaningful_chars++;
+        }
+    }
+    
+    // Require at least some meaningful content
+    return meaningful_chars >= 1;
+}
+
+double BPETokenizer::Impl::calculate_merge_score(int freq_old1, int freq_old2, int freq_new, double smoothing) const {
+    // More stable merge scoring with gradient clipping
+    double base_score = static_cast<double>(freq_new + smoothing) / 
+                       (std::sqrt(freq_old1 + smoothing) * std::sqrt(freq_old2 + smoothing));
+    
+    // Clip extreme values to prevent gradient explosion
+    return std::min(base_score, 1000.0);
+}
+
+void BPETokenizer::Impl::apply_stability_parameters(double stability_factor) {
+    // Lower values = more stability
+    stability_factor = std::max(0.1, std::min(stability_factor, 1.0));
+    
+    learning_rate_ = 0.1 * stability_factor;
+    smoothing_factor_ = 2.0 / stability_factor;
+    min_frequency_ratio_ = 0.0001 * stability_factor;
+    
+    // Be more inclusive with lower stability
+    if (stability_factor < 0.5) {
+        min_sequence_length_ = 1;
+    }
+}
+
+// Debug method to see what's happening during tokenization
+void BPETokenizer::Impl::debug_tokenization(const std::vector<std::string>& corpus) const {
+    if (!debug_logging) return;
+    
+    std::cout << "=== DEBUG TOKENIZATION ===" << std::endl;
+    std::cout << "Corpus size: " << corpus.size() << std::endl;
+    
+    for (size_t i = 0; i < std::min(corpus.size(), size_t(3)); i++) {
+        const auto& text = corpus[i];
+        std::cout << "Example " << i << ": '" << text << "'" << std::endl;
+        
+        auto words = split_text(text);
+        std::cout << "  Split into " << words.size() << " words" << std::endl;
+        
+        for (size_t j = 0; j < std::min(words.size(), size_t(5)); j++) {
+            const auto& word = words[j];
+            auto tokens = word_to_token_ids(word);
+            std::cout << "    Word " << j << ": '" << word << "' -> " << tokens.size() << " tokens: [";
+            for (auto token : tokens) {
+                std::cout << token << " ";
+            }
+            std::cout << "]" << std::endl;
+        }
+        if (words.size() > 5) {
+            std::cout << "    ... and " << (words.size() - 5) << " more words" << std::endl;
+        }
+    }
+    std::cout << "=== END DEBUG ===" << std::endl;
+}
 
 // Debug logging implementations
 void BPETokenizer::Impl::log_encode_start(const std::string& text) const {
@@ -228,8 +433,11 @@ void BPETokenizer::Impl::get_pair_counts_from_sequences(
 void BPETokenizer::Impl::log_word_split(const std::vector<std::string>& words) const {
     if (!debug_logging) return;
     std::cout << "[ENCODE] Split into " << words.size() << " words: ";
-    for (size_t i = 0; i < words.size(); i++) {
+    for (size_t i = 0; i < std::min(words.size(), size_t(10)); i++) {
         std::cout << "[" << i << "]='" << words[i] << "' ";
+    }
+    if (words.size() > 10) {
+        std::cout << "... and " << (words.size() - 10) << " more";
     }
     std::cout << std::endl;
 }
@@ -386,6 +594,18 @@ void BPETokenizer::Impl::initialize_vocab() {
     inv_vocab[next_token_id] = " ";
     next_token_id++;
     
+    // Add common punctuation for literary text
+    std::vector<std::string> common_punctuation = {
+        ".", ",", "!", "?", ";", ":", "-", "—", "–", "(", ")", "[", "]", "{", "}",
+        "\"", "'", "`", "“", "”", "‘", "’", "...", ".."
+    };
+    
+    for (const auto& punct : common_punctuation) {
+        vocab[punct] = next_token_id;
+        inv_vocab[next_token_id] = punct;
+        next_token_id++;
+    }
+    
     // Add special tokens
     vocab["<unk>"] = next_token_id;
     inv_vocab[next_token_id] = "<unk>";
@@ -447,15 +667,39 @@ std::vector<std::string> BPETokenizer::Impl::split_text(const std::string& text)
             return unicode::unicode_split(normalized);
         }
     } else {
+        // Enhanced splitting for literary text
         std::vector<std::string> words;
-        std::istringstream iss(text);
-        std::string word;
+        std::string current_word;
         
-        // Preallocate based on text size
-        words.reserve(text.size() / 6); // Average word length ~6 characters
+        for (size_t i = 0; i < text.size(); i++) {
+            char c = text[i];
+            
+            if (std::isspace(static_cast<unsigned char>(c))) {
+                if (!current_word.empty()) {
+                    words.push_back(current_word);
+                    current_word.clear();
+                }
+                // Add significant whitespace (like paragraph breaks) as separate tokens
+                if (c == '\n' && preserve_paragraphs_) {
+                    // Check if this is a paragraph break
+                    if (i > 0 && text[i-1] == '\n') {
+                        words.push_back("\n");
+                    }
+                }
+            } else if (std::ispunct(static_cast<unsigned char>(c)) && preserve_punctuation_) {
+                // Handle punctuation as separate tokens for better literary processing
+                if (!current_word.empty()) {
+                    words.push_back(current_word);
+                    current_word.clear();
+                }
+                words.push_back(std::string(1, c));
+            } else {
+                current_word.push_back(c);
+            }
+        }
         
-        while (iss >> word) {
-            words.push_back(std::move(word));
+        if (!current_word.empty()) {
+            words.push_back(current_word);
         }
         
         return words;
@@ -557,15 +801,57 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
         throw std::invalid_argument("Corpus cannot be empty");
     }
     
+    // Apply stability settings - use high stability (0.3)
+    pimpl_->apply_stability_parameters(0.3);
+    
+    std::cout << "Training with corpus size: " << corpus.size() << " examples\n";
+    std::cout << "Target vocabulary size: " << vocab_size << "\n";
+    
+    // Preprocess corpus for literary text
+    auto processed_corpus = pimpl_->preprocess_literary_text(corpus);
+    
+    std::cout << "After preprocessing: " << processed_corpus.size() << " examples\n";
+    
+    if (processed_corpus.empty()) {
+        // Emergency fallback: use original corpus
+        std::cout << "Warning: Preprocessing removed all examples, using original corpus\n";
+        processed_corpus = corpus;
+    }
+    
+    // Debug tokenization to see what's happening
+    if (pimpl_->debug_logging) {
+        pimpl_->debug_tokenization(processed_corpus);
+    }
+    
     // Disable caching during training as vocabulary changes frequently
     pimpl_->enable_caching(false);
     
-    // Validate all input texts before training
-    for (const auto& text : corpus) {
-        if (!is_valid_utf8_impl(text.data(), text.size())) {
-            std::cerr << "Warning: Invalid UTF-8 in training corpus: " << text << std::endl;
-            // Skip invalid text
-            continue;
+    // Tolerant validation for literary text
+    std::vector<std::string> valid_corpus;
+    valid_corpus.reserve(processed_corpus.size());
+    
+    size_t invalid_count = 0;
+    for (const auto& text : processed_corpus) {
+        if (pimpl_->validate_literary_example(text)) {
+            valid_corpus.push_back(text);
+        } else {
+            invalid_count++;
+            if (pimpl_->debug_logging) {
+                std::cout << "Skipping training example: '" << text << "'\n";
+            }
+        }
+    }
+    
+    std::cout << "After validation: " << valid_corpus.size() << " valid, " 
+              << invalid_count << " invalid examples\n";
+    
+    if (valid_corpus.empty()) {
+        // Ultimate fallback: use everything
+        std::cout << "CRITICAL: No examples passed validation, using ALL examples\n";
+        valid_corpus = processed_corpus;
+        
+        if (valid_corpus.empty()) {
+            throw std::invalid_argument("No training examples available after all fallbacks!");
         }
     }
     
@@ -574,16 +860,29 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     std::unordered_map<std::vector<TokenID>, int, VectorHash> sequence_counts;
     
     // First, split text into words and tokenize each word
-    for (const auto& text : corpus) {
+    std::cout << "Tokenizing corpus...\n";
+    size_t total_words = 0;
+    size_t valid_sequences = 0;
+    
+    for (const auto& text : valid_corpus) {
         auto words = pimpl_->split_text(text);
+        total_words += words.size();
+        
         for (const auto& word : words) {
             // Convert word to initial token sequence (characters)
             auto tokens = pimpl_->word_to_token_ids(word);
             
-            // Count frequency of this token sequence
-            sequence_counts[tokens]++;
+            // Very tolerant filtering - accept sequences of length 1 or more
+            if (tokens.size() >= 1 && tokens.size() <= pimpl_->max_sequence_length_) {
+                sequence_counts[tokens]++;
+                valid_sequences++;
+            }
         }
     }
+    
+    std::cout << "Total words processed: " << total_words << "\n";
+    std::cout << "Valid token sequences: " << valid_sequences << "\n";
+    std::cout << "Unique token sequences: " << sequence_counts.size() << "\n";
     
     // Convert to vector for easier processing
     tokenized_corpus.reserve(sequence_counts.size());
@@ -594,13 +893,42 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     // Clear the temporary map to save memory
     sequence_counts.clear();
     
-    // BPE training algorithm with safety limit
+    if (tokenized_corpus.empty()) {
+        // Last resort: try character-level tokenization without word splitting
+        std::cout << "No sequences from word splitting, trying character-level...\n";
+        for (const auto& text : valid_corpus) {
+            auto tokens = pimpl_->word_to_token_ids(text); // Treat entire text as one "word"
+            if (!tokens.empty()) {
+                tokenized_corpus.emplace_back(tokens, 1);
+            }
+        }
+        
+        if (tokenized_corpus.empty()) {
+            throw std::runtime_error("No valid token sequences could be generated from training data");
+        }
+    }
+    
+    std::cout << "Final token sequences for training: " << tokenized_corpus.size() << "\n";
+    
+    // Enhanced BPE training algorithm with stability
     int iteration = 0;
     int max_iterations = 10000;
+    size_t initial_vocab_size = pimpl_->vocab.size();
+    
+    // Calculate minimum frequency threshold - be very tolerant
+    int total_tokens = 0;
+    for (const auto& [seq, count] : tokenized_corpus) {
+        total_tokens += count * seq.size();
+    }
+    int min_frequency = static_cast<int>(total_tokens * pimpl_->min_frequency_ratio_);
+    min_frequency = std::max(min_frequency, 1); // At least 1
+    
+    std::cout << "Minimum frequency threshold: " << min_frequency << "\n";
+    std::cout << "Starting BPE training...\n";
     
     // Pre-allocate pair counts
     std::unordered_map<std::pair<TokenID, TokenID>, int, PairHash> pair_counts;
-    pair_counts.reserve(1000000); // Reserve space for 1M pairs
+    pair_counts.reserve(1000000);
     
     while (pimpl_->vocab.size() < vocab_size && iteration < max_iterations) {
         // Count pairs in token sequences
@@ -608,17 +936,22 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
         pimpl_->get_pair_counts_from_sequences(tokenized_corpus, pair_counts);
         
         if (pair_counts.empty()) {
-            std::cout << "No more pairs to merge. Stopping early." << std::endl;
+            std::cout << "No more pairs to merge. Stopping early.\n";
             break;
         }
         
-        // Find most frequent pair
+        // Find most frequent pair (simpler than scoring for now)
         auto max_pair = std::max_element(
             pair_counts.begin(), pair_counts.end(),
             [](const auto& a, const auto& b) { return a.second < b.second; }
         );
         
-        // Debug output - show what we're merging
+        if (max_pair->second < min_frequency) {
+            std::cout << "No pairs above frequency threshold. Stopping early.\n";
+            break;
+        }
+        
+        // Debug output
         if (pimpl_->debug_logging) {
             std::string first_str = pimpl_->inv_vocab.count(max_pair->first.first) ? 
                 pimpl_->inv_vocab.at(max_pair->first.first) : "<?>";
@@ -634,17 +967,17 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
         pimpl_->next_token_id++;
         iteration++;
         
-        // Periodically check memory usage and clean up
-        if (iteration % 500 == 0) {
+        // Progress reporting
+        if (iteration % 100 == 0) {
             size_t current_memory = get_peak_memory_usage();
-            std::cout << "Memory after " << iteration << " iterations: " 
-                      << (current_memory - start_memory) / (1024 * 1024) << "MB\n";
-            std::cout << "Vocabulary size: " << pimpl_->vocab.size() << std::endl;
+            std::cout << "Progress: " << iteration << " iterations, " 
+                      << (pimpl_->vocab.size() - initial_vocab_size) << " new tokens, "
+                      << "Memory: " << (current_memory - start_memory) / (1024 * 1024) << "MB\n";
         }
     }
     
     if (iteration >= max_iterations) {
-        std::cout << "Reached maximum iterations. Stopping training." << std::endl;
+        std::cout << "Reached maximum iterations. Stopping training.\n";
     }
     
     // Re-enable caching after training
@@ -652,8 +985,8 @@ void BPETokenizer::train(const std::vector<std::string>& corpus, size_t vocab_si
     
     size_t end_memory = get_peak_memory_usage();
     std::cout << "Training completed in " << iteration << " iterations\n";
-    std::cout << "Peak memory used: " << (end_memory - start_memory) / (1024 * 1024) << "MB\n";
     std::cout << "Final vocabulary size: " << pimpl_->vocab.size() << std::endl;
+    std::cout << "Peak memory used: " << (end_memory - start_memory) / (1024 * 1024) << "MB\n";
 }
 
 void BPETokenizer::Impl::get_pair_counts(
@@ -726,52 +1059,80 @@ size_t BPETokenizer::vocab_size() const {
 std::vector<TokenID> BPETokenizer::encode(const std::string& text) const {
     pimpl_->log_encode_start(text);
     
-    // Validate UTF-8 before processing
-    if (!is_valid_utf8_impl(text.data(), text.size())) {
-        if (pimpl_->byte_fallback_enabled) {
-            return pimpl_->handle_invalid_utf8(text);
-        } else {
-            return {pimpl_->unknown_token_id};
-        }
+    // Early return for empty text
+    if (text.empty()) {
+        return {};
     }
     
-    // Normalize the text first
-    std::string normalized = pimpl_->normalization_enabled ? 
-        pimpl_->unicode_cache.get_normalized(text) : text;
+    // More tolerant UTF-8 validation with detailed fallback
+    if (!is_valid_utf8_impl(text.data(), text.size())) {
+        std::cerr << "Warning: Invalid UTF-8 in input text, using fallback encoding\n";
+        auto fallback_tokens = pimpl_->handle_invalid_utf8(text);
+        if (!fallback_tokens.empty()) {
+            return fallback_tokens;
+        }
+        // If fallback also fails, return unknown token
+        return {pimpl_->unknown_token_id};
+    }
     
-    // Split into words
+    // Use the same preprocessing as training for consistency
+    std::vector<std::string> preprocessed = {text};
+    auto processed = pimpl_->preprocess_literary_text(preprocessed);
+    
+    std::string normalized;
+    if (!processed.empty()) {
+        normalized = processed[0];
+    } else {
+        normalized = text; // Fallback to original
+    }
+    
+    // Split into words using the same method as training
     auto words = pimpl_->split_text(normalized);
     pimpl_->log_word_split(words);
+    
+    // Handle case where no words were produced
+    if (words.empty()) {
+        if (pimpl_->debug_logging) {
+            std::cout << "[ENCODE] No words produced from text, using character-level encoding\n";
+        }
+        // Fall back to character-level encoding
+        return pimpl_->word_to_token_ids(normalized);
+    }
     
     std::vector<TokenID> tokens;
     
     for (const auto& word : words) {
-        // Convert word to initial tokens (characters)
+        if (word.empty()) continue;
+        
         auto word_tokens = pimpl_->word_to_token_ids(word);
         pimpl_->log_word_tokens(word, word_tokens);
         
-        // Apply BPE merges
+        // More robust merging with bounds checking
         bool changed;
+        size_t merge_iterations = 0;
+        const size_t max_merge_iterations = 1000; // Safety limit
+        
         do {
             changed = false;
-            for (size_t i = 0; i < word_tokens.size() - 1; i++) {
+            for (size_t i = 0; i < word_tokens.size() - 1 && merge_iterations < max_merge_iterations; i++) {
                 auto pair = std::make_pair(word_tokens[i], word_tokens[i+1]);
                 if (auto it = pimpl_->merges.find(pair); it != pimpl_->merges.end()) {
-                    // Replace the pair with the merged token
                     word_tokens[i] = it->second;
                     word_tokens.erase(word_tokens.begin() + i + 1);
                     changed = true;
+                    merge_iterations++;
                     pimpl_->log_merge_result(word_tokens);
-                    // Restart from the beginning to catch new pairs
+                    // Restart from beginning to catch new pairs
                     i = 0;
                 }
             }
-        } while (changed);
+        } while (changed && merge_iterations < max_merge_iterations);
+        
+        if (merge_iterations >= max_merge_iterations) {
+            std::cerr << "Warning: Maximum merge iterations reached for word: " << word << "\n";
+        }
         
         tokens.insert(tokens.end(), word_tokens.begin(), word_tokens.end());
-        
-        // DON'T add space between words - the original text already has spaces if needed
-        // This is the key change - remove the space insertion logic
     }
     
     pimpl_->log_final_tokens(tokens);
@@ -902,4 +1263,43 @@ void BPETokenizer::add_special_token(const std::string& token, TokenID id) {
     }
 }
 
+// Configuration method for stability and literary text handling
+void BPETokenizer::set_training_parameters(double stability_factor, 
+                                          bool aggressive_normalization,
+                                          size_t min_sequence_length,
+                                          bool preserve_paragraphs,
+                                          bool preserve_punctuation) {
+    pimpl_->apply_stability_parameters(stability_factor);
+    pimpl_->normalization_enabled = aggressive_normalization;
+    pimpl_->min_sequence_length_ = std::max(min_sequence_length, size_t(1));
+    pimpl_->preserve_paragraphs_ = preserve_paragraphs;
+    pimpl_->preserve_punctuation_ = preserve_punctuation;
+}
+
+void BPETokenizer::set_preserve_paragraphs(bool preserve) {
+    pimpl_->preserve_paragraphs_ = preserve;
+}
+
+void BPETokenizer::set_preserve_punctuation(bool preserve) {
+    pimpl_->preserve_punctuation_ = preserve;
+}
+
+void BPETokenizer::set_handle_contractions(bool handle) {
+    pimpl_->handle_contractions_ = handle;
+}
+
+// Getters for current configuration
+bool BPETokenizer::preserves_paragraphs() const {
+    return pimpl_->preserve_paragraphs_;
+}
+
+bool BPETokenizer::preserves_punctuation() const {
+    return pimpl_->preserve_punctuation_;
+}
+
+bool BPETokenizer::handles_contractions() const {
+    return pimpl_->handle_contractions_;
+}
+
 } // namespace lm
+

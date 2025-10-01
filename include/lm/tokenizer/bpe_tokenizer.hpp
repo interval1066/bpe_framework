@@ -48,9 +48,27 @@ public:
     void dump_vocabulary() const;
     void dump_merges() const;
 
+    // Configuration methods for literary text handling
+    void set_training_parameters(double stability_factor = 0.5, 
+                                bool aggressive_normalization = true,
+                                size_t min_sequence_length = 3,
+                                bool preserve_paragraphs = true,
+                                bool preserve_punctuation = true);
+    
+    // Text processing configuration
+    void set_preserve_paragraphs(bool preserve);
+    void set_preserve_punctuation(bool preserve);
+    void set_handle_contractions(bool handle);
+    
+    // Getters for current configuration
+    bool preserves_paragraphs() const;
+    bool preserves_punctuation() const;
+    bool handles_contractions() const;
+
 private:
     class Impl;
     std::unique_ptr<Impl> pimpl_;
 };
 
 } // namespace lm
+

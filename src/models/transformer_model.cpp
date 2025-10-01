@@ -106,9 +106,32 @@ struct TransformerModel::Impl {
     // Embedding layers
     Eigen::MatrixXf token_embedding;
     Eigen::MatrixXf position_embedding;
+    Eigen::MatrixXf lm_head_grad;
+    Eigen::VectorXf final_gamma_grad, final_beta_grad;
 
     // Add dimension validation flag
     bool enable_dimension_checks = true;
+
+    void clip_gradients_simple(float max_value) {
+        // Clip final layers
+        lm_head_grad = lm_head_grad.cwiseMax(-max_value).cwiseMin(max_value);
+        final_gamma_grad = final_gamma_grad.cwiseMax(-max_value).cwiseMin(max_value);
+        final_beta_grad = final_beta_grad.cwiseMax(-max_value).cwiseMin(max_value);
+        
+        // Clip transformer blocks
+        for (auto& block : blocks) {
+            block.w_q_grad = block.w_q_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.w_k_grad = block.w_k_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.w_v_grad = block.w_v_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.w_o_grad = block.w_o_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.attn_gamma_grad = block.attn_gamma_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.attn_beta_grad = block.attn_beta_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.w_ff1_grad = block.w_ff1_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.w_ff2_grad = block.w_ff2_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.ff_gamma_grad = block.ff_gamma_grad.cwiseMax(-max_value).cwiseMin(max_value);
+            block.ff_beta_grad = block.ff_beta_grad.cwiseMax(-max_value).cwiseMin(max_value);
+        }
+    }
 
     // Transformer blocks
     struct TransformerBlock {
@@ -272,10 +295,6 @@ struct TransformerModel::Impl {
     // Final layers
     Eigen::MatrixXf lm_head;
     Eigen::VectorXf final_gamma, final_beta;
-    
-    // Gradients for final layers
-    Eigen::MatrixXf lm_head_grad;
-    Eigen::VectorXf final_gamma_grad, final_beta_grad;
     
     // Model parameters
     size_t vocab_size;
@@ -614,6 +633,58 @@ struct TransformerModel::Impl {
             block.ff_beta_grad.setZero();
         }
     }
+
+    float clip_gradients(float max_norm = 1.0f) {
+        float total_norm = 0.0f;
+        
+        // Collect all gradients
+        std::vector<Eigen::MatrixXf*> all_grads;
+        std::vector<Eigen::VectorXf*> all_vec_grads;
+        
+        // Final layers
+        all_grads.push_back(&lm_head_grad);
+        all_vec_grads.push_back(&final_gamma_grad);
+        all_vec_grads.push_back(&final_beta_grad);
+        
+        // Transformer blocks
+        for (auto& block : blocks) {
+            all_grads.push_back(&block.w_q_grad);
+            all_grads.push_back(&block.w_k_grad);
+            all_grads.push_back(&block.w_v_grad);
+            all_grads.push_back(&block.w_o_grad);
+            all_vec_grads.push_back(&block.attn_gamma_grad);
+            all_vec_grads.push_back(&block.attn_beta_grad);
+            all_grads.push_back(&block.w_ff1_grad);
+            all_grads.push_back(&block.w_ff2_grad);
+            all_vec_grads.push_back(&block.ff_gamma_grad);
+            all_vec_grads.push_back(&block.ff_beta_grad);
+        }
+        
+        // Calculate total norm
+        for (const auto* grad : all_grads) {
+            total_norm += grad->squaredNorm();
+        }
+        for (const auto* grad : all_vec_grads) {
+            total_norm += grad->squaredNorm();
+        }
+        
+        total_norm = std::sqrt(total_norm);
+        
+        // Clip if norm exceeds max_norm
+        if (total_norm > max_norm) {
+            float scale = max_norm / (total_norm + 1e-6f);
+            
+            for (auto* grad : all_grads) {
+                *grad *= scale;
+            }
+            for (auto* grad : all_vec_grads) {
+                *grad *= scale;
+            }
+            
+            std::cout << "Gradient clipped: norm " << total_norm << " -> " << max_norm << std::endl;
+        }        
+        return total_norm;
+    }
 };
 
 // Factory methods
@@ -647,11 +718,11 @@ TransformerModel::TransformerModel(size_t vocab_size, size_t d_model,
 // Destructor - must be defined after Impl is defined
 TransformerModel::~TransformerModel() = default;
 
-// Public methods
-std::vector<float> TransformerModel::forward(const std::vector<TokenID>& input_tokens) {
-    return pimpl_->forward(input_tokens, false); // false for inference mode
-}
-
+    // Public methods
+    std::vector<float> TransformerModel::forward(const std::vector<TokenID>& input_tokens) {
+        return pimpl_->forward(input_tokens, false); // false for inference mode
+    }
+ 
 void TransformerModel::backward(const std::vector<float>& grad_output) {
     size_t seq_len = pimpl_->final_output.rows();
     size_t vocab_size = pimpl_->final_output.cols();
@@ -669,59 +740,74 @@ void TransformerModel::backward(const std::vector<float>& grad_output) {
     pimpl_->backward(grad_output_map);
 }
 
-void TransformerModel::train_step(const std::vector<TokenID>& input_tokens, 
+// Make sure this has 4 parameters to match the header
+float TransformerModel::train_step(const std::vector<TokenID>& input_tokens, 
                                 const std::vector<TokenID>& target_tokens,
-                                float learning_rate) {
-    pimpl_->update_parameters(learning_rate);
-    // Add validation
+                                float learning_rate,
+                                float max_grad_norm) {  // ADD THIS PARAMETER
+    // CRITICAL: Use much smaller learning rate for stability
+    learning_rate = 0.0001f; // 1e-4 - much safer than 0.01
+    
+    // Validation
     if (input_tokens.size() != target_tokens.size()) {
-        std::string error_msg = "Input and target sequences must have the same length. " +
-            std::string("Input: ") + std::to_string(input_tokens.size()) + ", " +
-            "Target: " + std::to_string(target_tokens.size());
-        throw std::runtime_error(error_msg);
+        throw std::runtime_error("Input and target sequences must have the same length");
     }
     
     if (input_tokens.empty()) {
         throw std::runtime_error("Input sequence cannot be empty");
     }
     
-    // Forward pass
-    auto logits = pimpl_->forward(input_tokens, true);
-    
-    // Calculate loss and gradient
-    float loss = calculate_loss(logits, target_tokens);
-    
-    // Compute gradient of loss with respect to logits
-    size_t seq_len = target_tokens.size();
-    size_t vocab_size = vocab_size_;
-    std::vector<float> grad_output(seq_len * vocab_size, 0.0f);
-    
-    for (size_t i = 0; i < seq_len; i++) {
-        // Softmax gradient: dL/dz = p - y (for cross-entropy loss)
-        const float* pos_logits = &logits[i * vocab_size];
+    try {
+        // Forward pass
+        auto logits = pimpl_->forward(input_tokens, true);
         
-        // Softmax
-        float max_logit = *std::max_element(pos_logits, pos_logits + vocab_size);
-        float sum_exp = 0.0;
-        for (size_t j = 0; j < vocab_size; j++) {
-            sum_exp += std::exp(pos_logits[j] - max_logit);
+        // Calculate loss
+        float loss = calculate_loss(logits, target_tokens);
+        
+        // CRITICAL: Check for exploding loss immediately
+        if (std::isnan(loss) || std::isinf(loss) || loss > 1e5f) {
+            std::cerr << "EXPLODING LOSS DETECTED: " << loss << " - skipping example" << std::endl;
+            return loss; // Return but don't update parameters
         }
         
         // Compute gradient
-        for (size_t j = 0; j < vocab_size; j++) {
-            float p = std::exp(pos_logits[j] - max_logit) / sum_exp;
-            float y = (j == target_tokens[i]) ? 1.0f : 0.0f;
-            grad_output[i * vocab_size + j] = (p - y) / seq_len;
+        size_t seq_len = target_tokens.size();
+        size_t vocab_size = vocab_size_;
+        std::vector<float> grad_output(seq_len * vocab_size, 0.0f);
+        
+        for (size_t i = 0; i < seq_len; i++) {
+            const float* pos_logits = &logits[i * vocab_size];
+            
+            // Stable softmax
+            float max_logit = *std::max_element(pos_logits, pos_logits + vocab_size);
+            float sum_exp = 0.0f;
+            for (size_t j = 0; j < vocab_size; j++) {
+                sum_exp += std::exp(pos_logits[j] - max_logit);
+            }
+            
+            // Gradient computation
+            for (size_t j = 0; j < vocab_size; j++) {
+                float p = std::exp(pos_logits[j] - max_logit) / sum_exp;
+                float y = (j == target_tokens[i]) ? 1.0f : 0.0f;
+                grad_output[i * vocab_size + j] = (p - y) / seq_len;
+            }
         }
+        
+        // Backward pass
+        backward(grad_output);
+        
+        // CRITICAL: Simple gradient clipping before update
+        pimpl_->clip_gradients_simple(max_grad_norm);  // Use the parameter
+        
+        // Update parameters
+        pimpl_->update_parameters(learning_rate);
+        
+        return loss;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error in train_step: " << e.what() << std::endl;
+        return std::numeric_limits<float>::max(); // Return high loss to indicate failure
     }
-    
-    // Backward pass
-    backward(grad_output);
-    
-    // Update parameters
-    pimpl_->update_parameters(learning_rate);
-    
-    std::cout << "Training step - Loss: " << loss << std::endl;
 }
 
 float TransformerModel::calculate_loss(const std::vector<float>& logits, 

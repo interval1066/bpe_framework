@@ -4,7 +4,7 @@
 #include "lm/models/transformer_model.hpp"
 #include "lm/tokenizer/bpe_tokenizer.hpp"
 #include "lm/data/training_data.hpp"
-#include "lm/context_manager.hpp"  // Add this include
+#include "lm/context_manager.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -23,9 +23,9 @@ public:
     
     // Train the model with a dataset
     void train(const TrainingDataset& dataset, 
-           size_t num_epochs = 50, 
-           float learning_rate = 0.01f,
-           const std::string& resume_checkpoint = "");
+               size_t num_epochs = 50, 
+               float learning_rate = 0.001f, // Reduced default
+               const std::string& resume_checkpoint = "");
 
     // Generate a response
     std::string generate_response(const std::string& user_input);
@@ -47,6 +47,11 @@ public:
     std::string find_latest_checkpoint() const;
     void set_checkpoint_interval(size_t interval) { checkpoint_interval_ = interval; }
 
+    // Training configuration
+    void set_gradient_clipping(float max_norm) { max_grad_norm_ = max_norm; }
+    void set_learning_rate_decay(float decay) { lr_decay_ = decay; }
+    void set_weight_decay(float decay) { weight_decay_ = decay; }
+
     inline size_t vocab_size() const {
         return transformer_->vocab_size();
     }
@@ -65,6 +70,11 @@ private:
     size_t max_response_length_ = 20;
     size_t checkpoint_interval_ = 10;
     
+    // Training configuration
+    float max_grad_norm_ = 1.0f;      // Gradient clipping
+    float lr_decay_ = 0.95f;          // Learning rate decay
+    float weight_decay_ = 0.01f;      // Weight decay for regularization
+    
     // Training metadata
     size_t training_epochs_ = 0;
     float best_loss_ = std::numeric_limits<float>::max();
@@ -72,7 +82,12 @@ private:
     
     // Helper method for timestamps
     std::string get_current_timestamp() const;
+    
+    // Improved training helpers
+    float calculate_learning_rate(size_t epoch, size_t total_epochs, float base_lr) const;
+    bool validate_training_example(const std::vector<TokenID>& input, 
+                                  const std::vector<TokenID>& target) const;
+    void apply_gradient_clipping(); // Assuming transformer has access to gradients
 };
 
 } // namespace lm
-

@@ -85,12 +85,18 @@ add_library(lm_core INTERFACE)
 target_include_directories(lm_core INTERFACE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
 
+# Configuration management library
+add_library(lm_config STATIC
+    src/config_manager.cpp
+)
+target_link_libraries(lm_config PUBLIC lm_core)
+
 # Tokenizer library
 add_library(lm_tokenizer STATIC
     src/tokenizer/bpe_tokenizer.cpp
     src/tokenizer/unicode_utils.cpp
 )
-target_link_libraries(lm_tokenizer PUBLIC lm_core ICU::uc ICU::i18n ${EIGEN3_LIBRARIES})
+target_link_libraries(lm_tokenizer PUBLIC lm_core lm_config ICU::uc ICU::i18n ${EIGEN3_LIBRARIES})
 
 # Optimizers library
 add_library(lm_optimizers STATIC
@@ -104,10 +110,6 @@ add_library(lm_models STATIC
     src/context/context_manager.cpp  # Add this line
 )
 target_link_libraries(lm_models PUBLIC lm_core lm_optimizers lm_tokenizer)
-
-#add_library(lm_core INTERFACE)
-#target_include_directories(lm_core INTERFACE ${CMAKE_SOURCE_DIR}/include)
-#target_link_libraries(lm_core INTERFACE Eigen3::Eigen)
 
 # Add TensorPool as part of the core library
 target_sources(lm_core INTERFACE
@@ -171,7 +173,15 @@ add_library(lm_alpha STATIC
     src/alpha/config_io.cpp
     src/alpha/repl.cpp
 )
-target_link_libraries(lm_alpha PUBLIC lm_core lm_runtime lm_conversation lm_models)
+target_link_libraries(lm_alpha PUBLIC lm_core lm_runtime lm_conversation lm_models lm_config)
+
+# Training library
+add_library(lm_training STATIC
+    src/training/trainer.cpp
+    src/training/data_loader.cpp
+    src/training/losses.cpp
+)
+target_link_libraries(lm_training PUBLIC lm_models lm_optimizers lm_tokenizer lm_config)
 
 # Test executables
 add_executable(performance_test tests/performance_test.cpp)
@@ -306,19 +316,20 @@ target_link_libraries(interactive_learning_convo
     lm_tokenizer
     lm_training
     lm_generation
+    lm_config  # Add config manager
     lm_core
     Threads::Threads  # Add threading support
 )
 
-add_library(lm_training STATIC
-    src/training/trainer.cpp
-    src/training/data_loader.cpp
-    src/training/losses.cpp
-)
-
-target_link_libraries(lm_training PUBLIC lm_models lm_optimizers lm_tokenizer)
 add_executable(test_tensor_pool tests/test_tensor_pool.cpp)
 target_link_libraries(test_tensor_pool
+    lm_core
+)
+
+# Add test for config manager
+add_executable(test_config_manager tests/test_config_manager.cpp)
+target_link_libraries(test_config_manager
+    lm_config
     lm_core
 )
 
