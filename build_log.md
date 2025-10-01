@@ -30,8 +30,11 @@ efficient. Added a vectorhash struct to effeiciently manipulate them as well.
 
 ### 9/16/2025 – Incremental tokenizer/inference improvements, just little dabs here and there.
 
-### 9/17/2025 – Epochal (cyclic) training implemented and seems to be working well. Speed still fairly limited given development is on a linux. Next step is a Window port to I can take advantage of my GPU. I debated several options, including a rebuild of my host pc and install a dual-boot situation, but I really like my rig as it is, so its a windows version of “Monster Baby” (new working title) so as to be able to take advantage of my laptop’s on-board AMD GPU. Run the “starter_convo” to see the training in action.
+### 9/17/2025 – Epochal (cyclic) training implemented and seems to be working well.
+Speed still fairly limited given development is on a linux. Next step is a Window port to I can take advantage of my GPU. I debated several options, including a rebuild of my host pc and install a dual-boot situation, but I really like my rig as it is, so its a windows version of “Monster Baby” (new working title) so as to be able to take advantage of my laptop’s on-board AMD GPU. Run the “starter_convo” to see the training in action.
 
-### 9/25/2025 – Added a new training driver “interactive_learning_convo”, besides holding interactive dialogues with the user it will also train the framework with a canned file of phrases, simply pass the “/interact <filename>” switch to the prompt and the framework will auto-train. Here’s the problem: after a minute of training the application with spew core. I’m suspecting a flaw in the Eigen libraries. Still tracing it down. Still chasing it down.
+### 9/25/2025 – Added a new training driver “interactive_learning_convo”,
+besides holding interactive dialogues with the user it will also train the framework with a canned file of phrases, simply pass the “/interact <filename>” switch to the prompt and the framework will auto-train. Here’s the problem: after a minute of training the application with spew core. I’m suspecting a flaw in the Eigen libraries. Still tracing it down. Still chasing it down.
 
-### 9/20/2025 – Got tired of re-building every time I wanted to change a parameter so I’ve added a configuration manager class that reads in an .ini-style file to get the tensor folding parameters.
+### 9/20/2025 – Got tired of re-building every time I wanted to change a parameter
+so I’ve added a configuration manager class that reads in an .ini-style file to get the tensor folding parameters.
